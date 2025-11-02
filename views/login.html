@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UNIRED - Iniciar Sesión</title>
+  </head>
+  <link rel="stylesheet" href="login.css" />
+  <body>
+    <div class="container">
+      <div class="logo-container">
+        <div class="logo">
+          <img src="logoUnired.png" alt="UNIRED Logo" />
+        </div>
+      </div>
+
+      <h1>INICIAR SESIÓN</h1>
+
+      <form>
+        <div class="form-group">
+          <input type="email" placeholder="Correo electronico" required />
+        </div>
+
+        <div class="form-group password-field">
+          <input
+            type="password"
+            id="password"
+            placeholder="Contraseña"
+            required
+          />
+          <span class="eye-icon" onclick="togglePassword()">👁️</span>
+        </div>
+
+        <div class="register-link">
+          ¿Eres un nuevo usuario? <a href="#">Registrarse</a>
+        </div>
+
+        <button type="submit">Iniciar sesion</button>
+      </form>
+    </div>
+
+    <script>
+      function togglePassword() {
+        const passwordField = document.getElementById("password");
+        if (passwordField.type === "password") {
+          passwordField.type = "text";
+        } else {
+          passwordField.type = "password";
+        }
+      }
+    </script>
+  </body>
+</html>
