@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNIRED - Perfil de Usuario</title>
+   <link rel="stylesheet" href="/assets/styles/styles.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-container">
+            <div class="logo">
+                <img src="/assets/images/logoUnired.png" alt="UNIRED Logo">
+            </div>
+        </div>
+        
+        <div class="menu-item">
+            <span class="menu-icon">📊</span>
+            <span>Noticias publicadas</span>
+        </div>
+        
+        <div class="menu-item">
+            <span class="menu-icon">📁</span>
+            <span>Mis Publicaciones</span>
+        </div>
+        
+        <div class="menu-item">
+            <span class="menu-icon">👥</span>
+            <span>Grupos</span>
+        </div>
+        
+        <div class="menu-item active">
+            <span class="menu-icon">👤</span>
+            <span>Perfil</span>
+        </div>
+        
+        <div class="menu-item">
+            <span class="menu-icon">📄</span>
+            <span>Crear una nota</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="content-wrapper">
+            <div class="profile-section">
+            <div class="profile-photo"></div>
+            <h2 class="profile-name">Manuel Orozco</h2>
+            <p class="profile-bio">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.
+            </p>
+            
+            <div class="stats-container">
+                <div class="stat">
+                    <div class="stat-number">2,100</div>
+                    <div class="stat-label">Amigos</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">187</div>
+                    <div class="stat-label">Me gusta</div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary">Editar perfil</button>
+                <button class="btn btn-secondary">Encontrar amigos</button>
+            </div>
+        </div>
+
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-user">
+                    <div class="post-avatar"></div>
+                    <div class="post-user-info">
+                        <h3>Manuel Orozco</h3>
+                        <div class="post-date">Publicado el: 12/03/2025</div>
+                    </div>
+                </div>
+                <div class="post-menu" onclick="toggleMenu(event, 'menu1')">
+                    ⋮
+                    <div class="post-menu-modal" id="menu1">
+                        <div class="menu-option delete">Eliminar</div>
+                        <div class="menu-option">Editar</div>
+                        <div class="menu-option">Cancelar</div>
+                    </div>
+                </div>
+            </div>
+            
+            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=300&fit=crop" alt="Paisaje" class="post-image">
+            
+            <p class="post-text">
+                Dento habitasse dictum tristique masuada eius. Ut rutrum erat eget lorem velit. Eget lorem velit rutrum amet non est. Quisque que amet tellus aliquam euismod. Consectetur suscipit suscipit sed tempor bibendum volutpat magna amet arci accumsan. Vulputate pede que amet arci suscipit sed.
+            </p>
+            
+            <div class="post-actions">
+                <button class="action-btn">❤️ 245 Me gusta</button>
+                <button class="action-btn">💬</button>
+            </div>
+            
+            <div class="comments-section">
+                <h4 style="margin-bottom: 15px; font-size: 15px;">Comentarios</h4>
+                
+                <div class="comment">
+                    <div class="comment-header">Gabriel Hernández: Eres publicista o dentista</div>
+                    <div class="comment-date">Hace 2 hrs • 5 de diciembre</div>
+                </div>
+                
+                <div class="comment">
+                    <div class="comment-header">Manuel Orozco: Soy publicista o tecnicista</div>
+                    <div class="comment-date">Hace 2 hrs • 5 de diciembre</div>
+                </div>
+                
+                <div class="comment-input-container">
+                    <input type="text" class="comment-input" placeholder="Comentar">
+                    <button class="comment-submit">Publicar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="post-card">
+            <div class="post-header">
+                <div class="post-user">
+                    <div class="post-avatar"></div>
+                    <div class="post-user-info">
+                        <h3>Manuel Orozco</h3>
+                        <div class="post-date">Publicado el: 7/2/2025</div>
+                    </div>
+                </div>
+                <div class="post-menu" onclick="toggleMenu(event, 'menu2')">
+                    ⋮
+                    <div class="post-menu-modal" id="menu2">
+                        <div class="menu-option delete">Eliminar</div>
+                        <div class="menu-option">Editar</div>
+                        <div class="menu-option">Cancelar</div>
+                    </div>
+                </div>
+            </div>
+            
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=300&fit=crop" alt="Motocicleta" class="post-image">
+            
+            <p class="post-text">
+                Dento habitasse dictum tristique masuada eius. Ut rutrum erat eget lorem velit. Eget lorem velit rutrum amet non est. Quisque que amet tellus aliquam euismod. Consectetur suscipit suscipit sed tempor bibendum volutpat magna amet arci accumsan. Vulputate pede que amet arci suscipit sed.
+            </p>
+            
+            <div class="post-actions">
+                <button class="action-btn">❤️ 391 Me gusta</button>
+                <button class="action-btn">💬</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu(event, menuId) {
+            event.stopPropagation();
+            const menu = document.getElementById(menuId);
+            const allMenus = document.querySelectorAll('.post-menu-modal');
+            
+            // Cerrar todos los menús
+            allMenus.forEach(m => {
+                if (m.id !== menuId) {
+                    m.classList.remove('active');
+                }
+            });
+            
+            // Toggle el menú actual
+            menu.classList.toggle('active');
+        }
+
+        // Cerrar menús al hacer clic fuera
+        document.addEventListener('click', function() {
+            const allMenus = document.querySelectorAll('.post-menu-modal');
+            allMenus.forEach(m => m.classList.remove('active'));
+        });
+    </script>
+</body>
+</html>
