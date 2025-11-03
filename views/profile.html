@@ -61,12 +61,13 @@
             </div>
             
             <div class="action-buttons">
-                <button class="btn btn-primary">Editar perfil</button>
-                <button class="btn btn-secondary">Encontrar amigos</button>
+                <a href="editProfile.html">
+                    <button class="btn btn-primary">Editar perfil</button>
+                </a>
             </div>
         </div>
 
-        <div class="post-card">
+        <div class="post-card" data-post-id="post-1">
             <div class="post-header">
                 <div class="post-user">
                     <div class="post-avatar"></div>
@@ -78,7 +79,7 @@
                 <div class="post-menu" onclick="toggleMenu(event, 'menu1')">
                     ⋮
                     <div class="post-menu-modal" id="menu1">
-                        <div class="menu-option delete">Eliminar</div>
+                        <div class="menu-option delete" onclick="abrirModalConfirmacion(this)">Eliminar</div>
                         <div class="menu-option">Editar</div>
                         <div class="menu-option">Cancelar</div>
                     </div>
@@ -116,7 +117,7 @@
             </div>
         </div>
 
-        <div class="post-card">
+        <div class="post-card" data-post-id="post-2">
             <div class="post-header">
                 <div class="post-user">
                     <div class="post-avatar"></div>
@@ -128,7 +129,7 @@
                 <div class="post-menu" onclick="toggleMenu(event, 'menu2')">
                     ⋮
                     <div class="post-menu-modal" id="menu2">
-                        <div class="menu-option delete">Eliminar</div>
+                        <div class="menu-option delete" onclick="abrirModalConfirmacion(this)">Eliminar</div>
                         <div class="menu-option">Editar</div>
                         <div class="menu-option">Cancelar</div>
                     </div>
@@ -147,29 +148,15 @@
             </div>
         </div>
     </div>
+    <dialog id="confirm-delete-modal">
+        <h3>Confirmar Eliminación</h3>
+        <p>¿Estás seguro de que quieres eliminar esta publicación? Esta acción no se puede deshacer.</p>
 
-    <script>
-        function toggleMenu(event, menuId) {
-            event.stopPropagation();
-            const menu = document.getElementById(menuId);
-            const allMenus = document.querySelectorAll('.post-menu-modal');
-            
-            // Cerrar todos los menús
-            allMenus.forEach(m => {
-                if (m.id !== menuId) {
-                    m.classList.remove('active');
-                }
-            });
-            
-            // Toggle el menú actual
-            menu.classList.toggle('active');
-        }
-
-        // Cerrar menús al hacer clic fuera
-        document.addEventListener('click', function() {
-            const allMenus = document.querySelectorAll('.post-menu-modal');
-            allMenus.forEach(m => m.classList.remove('active'));
-        });
-    </script>
+        <form method="dialog" style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button value="cancel">Cancelar</button>
+            <button value="confirm" class="btn-danger">Eliminar</button>
+        </form>
+    </dialog>
+  <script src="/main.js"></script>
 </body>
 </html>

@@ -16,15 +16,16 @@
 
       <h1>INICIAR SESIÓN</h1>
 
-      <form>
+      <form method="post" action="../controllers/authController.php">
         <div class="form-group">
-          <input type="email" placeholder="Correo electronico" required />
+          <input type="email" placeholder="Correo electronico" name="email" required />
         </div>
 
         <div class="form-group password-field">
           <input
             type="password"
             id="password"
+            name="password"
             placeholder="Contraseña"
             required
           />
