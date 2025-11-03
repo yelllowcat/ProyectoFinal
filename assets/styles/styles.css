@@ -231,9 +231,16 @@ body {
     color: white;
 }
 
+.btn-delete-post {
+    background: #d93025;
+    color: white;
+
+}
+
 .btn-save {
     background-color: #4db8c4;
     color: white;
+
 }
 
 .post-card {
