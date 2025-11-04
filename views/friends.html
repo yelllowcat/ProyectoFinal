@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNIRED - Amigos</title>
-    <link rel="stylesheet" href="/assets/styles/styles.css">
+    <link rel="stylesheet" href="../assets/styles/styles.css">
 </head>
 <body>
     <div class="sidebar">
         <div class="logo-container">
             <div class="logo">
-                <img src="/assets/images/logoUnired.png" alt="UNIRED Logo">
+                <img src="../assets/images/logoUnired.png" alt="UNIRED Logo">
             </div>
         </div>
         
@@ -19,20 +19,20 @@
             <span>Nueva publicación</span>
         </div>
         
-        <div class="menu-item">
+        <a href="posts.html" class="menu-item">
             <span class="menu-icon">📄</span>
             <span>Publicaciones</span>
-        </div>
+        </a>
         
         <div class="menu-item active">
             <span class="menu-icon">👥</span>
             <span>Amigos</span>
         </div>
         
-        <div class="menu-item">
+        <a href="profile.html" class="menu-item">
             <span class="menu-icon">👤</span>
             <span>Perfil</span>
-        </div>
+        </a>
         
         <div class="menu-item">
             <span class="menu-icon">🚪</span>
@@ -51,8 +51,12 @@
 
                 <div class="friends-tabs">
                     <div class="tab active">Todos los amigos</div>
-                    <div class="tab">Solicitudes</div>
-                    <div class="tab">Enviar solicitud</div>
+                    <a href="friendReqs.html">
+                        <div class="tab">Solicitudes</div>
+                    </a>
+                    <a href="sendReqs.html">
+                        <div class="tab">Enviar solicitud</div>
+                    </a>
                 </div>
             </div>
 
