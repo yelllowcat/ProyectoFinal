@@ -1,3 +1,11 @@
+<?php
+if (!isLoggedIn()) {
+    header('Location: /login');
+    exit();
+}
+$currentUser = getCurrentUser();
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -50,10 +58,10 @@
                 </div>
 
                 <div class="friends-tabs">
-                    <a href="friends.html">
+                    <a href="/friends">
                         <div class="tab">Todos los amigos</div>
                     </a>
-                    <a href="friendReqs.html">
+                    <a href="/friendReqs">
                         <div class="tab">Solicitudes</div>
                     </a>
                     <div class="tab active">Enviar solicitud</div>

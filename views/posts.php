@@ -24,20 +24,19 @@
             <span>Publicaciones</span>
         </div>
         
-        <div class="menu-item">
+        <a href="/friends" class="menu-item">
             <span class="menu-icon">👥</span>
             <span>Amigos</span>
-        </div>
-        
-        <div class="menu-item">
+        </a>
+        <a href="/profile" class="menu-item">
             <span class="menu-icon">👤</span>
             <span>Perfil</span>
-        </div>
+        </a>
         
-        <div class="menu-item">
+        <a href="/logout" class="menu-item">
             <span class="menu-icon">🚪</span>
             <span>Cerrar sesión</span>
-        </div>
+        </a>
     </div>
 
     <div class="main-content">
@@ -136,6 +135,5 @@
             </div>
         </div>
     </div>
-    <img src="/assets/images/squarePlus.png" alt="squarePlus" class="square-plus">
 </body>
 </html>

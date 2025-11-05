@@ -14,19 +14,19 @@
         </div>
       </div>
 
-      <a href="#" class="menu-item">
+      <a href="/newPost" class="menu-item">
         <span class="menu-icon">➕</span> Nueva publicación
       </a>
-      <a href="#" class="menu-item">
+      <a href="/posts" class="menu-item">
         <span class="menu-icon">📰</span> Publicaciones
       </a>
-      <a href="#" class="menu-item">
+      <a href="/friends" class="menu-item">
         <span class="menu-icon">👥</span> Amigos
       </a>
-      <a href="#" class="menu-item active">
+      <a href="/profile" class="menu-item active">
         <span class="menu-icon">👤</span> Perfil
       </a>
-      <a href="#" class="menu-item">
+      <a href="/logout" class="menu-item">
         <span class="menu-icon">🚪</span> Cerrar sesión
       </a>
     </div>

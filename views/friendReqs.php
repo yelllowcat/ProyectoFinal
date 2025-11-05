@@ -19,7 +19,7 @@
             <span>Nueva publicación</span>
         </div>
         
-        <a href="posts.html" class="menu-item">
+        <a href="/posts" class="menu-item">
             <span class="menu-icon">📄</span>
             <span>Publicaciones</span>
         </a>
@@ -29,7 +29,7 @@
             <span>Amigos</span>
         </div>
         
-        <a href="profile.html" class="menu-item">
+        <a href="/profile" class="menu-item">
             <span class="menu-icon">👤</span>
             <span>Perfil</span>
         </a>
@@ -50,11 +50,11 @@
                 </div>
 
                 <div class="friends-tabs">
-                    <a href="friends.html">
+                    <a href="/friends">
                         <div class="tab">Todos los amigos</div>
                     </a>
                         <div class="tab active">Solicitudes</div>
-                    <a href="sendReqs.html">
+                    <a href="/sendReqs">
                         <div class="tab">Enviar solicitud</div>
                     </a>
                 </div>

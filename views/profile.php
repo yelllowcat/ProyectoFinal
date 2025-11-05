@@ -19,12 +19,12 @@
             <span>Nueva publicación</span>
         </div>
         
-        <a href="posts.html" class="menu-item">
+        <a href="/posts" class="menu-item">
             <span class="menu-icon">📄</span>
             <span>Publicaciones</span>
         </a>
         
-        <a href="friends.html" class="menu-item">
+        <a href="/friends" class="menu-item">
             <span class="menu-icon">👥</span>
             <span>Amigos</span>
         </a>
@@ -61,7 +61,7 @@
             </div>
             
             <div class="action-buttons">
-                <a href="editProfile.html">
+                <a href="/editProfile">
                     <button class="btn btn-primary">Editar perfil</button>
                 </a>
             </div>

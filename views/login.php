@@ -16,7 +16,7 @@
 
       <h1>INICIAR SESIÓN</h1>
 
-      <form method="post" action="../controllers/authController.php">
+      <form method="post" action="/login">
         <div class="form-group">
           <input type="email" placeholder="Correo electronico" name="email" required />
         </div>
@@ -33,7 +33,7 @@
         </div>
 
         <div class="register-link">
-          ¿Eres un nuevo usuario? <a href="register.html">Registrarse</a>
+          ¿Eres un nuevo usuario? <a href="/register">Registrarse</a>
         </div>
 
         <button type="submit">Iniciar sesion</button>

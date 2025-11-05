@@ -16,13 +16,13 @@
 
       <h1>REGISTRO</h1>
 
-      <form>
+      <form action="/register" method="POST">
         <div class="form-group">
-          <input type="text" placeholder="Nombre de usuario" required />
+          <input type="text" placeholder="Nombre de usuario" name="name" required />
         </div>
 
         <div class="form-group">
-          <input type="email" placeholder="Correo electronico" required />
+          <input type="email" placeholder="Correo electronico" name="email" required />
         </div>
 
         <div class="form-group password-field">
@@ -30,6 +30,7 @@
             type="password"
             id="password"
             placeholder="Contraseña"
+            name="password"
             required
           />
           <span class="eye-icon" onclick="togglePassword('password')">👁️</span>
@@ -40,6 +41,7 @@
             type="password"
             id="confirm-password"
             placeholder="Confirmar Contraseña"
+            name="confirm-password"
             required
           />
           <span class="eye-icon" onclick="togglePassword('confirm-password')"
@@ -48,7 +50,7 @@
         </div>
 
         <div class="login-link">
-          ¿Ya tienes una cuenta? <a href="login.html">Iniciar Sesión</a>
+          ¿Ya tienes una cuenta? <a href="/login">Iniciar Sesión</a>
         </div>
 
         <button type="submit">Registarte</button>
