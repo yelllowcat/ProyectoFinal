@@ -113,7 +113,7 @@ $router->add('GET', '/profile/:id', function($id) {
     }
 });
 
-$router->add('GET', '/edit-profile', function() {
+$router->add('GET', '/editProfile', function() {
     requireAuth();
     if (file_exists('views/editProfile.php')) {
         require 'views/editProfile.php';

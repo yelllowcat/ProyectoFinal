@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNIRED - Perfil de Usuario</title>
-   <link rel="stylesheet" href="../assets/styles/styles.css">
+   <link rel="stylesheet" href="/assets/styles/styles.css">
 </head>
 <body>
     <div class="sidebar">
         <div class="logo-container">
             <div class="logo">
-                <img src="../assets/images/logoUnired.png" alt="UNIRED Logo">
+                <img src="/assets/images/logoUnired.png" alt="UNIRED Logo">
             </div>
         </div>
         
@@ -67,7 +67,7 @@
             </div>
         </div>
 
-        <div class="post-card" data-post-id="post-1">
+        <div class="post-card post-container" data-post-id="post-1">
             <div class="post-header">
                 <div class="post-user">
                     <div class="post-avatar"></div>
@@ -77,7 +77,7 @@
                     </div>
                 </div>
                 <div class="post-menu" onclick="toggleMenu(event, 'menu1')">
-                    ⋮
+                    <img src="/assets/images/more.png" alt="more options" width="25">
                     <div class="post-menu-modal" id="menu1">
                         <div class="menu-option delete" onclick="abrirModalConfirmacion(this)">Eliminar</div>
                         <div class="menu-option">Editar</div>
@@ -93,11 +93,16 @@
             </p>
             
             <div class="post-actions">
-                <button class="action-btn">❤️ 245 Me gusta</button>
-                <button class="action-btn">💬</button>
+                <button class="action-btn" onclick="handleLike(this)">
+                   <img src="/assets/images/heartOutline.png" alt="heart icon" width="25">   
+                245 Me gusta</button>
+                <button class="action-btn comments" onclick="toggleComments(this)">
+                    <img src="/assets/images/comments.png" alt="comments icon" width="25">
+                    12 comentarios
+                </button>
             </div>
             
-            <div class="comments-section">
+            <div class="comments-section hidden">
                 <h4 style="margin-bottom: 15px; font-size: 15px;">Comentarios</h4>
                 
                 <div class="comment">
@@ -111,13 +116,13 @@
                 </div>
                 
                 <div class="comment-input-container">
-                    <input type="text" class="comment-input" placeholder="Comentar">
-                    <button class="comment-submit">Publicar</button>
+                    <input type="text" class="comment-input" placeholder="Comentar" onkeypress="handleCommentKeyPress(event, this.nextElementSibling)">
+                    <button class="comment-submit" onclick="addComment(this)">Publicar</button>
                 </div>
             </div>
         </div>
 
-        <div class="post-card" data-post-id="post-2">
+        <div class="post-card post-container" data-post-id="post-2">
             <div class="post-header">
                 <div class="post-user">
                     <div class="post-avatar"></div>
@@ -127,7 +132,7 @@
                     </div>
                 </div>
                 <div class="post-menu" onclick="toggleMenu(event, 'menu2')">
-                    ⋮
+                    <img src="/assets/images/more.png" alt="more options" width="25">
                     <div class="post-menu-modal" id="menu2">
                         <div class="menu-option delete" onclick="abrirModalConfirmacion(this)">Eliminar</div>
                         <div class="menu-option">Editar</div>
@@ -143,8 +148,32 @@
             </p>
             
             <div class="post-actions">
-                <button class="action-btn">❤️ 391 Me gusta</button>
-                <button class="action-btn">💬</button>
+                <button class="action-btn" onclick="handleLike(this)">
+                    <img src="/assets/images/heartOutline.png" alt="heart icon" width="25">
+                    391 Me gusta
+                </button>
+                <button class="action-btn comments" onclick="toggleComments(this)">
+                    <img src="/assets/images/comments.png" alt="comments icon" width="25">
+                    4 Comentarios
+                </button>
+            </div>
+             <div class="comments-section hidden">
+                <h4 style="margin-bottom: 15px; font-size: 15px;">Comentarios</h4>
+                
+                <div class="comment">
+                    <div class="comment-header">Gabriel Hernández: Eres publicista o dentista</div>
+                    <div class="comment-date">Hace 2 hrs • 5 de diciembre</div>
+                </div>
+                
+                <div class="comment">
+                    <div class="comment-header">Manuel Orozco: Soy publicista o tecnicista</div>
+                    <div class="comment-date">Hace 2 hrs • 5 de diciembre</div>
+                </div>
+                
+                <div class="comment-input-container">
+                    <input type="text" class="comment-input" placeholder="Comentar" onkeypress="handleCommentKeyPress(event, this.nextElementSibling)">
+                    <button class="comment-submit" onclick="addComment(this)">Publicar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -157,6 +186,6 @@
             <button value="confirm" class="btn-danger">Eliminar</button>
         </form>
     </dialog>
-  <script src="../main.js"></script>
+  <script src="/main.js"></script>
 </body>
 </html>

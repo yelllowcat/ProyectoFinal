@@ -41,7 +41,8 @@
 
     <div class="main-content">
         <div class="feed-container">
-            <div class="feed-post-card">
+            
+            <div class="feed-post-card post-container">
                 <div class="feed-post-header">
                     <div class="feed-post-user">
                         <div class="feed-post-avatar"></div>
@@ -50,7 +51,14 @@
                             <div class="feed-post-date">Publicado el: 18/03/2025</div>
                         </div>
                     </div>
-                    <div class="feed-post-menu">⋮</div>
+                    <div class="feed-post-menu" onclick="toggleMenu(event, 'menu1')">
+                        <img src="/assets/images/more.png" alt="more options" width="25">
+                        <div class="post-menu-modal" id="menu1">
+                            <div class="menu-option delete" onclick="abrirModalConfirmacion(this)">Eliminar</div>
+                            <div class="menu-option">Editar</div>
+                            <div class="menu-option">Cancelar</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="feed-post-image">
@@ -62,17 +70,36 @@
                 </p>
 
                 <div class="feed-post-actions">
-                    <button class="feed-action-btn liked">
-                        ❤️ <span>200 Me gusta</span>
+                    <button class="action-btn" onclick="handleLike(this)">
+                        <img src="/assets/images/heartOutline.png" alt="heart icon" width="25">
+                        200 Me gusta
                     </button>
-                    <button class="feed-action-btn">
-                        💬 <span>20 Comentarios</span>
+                    <button class="action-btn comments" onclick="toggleComments(this)">
+                        <img src="/assets/images/comments.png" alt="comments icon" width="25">
+                        20 Comentarios
                     </button>
-                    <div class="fullscreen-btn">⛶</div>
                 </div>
+                <div class="comments-section hidden">
+                <h4 style="margin-bottom: 15px; font-size: 15px;">Comentarios</h4>
+                
+                <div class="comment">
+                    <div class="comment-header">Gabriel Hernández: Eres publicista o dentista</div>
+                    <div class="comment-date">Hace 2 hrs • 5 de diciembre</div>
+                </div>
+                
+                <div class="comment">
+                    <div class="comment-header">Manuel Orozco: Soy publicista o tecnicista</div>
+                    <div class="comment-date">Hace 2 hrs • 5 de diciembre</div>
+                </div>
+                
+                <div class="comment-input-container">
+                    <input type="text" class="comment-input" placeholder="Comentar" onkeypress="handleCommentKeyPress(event, this.nextElementSibling)">
+                    <button class="comment-submit" onclick="addComment(this)">Publicar</button>
+                </div>
+            </div>                
             </div>
 
-            <div class="feed-post-card">
+            <div class="feed-post-card post-container">
                 <div class="feed-post-header">
                     <div class="feed-post-user">
                         <div class="feed-post-avatar"></div>
@@ -81,7 +108,14 @@
                             <div class="feed-post-date">Publicado el: 10/03/2025</div>
                         </div>
                     </div>
-                    <div class="feed-post-menu">⋮</div>
+                    <div class="feed-post-menu" onclick="toggleMenu(event, 'menu2')">
+                        <img src="/assets/images/more.png" alt="more options" width="25">
+                        <div class="post-menu-modal" id="menu2">
+                            <div class="menu-option delete" onclick="abrirModalConfirmacion(this)">Eliminar</div>
+                            <div class="menu-option">Editar</div>
+                            <div class="menu-option">Cancelar</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="feed-post-image">
@@ -93,17 +127,36 @@
                 </p>
 
                 <div class="feed-post-actions">
-                    <button class="feed-action-btn liked">
-                        ❤️ <span>160 Me gusta</span>
+                    <button class="action-btn" onclick="handleLike(this)">
+                        <img src="/assets/images/heartOutline.png" alt="heart icon" width="25">
+                        391 Me gusta
                     </button>
-                    <button class="feed-action-btn">
-                        💬 <span>30 Comentarios</span>
+                    <button class="action-btn comments" onclick="toggleComments(this)">
+                        <img src="/assets/images/comments.png" alt="comments icon" width="25">
+                        12 Comentarios
                     </button>
-                    <div class="fullscreen-btn">⛶</div>
+                </div>
+                 <div class="comments-section hidden">
+                <h4 style="margin-bottom: 15px; font-size: 15px;">Comentarios</h4>
+                
+                <div class="comment">
+                    <div class="comment-header">Gabriel Hernández: Eres publicista o dentista</div>
+                    <div class="comment-date">Hace 2 hrs • 5 de diciembre</div>
+                </div>
+                
+                <div class="comment">
+                    <div class="comment-header">Manuel Orozco: Soy publicista o tecnicista</div>
+                    <div class="comment-date">Hace 2 hrs • 5 de diciembre</div>
+                </div>
+                
+                <div class="comment-input-container">
+                    <input type="text" class="comment-input" placeholder="Comentar" onkeypress="handleCommentKeyPress(event, this.nextElementSibling)">
+                    <button class="comment-submit" onclick="addComment(this)">Publicar</button>
                 </div>
             </div>
+            </div>
 
-            <div class="feed-post-card">
+            <div class="feed-post-card post-container">
                 <div class="feed-post-header">
                     <div class="feed-post-user">
                         <div class="feed-post-avatar"></div>
@@ -112,7 +165,14 @@
                             <div class="feed-post-date">Publicado el: 05/03/2025</div>
                         </div>
                     </div>
-                    <div class="feed-post-menu">⋮</div>
+                    <div class="feed-post-menu" onclick="toggleMenu(event, 'menu3')">
+                        <img src="/assets/images/more.png" alt="more options" width="25">
+                        <div class="post-menu-modal" id="menu3">
+                            <div class="menu-option delete" onclick="abrirModalConfirmacion(this)">Eliminar</div>
+                            <div class="menu-option">Editar</div>
+                            <div class="menu-option">Cancelar</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="feed-post-image">
@@ -124,16 +184,36 @@
                 </p>
 
                 <div class="feed-post-actions">
-                    <button class="feed-action-btn">
-                        🤍 <span>95 Me gusta</span>
+                    <button class="action-btn" onclick="handleLike(this)">
+                        <img src="/assets/images/heartOutline.png" alt="heart icon" width="25">
+                        95 Me gusta
                     </button>
-                    <button class="feed-action-btn">
-                        💬 <span>12 Comentarios</span>
+                    <button class="action-btn comments" onclick="toggleComments(this)">
+                        <img src="/assets/images/comments.png" alt="comments icon" width="25">
+                        12 Comentarios
                     </button>
-                    <div class="fullscreen-btn">⛶</div>
                 </div>
+                <div class="comments-section hidden">
+                <h4 style="margin-bottom: 15px; font-size: 15px;">Comentarios</h4>
+                
+                <div class="comment">
+                    <div class="comment-header">Gabriel Hernández: Eres publicista o dentista</div>
+                    <div class="comment-date">Hace 2 hrs • 5 de diciembre</div>
+                </div>
+                
+                <div class="comment">
+                    <div class="comment-header">Manuel Orozco: Soy publicista o tecnicista</div>
+                    <div class="comment-date">Hace 2 hrs • 5 de diciembre</div>
+                </div>
+                
+                <div class="comment-input-container">
+                    <input type="text" class="comment-input" placeholder="Comentar" onkeypress="handleCommentKeyPress(event, this.nextElementSibling)">
+                    <button class="comment-submit" onclick="addComment(this)">Publicar</button>
+                </div>
+            </div>
             </div>
         </div>
     </div>
+    <script src="/main.js"></script>
 </body>
 </html>

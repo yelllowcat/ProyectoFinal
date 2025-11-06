@@ -43,7 +43,7 @@ class Router {
         
         $this->notFound();
     }
-    
+
     /**
      * Convert route pattern to regex
      * @param string $pattern Route pattern like /profile/:id

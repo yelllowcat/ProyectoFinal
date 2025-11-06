@@ -370,7 +370,7 @@ body {
 .action-btn {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     background: none;
     border: none;
     cursor: pointer;
@@ -382,10 +382,24 @@ body {
     color: #4db8c4;
 }
 
+.action-btn img {
+    transition: opacity 0.2s ease;
+    vertical-align: middle;
+}
+
+.action-btn:hover img {
+    opacity: 0.8;
+}
+
+
 .comments-section {
     margin-top: 15px;
     padding-top: 15px;
     border-top: 1px solid #f0f0f0;
+}
+
+.comments-section.hidden {
+    display: none;
 }
 
 .comment {
@@ -436,6 +450,42 @@ body {
     border-radius: 20px;
     cursor: pointer;
     font-size: 14px;
+}
+
+.comment {
+    transition: all 0.3s ease;
+}
+
+.comment-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+}
+
+.comment-input:focus {
+    border-color: #4db8c4;
+}
+
+.comment-submit {
+    padding: 10px 20px;
+    background-color: #4db8c4;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.comment-submit:hover {
+    background-color: #3da3af;
+}
+
+.comment-submit:active {
+    transform: scale(0.98);
 }
 
 .edit-section {
