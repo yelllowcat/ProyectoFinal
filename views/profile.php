@@ -79,7 +79,7 @@
                 <div class="post-menu" onclick="toggleMenu(event, 'menu1')">
                     <img src="/assets/images/more.png" alt="more options" width="25">
                     <div class="post-menu-modal" id="menu1">
-                        <div class="menu-option delete" onclick="abrirModalConfirmacion(this)">Eliminar</div>
+                        <div class="menu-option delete" onclick="openConfirmModal(this)">Eliminar</div>
                         <div class="menu-option">Editar</div>
                         <div class="menu-option">Cancelar</div>
                     </div>
@@ -134,8 +134,8 @@
                 <div class="post-menu" onclick="toggleMenu(event, 'menu2')">
                     <img src="/assets/images/more.png" alt="more options" width="25">
                     <div class="post-menu-modal" id="menu2">
-                        <div class="menu-option delete" onclick="abrirModalConfirmacion(this)">Eliminar</div>
-                        <div class="menu-option">Editar</div>
+                        <div class="menu-option delete" onclick="openConfirmModal(this)">Eliminar</div>
+                        <div class="menu-option" >Editar</div>
                         <div class="menu-option">Cancelar</div>
                     </div>
                 </div>
@@ -177,14 +177,20 @@
             </div>
         </div>
     </div>
-    <dialog id="confirm-delete-modal">
-        <h3>Confirmar Eliminación</h3>
-        <p>¿Estás seguro de que quieres eliminar esta publicación? Esta acción no se puede deshacer.</p>
+    <dialog id="confirm-delete-modal" class="confirm-dialog" aria-labelledby="confirm-delete-title">
+        <div class="confirm-box">
+            <div class="confirm-head">
+                <h3 id="confirm-delete-title">Confirmar eliminación</h3>
+                <p class="confirm-subtitle">¿Estás seguro/a de que deseas eliminar a <span class="friend-name">[Nombre del amigo]</span>?</p>
+            </div>
 
-        <form method="dialog" style="display: flex; justify-content: flex-end; gap: 10px;">
-            <button value="cancel">Cancelar</button>
-            <button value="confirm" class="btn-danger">Eliminar</button>
-        </form>
+            <div class="confirm-sep"></div>
+
+            <form method="dialog" class="confirm-actions">
+                <button value="confirm" class="confirm-delete">Eliminar</button>
+                <button value="cancel" class="confirm-cancel">Cancelar</button>
+            </form>
+        </div>
     </dialog>
   <script src="/main.js"></script>
 </body>

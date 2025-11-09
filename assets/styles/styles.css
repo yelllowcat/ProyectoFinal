@@ -991,6 +991,116 @@ body {
     opacity: 0.85;
 }
 
+#confirm-delete-modal,
+#confirm-delete-modal.confirm-dialog {
+    border: none;
+    padding: 0;
+    margin: 0;
+    position: fixed; /* make dialog cover viewport so we can center its content */
+    inset: 0; /* top:0; right:0; bottom:0; left:0; */
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    z-index: 9999;
+}
+
+#confirm-delete-modal::backdrop {
+    background: rgba(0,0,0,0.9);
+}
+
+.confirm-box {
+    width: 420px;
+    max-width: calc(100% - 40px);
+    background: #ffffff;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    font-family: inherit;
+    text-align: center;
+}
+
+/* Stronger rules for browsers that apply UA styles to dialog */
+#confirm-delete-modal[open] {
+    position: fixed !important;
+    inset: 0 !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.confirm-box { margin: 0 auto; }
+
+.confirm-head {
+    padding: 18px 22px 8px 22px;
+}
+
+.confirm-head h3 {
+    font-size: 20px;
+    margin-bottom: 6px;
+    color: #111;
+    font-weight: 600;
+}
+
+.confirm-subtitle {
+    font-size: 13px;
+    color: #333;
+    margin: 0 0 12px 0;
+}
+
+.confirm-sep {
+    height: 1px;
+    background: #d0d0d0;
+}
+
+.confirm-actions {
+    display: flex;
+    flex-direction: column;
+}
+
+.confirm-actions button {
+    background: transparent;
+    border: none;
+    padding: 14px 18px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.confirm-delete {
+    color: #d93025; 
+    border-top: 1px solid rgba(0,0,0,0.06);
+    font-weight: 600;
+}
+
+.confirm-cancel {
+    color: #000;
+    border-top: 1px solid rgba(0,0,0,0.06);
+    font-weight: 600;
+    padding-bottom: 18px;
+}
+.add-post-image-section {
+    display: flex;
+    justify-content: center;
+}
+.add-post-image{
+    width: 15%;
+}
+/* smaller screens */
+@media (max-width: 480px) {
+    .confirm-box { width: calc(100% - 30px); }
+    .confirm-head h3 { font-size: 18px; }
+    .confirm-actions button { font-size: 18px; }
+}
+
+
 @media (max-width: 768px) {
     .sidebar {
         width: 200px;
@@ -1039,3 +1149,4 @@ body {
         max-width: 100%;
     }
 }
+

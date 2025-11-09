@@ -13,16 +13,16 @@
                 <img src="../assets/images/logoUnired.png" alt="UNIRED Logo">
             </div>
         </div>
-        
-        <div class="menu-item">
+
+        <a href="/addPost" class="menu-item">
             <span class="menu-icon">➕</span>
             <span>Nueva publicación</span>
-        </div>
-        
-        <div class="menu-item active">
+        </a>
+
+        <a href="/posts" class="menu-item active">
             <span class="menu-icon">📄</span>
             <span>Publicaciones</span>
-        </div>
+        </a>
         
         <a href="/friends" class="menu-item">
             <span class="menu-icon">👥</span>
@@ -41,7 +41,6 @@
 
     <div class="main-content">
         <div class="feed-container">
-            
             <div class="feed-post-card post-container">
                 <div class="feed-post-header">
                     <div class="feed-post-user">
@@ -98,7 +97,6 @@
                 </div>
             </div>                
             </div>
-
             <div class="feed-post-card post-container">
                 <div class="feed-post-header">
                     <div class="feed-post-user">

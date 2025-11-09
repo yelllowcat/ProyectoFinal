@@ -131,6 +131,34 @@ $router->add('GET', '/friends', function() {
     }
 });
 
+$router->add('GET', '/sendReqs', function() {
+    requireAuth();
+    if (file_exists('views/sendReqs.php')) {
+        require 'views/sendReqs.php';
+    } else {
+        die("Error: views/sendReqs.php not found");
+    }
+});
+
+
+$router->add('GET', '/friendReqs', function() {
+    requireAuth();
+    if (file_exists('views/friendReqs.php')) {
+        require 'views/friendReqs.php';
+    } else {
+        die("Error: views/friendReqs.php not found");
+    }
+});
+
+$router->add('GET', '/addPost', function() {
+    requireAuth();
+    if (file_exists('views/addPost.php')) {
+        require 'views/addPost.php';
+    } else {
+        die("Error: views/addPost.php not found");
+    }
+});
+
 try {
     $router->dispatch();
 } catch (Exception $e) {
