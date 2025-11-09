@@ -159,6 +159,15 @@ $router->add('GET', '/addPost', function() {
     }
 });
 
+$router->add('GET', '/dashboard', function() {
+    requireAuth();
+    if (file_exists('views/admin/dashboard.php')) {
+        require 'views/admin/dashboard.php';
+    } else {
+        die("Error: views/admin/dashboard.php not found");
+    }
+});
+
 try {
     $router->dispatch();
 } catch (Exception $e) {
