@@ -7,39 +7,9 @@
     <link rel="stylesheet" href="../assets/styles/styles.css">
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo-container">
-            <div class="logo">
-                <img src="../assets/images/logoUnired.png" alt="UNIRED Logo">
-            </div>
-        </div>
-        
-        <div class="menu-item">
-            <span class="menu-icon">➕</span>
-            <span>Nueva publicación</span>
-        </div>
-        
-        <a href="/posts" class="menu-item">
-            <span class="menu-icon">📄</span>
-            <span>Publicaciones</span>
-        </a>
-        
-        <div class="menu-item active">
-            <span class="menu-icon">👥</span>
-            <span>Amigos</span>
-        </div>
-        
-        <a href="/profile" class="menu-item">
-            <span class="menu-icon">👤</span>
-            <span>Perfil</span>
-        </a>
-        
-        <div class="menu-item">
-            <span class="menu-icon">🚪</span>
-            <span>Cerrar sesión</span>
-        </div>
-    </div>
-
+    <?php
+    $currentPage = 'friends';
+    require_once 'assets/sidebar.php' ?>
     <div class="main-content">
         <div class="friends-container">
             <div class="friends-header">
@@ -50,13 +20,9 @@
                 </div>
 
                 <div class="friends-tabs">
-                    <div class="tab active">Todos los amigos</div>
-                    <a href="/friendReqs">
-                        <div class="tab">Solicitudes</div>
-                    </a>
-                    <a href="/sendReqs">
-                        <div class="tab">Enviar solicitud</div>
-                    </a>
+                    <div class="tab active" onclick="fetchFriends(event)">Todos los amigos</div>
+                        <div class="tab" onclick="fetchFriendRequests(event)">Solicitudes</div>
+                        <div class="tab" onclick="fetchSendRequests(event)">Enviar solicitud</div>
                 </div>
             </div>
 
@@ -106,5 +72,6 @@
             </div>
         </div>
     </div>
+    <script src="../js/main.js"></script>
 </body>
 </html>

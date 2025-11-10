@@ -7,29 +7,9 @@
     <link rel="stylesheet" href="../assets/styles/styles.css" />
   </head>
   <body>
-    <div class="sidebar">
-      <div class="logo-container">
-        <div class="logo">
-          <img src="../assets/images/logoUnired.png" alt="Logo" />
-        </div>
-      </div>
-
-      <a href="/newPost" class="menu-item">
-        <span class="menu-icon">➕</span> Nueva publicación
-      </a>
-      <a href="/posts" class="menu-item">
-        <span class="menu-icon">📰</span> Publicaciones
-      </a>
-      <a href="/friends" class="menu-item">
-        <span class="menu-icon">👥</span> Amigos
-      </a>
-      <a href="/profile" class="menu-item active">
-        <span class="menu-icon">👤</span> Perfil
-      </a>
-      <a href="/logout" class="menu-item">
-        <span class="menu-icon">🚪</span> Cerrar sesión
-      </a>
-    </div>
+    <?php
+    $currentPage = 'editProfile';
+    require_once 'assets/sidebar.php' ?>
 
     <div class="main-content">
       <div class="content-wrapper">

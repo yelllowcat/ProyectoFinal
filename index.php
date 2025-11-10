@@ -168,6 +168,16 @@ $router->add('GET', '/dashboard', function() {
     }
 });
 
+$router->add('GET', '/editPost/:id', function($id) {
+    requireAuth();
+    $_GET['post_id'] = $id;
+    if (file_exists('views/editPost.php')) {
+        require 'views/editPost.php';
+    } else {
+        die("Error: views/editPost.php not found");
+    }
+});
+
 try {
     $router->dispatch();
 } catch (Exception $e) {

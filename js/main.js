@@ -1,3 +1,21 @@
+const COMMENTS_PER_LOAD = 3;
+
+function loadMoreComments(button) {
+  const commentsSection = button.closest(".comments-section");
+  const comments = commentsSection.querySelectorAll(".comment.hidden");
+  const loadMoreBtn = button;
+
+  let loaded = 0;
+  for (let i = 0; i < comments.length && loaded < COMMENTS_PER_LOAD; i++) {
+    comments[i].classList.remove("hidden");
+    loaded++;
+  }
+
+  const remainingComments = commentsSection.querySelectorAll(".comment.hidden");
+  if (remainingComments.length === 0) {
+    loadMoreBtn.classList.add("hidden");
+  }
+}
 function toggleMenu(event, menuId) {
   event.stopPropagation();
 
@@ -24,7 +42,8 @@ const confirmModal = document.getElementById("confirm-delete-modal");
 let postToDelete = null;
 
 function openConfirmModal(deleteButton) {
-  postToDelete = deleteButton.closest(".post-card");
+  console.log(deleteButton);
+  postToDelete = deleteButton.closest(".post-container");
 
   if (confirmModal) {
     try {
@@ -181,6 +200,27 @@ function fetchPostsWithMostComments(event) {
 function fetchPostsWithMostLikes(event) {
   console.log("Fetching posts with most likes...");
   const tabs = document.querySelectorAll(".stat-tab");
+  tabs.forEach((tab) => tab.classList.remove("active"));
+  event.currentTarget.classList.add("active");
+}
+
+function fetchFriends(event) {
+  console.log("Fetching all friends...");
+  const tabs = document.querySelectorAll(".tab");
+  tabs.forEach((tab) => tab.classList.remove("active"));
+  event.currentTarget.classList.add("active");
+}
+
+function fetchFriendRequests(event) {
+  console.log("Fetching friend requests...");
+  const tabs = document.querySelectorAll(".tab");
+  tabs.forEach((tab) => tab.classList.remove("active"));
+  event.currentTarget.classList.add("active");
+}
+
+function fetchSendRequests(event) {
+  console.log("Fetching sent friend requests...");
+  const tabs = document.querySelectorAll(".tab");
   tabs.forEach((tab) => tab.classList.remove("active"));
   event.currentTarget.classList.add("active");
 }

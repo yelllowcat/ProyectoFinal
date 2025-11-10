@@ -7,38 +7,9 @@
     <link rel="stylesheet" href="../assets/styles/styles.css" />
   </head>
   <body>
-    <div class="sidebar">
-      <div class="logo-container">
-        <div class="logo">
-          <img src="../assets/images/logoUnired.png" alt="Logo" />
-        </div>
-      </div>
-
-      <div class="menu-item active">
-        <span class="menu-icon">➕</span>
-        <span>Nueva publicación</span>
-      </div>
-
-      <a href="/posts" class="menu-item">
-        <span class="menu-icon">📄</span>
-        <span>Publicaciones</span>
-      </a>
-
-      <a href="/friends" class="menu-item">
-        <span class="menu-icon">👥</span>
-        <span>Amigos</span>
-      </a>
-
-      <a href="/profile" class="menu-item">
-        <span class="menu-icon">👤</span>
-        <span>Perfil</span>
-      </a>
-
-      <a href="/logout" class="menu-item">
-        <span class="menu-icon">🚪</span>
-        <span>Cerrar sesión</span>
-      </a>
-    </div>
+    <?php
+    $currentPage = 'addPost';
+    require_once 'assets/sidebar.php' ?>
 
     <div class="main-content">
       <div class="edit-container">
@@ -82,6 +53,6 @@ Blandit habitasse eleifend himenaeos maecenas risus dui congue torquent, felis c
         </div>
       </div>
     </div>
-  <script src="/main.js"></script>
+  <script src="../js/main.js"></script>
   </body>
 </html>

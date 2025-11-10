@@ -7,38 +7,9 @@
     <link rel="stylesheet" href="../assets/styles/styles.css" />
   </head>
   <body>
-    <div class="sidebar">
-      <div class="logo-container">
-        <div class="logo">
-          <img src="../assets/images/logoUnired.png" alt="Logo" />
-        </div>
-      </div>
-
-      <div class="menu-item">
-        <span class="menu-icon">➕</span>
-        <span>Nueva publicación</span>
-      </div>
-
-      <div class="menu-item">
-        <span class="menu-icon">📄</span>
-        <span>Publicaciones</span>
-      </div>
-
-      <div class="menu-item">
-        <span class="menu-icon">👥</span>
-        <span>Amigos</span>
-      </div>
-
-      <div class="menu-item active">
-        <span class="menu-icon">👤</span>
-        <span>Perfil</span>
-      </div>
-
-      <div class="menu-item">
-        <span class="menu-icon">🚪</span>
-        <span>Cerrar sesión</span>
-      </div>
-    </div>
+    <?php
+    $currentPage = 'editPost';
+    require_once 'assets/sidebar.php' ?>
 
     <div class="main-content">
       <div class="edit-container">
@@ -84,15 +55,6 @@ Blandit habitasse eleifend himenaeos maecenas risus dui congue torquent, felis c
       </div>
     </div>
 
-    <script>
-      function updateCounter() {
-        const textarea = document.getElementById("postText");
-        const counter = document.getElementById("charCount");
-        counter.textContent = textarea.value.length;
-      }
-
-      // Inicializar contador
-      updateCounter();
-    </script>
+    <script src="../js/main.js"></script>
   </body>
 </html>
