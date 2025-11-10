@@ -18,11 +18,11 @@
 
       <form action="/register" method="POST">
         <div class="form-group">
-          <input type="text" placeholder="Nombre de usuario" name="name" required />
+          <input type="text" placeholder="Nombre de usuario" name="full_name" required />
         </div>
 
         <div class="form-group">
-          <input type="email" placeholder="Correo electronico" name="email" required />
+          <input type="email" placeholder="Correo electrónico" name="email" required />
         </div>
 
         <div class="form-group password-field">
@@ -41,19 +41,17 @@
             type="password"
             id="confirm-password"
             placeholder="Confirmar Contraseña"
-            name="confirm-password"
+            name="confirm_password"
             required
           />
-          <span class="eye-icon" onclick="togglePassword('confirm-password')"
-            >👁️</span
-          >
+          <span class="eye-icon" onclick="togglePassword('confirm-password')">👁️</span>
         </div>
 
         <div class="login-link">
           ¿Ya tienes una cuenta? <a href="/login">Iniciar Sesión</a>
         </div>
 
-        <button type="submit">Registarte</button>
+        <button type="submit">Registrarte</button>
       </form>
     </div>
   </body>

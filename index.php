@@ -42,15 +42,15 @@ $router->add('GET', '/login', function() {
 });
 
 $router->add('POST', '/login', function() {
-    if (file_exists('controllers/authController.php')) {
-        require_once 'controllers/authController.php';
-        if (function_exists('handleLogin')) {
-            handleLogin();
-        } else {
-            die("Error: handleLogin() function not found in authController.php");
-        }
+    $authController = __DIR__ . '/app/controllers/authController.php';
+    
+    if (file_exists($authController)) {
+        require_once $authController;
+        
+        $controller = new AuthController();
+        $controller->login();
     } else {
-        die("Error: controllers/authController.php not found");
+        die("Error: app/controllers/authController.php not found at $authController");
     }
 });
 
@@ -67,17 +67,17 @@ $router->add('GET', '/register', function() {
 });
 
 $router->add('POST', '/register', function() {
-    if (file_exists('controllers/authController.php')) {
-        require_once 'controllers/authController.php';
-        if (function_exists('handleRegister')) {
-            handleRegister();
-        } else {
-            die("Error: handleRegister() function not found in authController.php");
-        }
-    } else {
-        die("Error: controllers/authController.php not found");
-    }
-});
+     $authController = __DIR__ . '/app/controllers/authController.php';
+
+     if (file_exists($authController)) {
+         require_once $authController;
+
+         $controller = new AuthController();
+         $controller->register();
+     } else {
+         die("Error: app/controllers/authController.php not found at $authController");
+     }
+ });
 
 $router->add('GET', '/logout', function() {
     session_destroy();
