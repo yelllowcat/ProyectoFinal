@@ -138,6 +138,21 @@
         transform: scale(0.98);
       }
 
+      .alert {
+           padding: 12px 20px;
+           margin-bottom: 20px;
+           border-radius: 4px;
+       }
+       .alert-error {
+           background-color: #fee;
+           color: #c33;
+           border: 1px solid #fcc;
+       }
+       .alert-success {
+           background-color: #efe;
+           color: #3c3;
+           border: 1px solid #cfc;
+       }
       @media (max-width: 600px) {
         .container {
           padding: 40px 30px;

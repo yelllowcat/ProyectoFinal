@@ -1,4 +1,8 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+require_once __DIR__ . '/autoload.php';
 
 session_start();
 
@@ -42,7 +46,7 @@ $router->add('GET', '/login', function() {
 });
 
 $router->add('POST', '/login', function() {
-    $authController = __DIR__ . '/app/controllers/authController.php';
+    $authController = __DIR__ . '/app/controllers/AuthController.php';
     
     if (file_exists($authController)) {
         require_once $authController;
@@ -50,7 +54,7 @@ $router->add('POST', '/login', function() {
         $controller = new AuthController();
         $controller->login();
     } else {
-        die("Error: app/controllers/authController.php not found at $authController");
+        die("Error: app/controllers/AuthController.php not found at $authController");
     }
 });
 
@@ -67,7 +71,7 @@ $router->add('GET', '/register', function() {
 });
 
 $router->add('POST', '/register', function() {
-     $authController = __DIR__ . '/app/controllers/authController.php';
+     $authController = __DIR__ . '/app/controllers/AuthController.php';
 
      if (file_exists($authController)) {
          require_once $authController;
@@ -75,7 +79,7 @@ $router->add('POST', '/register', function() {
          $controller = new AuthController();
          $controller->register();
      } else {
-         die("Error: app/controllers/authController.php not found at $authController");
+         die("Error: app/controllers/AuthController.php not found at $authController");
      }
  });
 

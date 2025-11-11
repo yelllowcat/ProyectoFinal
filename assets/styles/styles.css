@@ -222,32 +222,19 @@ body {
   color: white;
 }
 
-.btn-delete {
-  position: absolute;
-  top: -40px;
-  right: 15px;
-  background: #d93025;
-  color: white;
-}
-
-.btn-delete-post {
-  background: #d93025;
-  color: white;
-}
-
+.btn-deny,
+.btn-cancel,
+.btn-delete,
+.btn-red-post,
 .btn-delete-req {
   background: #d93025;
   color: white;
 }
 
-.btn-send {
-  background-color: #4db8c4;
-  color: white;
-}
-
-.btn-save {
-  background-color: #4db8c4;
-  color: white;
+.btn-delete {
+  position: absolute;
+  top: -40px;
+  right: 15px;
 }
 
 .post-card {
@@ -342,6 +329,14 @@ body {
   background-color: #fee;
 }
 
+.menu-option.edit {
+  text-decoration: none;
+  display: block;
+}
+.menu-option.edit:hover {
+  background-color: #f5f5f5;
+}
+
 .post-image {
   width: 100%;
   height: 300px;
@@ -406,6 +401,7 @@ body {
   border-radius: 8px;
   margin-bottom: 10px;
 }
+
 .comment.hidden {
   display: none;
 }
@@ -488,10 +484,12 @@ body {
 .comment-submit:active {
   transform: scale(0.98);
 }
+
 .load-more-container {
   text-align: center;
   margin: 10px 0;
 }
+
 .load-more-btn {
   padding: 10px 30px;
   border: none;
@@ -966,6 +964,9 @@ body {
 }
 
 .friend-avatar {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   width: 120px;
   height: 120px;
   background-color: #d4b896;
@@ -1015,8 +1016,10 @@ body {
   border: none;
   padding: 0;
   margin: 0;
-  position: fixed; /* make dialog cover viewport so we can center its content */
-  inset: 0; /* top:0; right:0; bottom:0; left:0; */
+  position: fixed;
+  /* make dialog cover viewport so we can center its content */
+  inset: 0;
+  /* top:0; right:0; bottom:0; left:0; */
   display: none;
   align-items: center;
   justify-content: center;
@@ -1107,21 +1110,26 @@ body {
   font-weight: 600;
   padding-bottom: 18px;
 }
+
 .add-post-image-section {
   display: flex;
   justify-content: center;
 }
+
 .add-post-image {
   width: 15%;
 }
+
 /* smaller screens */
 @media (max-width: 480px) {
   .confirm-box {
     width: calc(100% - 30px);
   }
+
   .confirm-head h3 {
     font-size: 18px;
   }
+
   .confirm-actions button {
     font-size: 18px;
   }
