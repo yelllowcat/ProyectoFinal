@@ -20,11 +20,15 @@
 
     <form method="post" action="/login">
       <div class="form-group">
-        <input type="email" placeholder="Correo electronico" name="email" required />
+        <input type="email" id="email" placeholder="Correo electronico" name="email" required />
+        <label for="email" class="form-label" data-help="Formato: correo@ejemplo.com">Correo electronico</label>
       </div>
 
       <div class="form-group password-field">
-        <input type="password" id="password" name="password" placeholder="Contraseña" required />
+        <input type="password" id="password" name="password" placeholder="Contraseña" required
+          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$" minlength="8" />
+        <label for="password" class="form-label"
+          data-help="8+ caracteres, mayúscula, minúscula, número y símbolo">Contraseña</label>
         <img class="eye-icon" onclick="togglePassword()" src="../assets/images/eye-off.png" alt="Ocultar contraseña" />
       </div>
 
@@ -34,36 +38,35 @@
 
       <button type="submit">Iniciar sesion</button>
     </form>
-  </div>
 
-  <script>
-    let hidePasswordTimeout = null;
+    <script>
+      let hidePasswordTimeout = null;
 
-    function togglePassword() {
-      const passwordField = document.getElementById("password");
-      const eyeIcon = document.querySelector(".eye-icon");
+      function togglePassword() {
+        const passwordField = document.getElementById("password");
+        const eyeIcon = document.querySelector(".eye-icon");
 
-      if (hidePasswordTimeout) {
-        clearTimeout(hidePasswordTimeout);
-        hidePasswordTimeout = null;
-      }
+        if (hidePasswordTimeout) {
+          clearTimeout(hidePasswordTimeout);
+          hidePasswordTimeout = null;
+        }
 
-      if (passwordField.type === "password") {
-        passwordField.type = "text";
-        eyeIcon.src = "../assets/images/eye.png";
+        if (passwordField.type === "password") {
+          passwordField.type = "text";
+          eyeIcon.src = "../assets/images/eye.png";
 
-        hidePasswordTimeout = setTimeout(() => {
+          hidePasswordTimeout = setTimeout(() => {
+            passwordField.type = "password";
+            eyeIcon.src = "../assets/images/eye-off.png";
+            hidePasswordTimeout = null;
+          }, 5000);
+
+        } else {
           passwordField.type = "password";
           eyeIcon.src = "../assets/images/eye-off.png";
-          hidePasswordTimeout = null;
-        }, 3000);
-
-      } else {
-        passwordField.type = "password";
-        eyeIcon.src = "../assets/images/eye-off.png";
+        }
       }
-    }
-  </script>
+    </script>
 </body>
 
 </html>
