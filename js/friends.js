@@ -1,75 +1,89 @@
-/* document.addEventListener('DOMContentLoaded', function() {
-    const tabs = document.querySelectorAll('.tab');
-    const friendsGrid = document.getElementById('friendsGrid');
-    const searchInput = document.getElementById('searchInput');
-    let currentType = 'friend';
-    let searchTimeout;
+let currentFilter = "friend";
+let currentSearchTerm = "";
 
-    loadFriends('friend');
+function searchFriends(searchTerm) {
+  currentSearchTerm = searchTerm.toLowerCase().trim();
+  const clearBtn = document.getElementById("clearSearchBtn");
+  const searchResults = document.getElementById("searchResults");
 
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            tabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            
-            currentType = this.dataset.type;
-            loadFriends(currentType);
-        });
-    });
+  if (currentSearchTerm.length > 0) {
+    clearBtn.style.display = "block";
+  } else {
+    clearBtn.style.display = "none";
+    searchResults.style.display = "none";
+  }
 
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            loadFriends(currentType, this.value);
-        }, 300);
-    });
+  filterAndSearch();
+}
 
-    function loadFriends(type, search = '') {
-        friendsGrid.innerHTML = '<p>Cargando...</p>';
-        
-        fetch(`api/get_friends.php?type=${type}&search=${encodeURIComponent(search)}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    friendsGrid.innerHTML = data.html || '<p>No se encontraron resultados.</p>';
-                } else {
-                    friendsGrid.innerHTML = '<p>Error al cargar amigos.</p>';
-                    console.error(data.error);
-                }
-            })
-            .catch(error => {
-                friendsGrid.innerHTML = '<p>Error de conexión.</p>';
-                console.error('Error:', error);
-            });
+function clearSearch() {
+  const searchInput = document.getElementById("friendSearchInput");
+  searchInput.value = "";
+  currentSearchTerm = "";
+  document.getElementById("clearSearchBtn").style.display = "none";
+  document.getElementById("searchResults").style.display = "none";
+  filterAndSearch();
+}
+
+function filterFriends(event, filter) {
+  const tabs = document.querySelectorAll(".tab");
+  tabs.forEach((tab) => tab.classList.remove("active"));
+  event.target.classList.add("active");
+
+  currentFilter = filter;
+  filterAndSearch();
+}
+
+function filterAndSearch() {
+  const friendCards = document.querySelectorAll(".friend-card");
+  const noResultsMessage = document.getElementById("noResultsMessage");
+  const searchResults = document.getElementById("searchResults");
+  let visibleCount = 0;
+
+  friendCards.forEach((card) => {
+    const friendName = card
+      .querySelector(".friend-name")
+      .textContent.toLowerCase();
+    const cardStatus = card.dataset.status || "friend";
+
+    const matchesFilter = cardStatus === currentFilter;
+
+    const matchesSearch =
+      currentSearchTerm === "" || friendName.includes(currentSearchTerm);
+
+    if (matchesFilter && matchesSearch) {
+      card.style.display = "block";
+      visibleCount++;
+    } else {
+      card.style.display = "none";
     }
+  });
 
-    friendsGrid.addEventListener('click', function(e) {
-        if (e.target.classList.contains('btn-accept')) {
-            acceptFriendRequest(e.target);
-        } else if (e.target.classList.contains('btn-deny')) {
-            denyFriendRequest(e.target);
-        } else if (e.target.classList.contains('btn-add')) {
-            sendFriendRequest(e.target);
-        } else if (e.target.classList.contains('btn-view-profile')) {
-            viewProfile(e.target);
-        }
-    });
+  if (visibleCount === 0) {
+    noResultsMessage.style.display = "block";
+  } else {
+    noResultsMessage.style.display = "none";
+  }
 
-    function acceptFriendRequest(button) {
-        console.log('Accept friend request');
+  if (currentSearchTerm.length > 0) {
+    searchResults.style.display = "block";
+    searchResults.textContent = `Se encontraron ${visibleCount} resultado${
+      visibleCount !== 1 ? "s" : ""
+    } para "${currentSearchTerm}"`;
+  }
+}
+document.addEventListener("DOMContentLoaded", () => {
+  const friendCards = document.querySelectorAll(".friend-card");
+  friendCards.forEach((card) => {
+    if (card.querySelector(".btn-accept")) {
+      card.dataset.status = "request";
+    } else if (card.querySelector(".btn-add")) {
+      card.dataset.status = "send";
+    } else {
+      card.dataset.status = "friend";
     }
+  });
 
-    function denyFriendRequest(button) {
-        console.log('Deny friend request');
-    }
-
-    function sendFriendRequest(button) {
-        console.log('Send friend request');
-    }
-
-    function viewProfile(button) {
-        console.log('View profile');
-    }
+  filterAndSearch();
 });
-*/
 console.log("Friends.js loaded");
