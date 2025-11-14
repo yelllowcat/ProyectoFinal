@@ -24,7 +24,8 @@ try {
  * Get database connection
  * @return PDO
  */
-function getDB() {
+function getDB()
+{
     global $pdo;
     return $pdo;
 }

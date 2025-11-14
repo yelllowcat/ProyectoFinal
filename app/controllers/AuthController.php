@@ -1,6 +1,10 @@
 <?php
-require_once __DIR__ . '/../models/UserModel.php';
-require_once __DIR__ . '/../../helpers/auth.php';
+
+namespace App\controllers;
+use Illuminate\Http\Request;
+use App\models\UserModel;
+use App\Helpers\Auth;
+
 
 class AuthController
 {
@@ -71,4 +75,10 @@ class AuthController
         }
     }
 
+    public function logout()
+    {
+        clearUserSession();
+        flash('success', 'Logged out successfully');
+        redirect('/login');
+    }
 }

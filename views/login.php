@@ -1,3 +1,6 @@
+<?php
+use App\components\Alert;
+?>
 <!DOCTYPE html>
 <html lang="es">
 

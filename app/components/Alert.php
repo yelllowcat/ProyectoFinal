@@ -1,4 +1,5 @@
 <?php
+namespace App\components;
 class Alert
 {
     public static function render(): string

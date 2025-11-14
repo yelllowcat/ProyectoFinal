@@ -1,5 +1,9 @@
-cambio el UserModel este
 <?php
+
+namespace App\Models;
+
+use PDO;
+use PDOException;
 require_once __DIR__ . '/../../config/database.php';
 
 class UserModel

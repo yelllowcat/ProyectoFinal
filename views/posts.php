@@ -1,3 +1,7 @@
+<?php
+namespace App\views;
+use App\components\Post;
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -25,7 +29,7 @@
                     'image_alt' => 'Paisaje montañoso',
                     'text' => 'Blandit habitasse eleifend himenaeos maecenas risus dui congue torquent, felis curae eros cubilia justo iaculis ornare, inceptos est arcu odio mus diam rhoncus. Orci tortor semper parturient nascetur venenatis porta cum nisi suscipit sagittis.',
                     'likes' => 200,
-                    'comments_count' => 20,
+                    'comments_count' => 2,
                     'comments' => [
                         [
                             'author' => 'Gabriel Hernández',
@@ -49,7 +53,7 @@
                     'image_alt' => 'Gran Cañón',
                     'text' => 'Blandit habitasse eleifend himenaeos maecenas risus dui congue torquent, felis curae eros cubilia justo iaculis ornare, inceptos est arcu odio mus diam rhoncus. Orci tortor semper parturient nascetur venenatis porta cum nisi suscipit sagittis.',
                     'likes' => 391,
-                    'comments_count' => 12,
+                    'comments_count' => 6,
                     'comments' => [
                         [
                             'author' => 'Gabriel Hernández',
@@ -97,7 +101,7 @@
                     'image_alt' => 'Naturaleza',
                     'text' => 'Blandit habitasse eleifend himenaeos maecenas risus dui congue torquent, felis curae eros cubilia justo iaculis ornare, inceptos est arcu odio mus diam rhoncus. Orci tortor semper parturient nascetur venenatis porta cum nisi suscipit sagittis.',
                     'likes' => 95,
-                    'comments_count' => 12,
+                    'comments_count' => 2,
                     'comments' => [
                         [
                             'author' => 'Gabriel Hernández',

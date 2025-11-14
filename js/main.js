@@ -157,6 +157,15 @@ function addComment(button) {
     newComment.style.opacity = "1";
     newComment.style.transform = "translateY(0)";
   }, 10);
+
+  // **UPDATE THE COMMENT COUNTER**
+  const commentsButton = postCard.querySelector(".action-btn.comments");
+  const currentCount = parseInt(commentsButton.textContent.match(/\d+/)[0]);
+  const newCount = currentCount + 1;
+  commentsButton.innerHTML = `
+    <img src='/assets/images/comments.png' alt='comments icon' width='25'>
+    ${newCount} Comentarios
+  `;
 }
 
 function escapeHtml(text) {

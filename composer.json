@@ -1,0 +1,18 @@
+{
+    "description": "Red Social",
+    "type": "project",
+    "require": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        },
+        "files": [
+            "helpers/auth.php"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

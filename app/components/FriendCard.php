@@ -1,5 +1,5 @@
 <?php
-
+namespace App\components;
 class FriendCard
 {
     private string $name;

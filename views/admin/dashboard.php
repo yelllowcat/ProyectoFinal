@@ -1,11 +1,16 @@
+<?php
+namespace App\views\admin;
+?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNIRED - Administrador</title>
     <link rel="stylesheet" href="../assets/styles/dashboard.css">
 </head>
+
 <body>
     <div class="admin-header">
         <div class="logo">
@@ -13,7 +18,7 @@
         </div>
         <h1 class="admin-title">Administrador</h1>
         <a href="/logout">
-        <button class="btn-logout">Cerrar sesión</button>
+            <button class="btn-logout">Cerrar sesión</button>
         </a>
     </div>
 
@@ -24,7 +29,7 @@
             <div class="stat-tab" onclick="fetchPostsWithMostComments(event)">Publicaciones con mas comentarios</div>
             <div class="stat-tab" onclick="fetchPostsWithMostLikes(event)">Publicaciones con mas "Me gusta"</div>
         </div>
-            <button class="btn-download">Estadísticas en PDF</button>
+        <button class="btn-download">Estadísticas en PDF</button>
 
         <div class="users-table-container">
             <table class="users-table">
@@ -100,4 +105,5 @@
     </div>
     <script src="../../js/main.js"></script>
 </body>
+
 </html>

@@ -1,3 +1,7 @@
+<?php
+namespace App\views;
+use App\components\Post;
+?>
 <!DOCTYPE html>
 <html lang="es">
 
