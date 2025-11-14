@@ -1,5 +1,5 @@
 <?php
-use App\components\Alert;
+use App\Components\Alert;
 ?>
 <!DOCTYPE html>
 <html lang="es">

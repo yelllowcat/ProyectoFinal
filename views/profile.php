@@ -1,6 +1,6 @@
 <?php
 namespace App\views;
-use App\components\Post;
+use App\Components\Post;
 ?>
 <!DOCTYPE html>
 <html lang="es">

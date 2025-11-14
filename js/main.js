@@ -62,9 +62,7 @@ function openConfirmModal(deleteButton) {
         }
       }
       if (modalName) modalName.textContent = name || "[Nombre del amigo]";
-    } catch (e) {
-      // ignore errors
-    }
+    } catch (e) {}
 
     confirmModal.showModal();
   }
@@ -158,7 +156,6 @@ function addComment(button) {
     newComment.style.transform = "translateY(0)";
   }, 10);
 
-  // **UPDATE THE COMMENT COUNTER**
   const commentsButton = postCard.querySelector(".action-btn.comments");
   const currentCount = parseInt(commentsButton.textContent.match(/\d+/)[0]);
   const newCount = currentCount + 1;

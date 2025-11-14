@@ -1,5 +1,5 @@
 <?php
-namespace App\components;
+namespace App\Components;
 class Post
 {
     private $id;

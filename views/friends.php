@@ -1,6 +1,6 @@
 <?php
 namespace App\views;
-use App\components\FriendCard;
+use App\Components\FriendCard;
 ?>
 <!DOCTYPE html>
 <html lang="es">
