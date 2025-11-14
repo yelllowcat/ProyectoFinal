@@ -78,13 +78,13 @@ class Post
         return "
         <div class='feed-post-card post-container' data-post-id='{$this->id}'>
             <div class='feed-post-header'>
-                <div class='feed-post-user'>
+                <a href='/profile/{$this->id}' class='feed-post-user'>
                     <div class='feed-post-avatar'></div>
                     <div class='feed-post-user-info'>
                         <h3>{$this->author}</h3>
                         <div class='feed-post-date'>Publicado el: {$this->date}</div>
                     </div>
-                </div>
+                </a>
                 <div class='feed-post-menu' onclick=\"toggleMenu(event, '{$menuId}')\">
                     <img src='/assets/images/more.png' alt='more options' width='25'>
                     <div class='post-menu-modal' id='{$menuId}'>

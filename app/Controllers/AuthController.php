@@ -1,9 +1,7 @@
 <?php
 
 namespace App\Controllers;
-use Illuminate\Http\Request;
 use App\Models\UserModel;
-use App\Helpers\Auth;
 
 
 class AuthController

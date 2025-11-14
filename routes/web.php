@@ -1,7 +1,10 @@
 <?php
 
-use App\controllers\AuthController;
-
+use App\Controllers\AuthController;
+use App\Controllers\UserController;
+use App\Controllers\PostController;
+use App\Controllers\FriendController;
+use App\Controllers\ProfileController;
 
 
 $router->get('/', function () {
@@ -45,18 +48,10 @@ $router->get('/profile', function () {
     require __DIR__ . '/../views/profile.php';
 });
 
-$router->get('/profile/:id', function ($id) {
-    requireAuth();
-    $_GET['user_id'] = $id;
-    require __DIR__ . '/../views/profile.php';
-});
+$router->get('/profile/:id', [UserController::class, 'show']);
 
-$router->get('/editProfile', function () {
-    requireAuth();
-    require __DIR__ . '/../views/editProfile.php';
-});
+$router->get('/editProfile', [UserController::class, 'edit']);
 
-//$router->post('/profile/update', [ProfileController::class, 'update']);
 
 $router->get('/friends', function () {
     requireAuth();
@@ -73,17 +68,17 @@ $router->get('/friendReqs', function () {
     require __DIR__ . '/../views/friendReqs.php';
 });
 
-//$router->post('/friend/request/:id', [FriendController::class, 'sendRequest']);
-//$router->post('/friend/accept/:id', [FriendController::class, 'acceptRequest']);
-//$router->post('/friend/reject/:id', [FriendController::class, 'rejectRequest']);
-//$router->delete('/friend/remove/:id', [FriendController::class, 'removeFriend']);
+$router->post('/friend/request/:id', [FriendController::class, 'sendRequest']);
+$router->post('/friend/accept/:id', [FriendController::class, 'acceptRequest']);
+$router->post('/friend/reject/:id', [FriendController::class, 'rejectRequest']);
+$router->delete('/friend/remove/:id', [FriendController::class, 'removeFriend']);
 
 $router->get('/addPost', function () {
     requireAuth();
     require __DIR__ . '/../views/addPost.php';
 });
 
-//$router->post('/posts', [PostController::class, 'store']);
+$router->post('/posts', [PostController::class, 'store']);
 
 $router->get('/editPost/:id', function ($id) {
     requireAuth();
@@ -91,15 +86,16 @@ $router->get('/editPost/:id', function ($id) {
     require __DIR__ . '/../views/editPost.php';
 });
 
-//$router->put('/posts/:id', [PostController::class, 'update']);
-//$router->delete('/posts/:id', [PostController::class, 'destroy']);
 
-//$router->post('/posts/:id/like', [PostController::class, 'like']);
-//$router->delete('/posts/:id/like', [PostController::class, 'unlike']);
 
-//$router->post('/posts/:id/comments', [PostController::class, 'addComment']);
-//$router->delete('/comments/:id', [PostController::class, 'deleteComment']);
+$router->put('/posts/:id', [PostController::class, 'update']);
+$router->delete('/posts/:id', [PostController::class, 'destroy']);
 
+$router->post('/posts/:id/like', [PostController::class, 'like']);
+$router->delete('/posts/:id/like', [PostController::class, 'unlike']);
+
+$router->post('/posts/:id/comments', [PostController::class, 'addComment']);
+$router->delete('/comments/:id', [PostController::class, 'deleteComment']);
 
 $router->get('/dashboard', function () {
     requireAuth();

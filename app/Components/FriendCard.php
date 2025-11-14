@@ -1,14 +1,18 @@
 <?php
+
 namespace App\Components;
+
 class FriendCard
 {
+    private string $id;
     private string $name;
     private string $joinDate;
     private string $status;
     private ?string $avatarUrl;
 
-    public function __construct(string $name, string $joinDate, string $status = 'friend', ?string $avatarUrl = null)
+    public function __construct(string $id, string $name, string $joinDate, string $status = 'friend', ?string $avatarUrl = null)
     {
+        $this->id = $id;
         $this->name = htmlspecialchars($name);
         $this->joinDate = htmlspecialchars($joinDate);
         $this->status = htmlspecialchars($status);
@@ -24,9 +28,11 @@ class FriendCard
 
         return "
         <div class='friend-card' data-status='{$this->status}'>
+            <a href='/profile/{$this->id}'>
             <div class='friend-avatar' style=\"{$avatarStyle}\"></div>
             <h3 class='friend-name'>{$this->name}</h3>
             <p class='friend-date'>Se unió el: {$this->joinDate}</p>
+            </a>
             <div class='friend-actions'>
                 {$buttons}
             </div>
@@ -52,5 +58,3 @@ class FriendCard
         }
     }
 }
-
-?>

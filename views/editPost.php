@@ -1,5 +1,8 @@
 <?php
 namespace App\views;
+
+$post = $_GET['post_id'];
+
 ?>
 <!DOCTYPE html>
 <html lang="es">

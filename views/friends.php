@@ -41,12 +41,12 @@ use App\Components\FriendCard;
             <div class="friends-grid" id="friendsGrid">
                 <?php
                 $friends = [
-                    new FriendCard('Pedrito Navajas', '18/03/2025', 'friend', 'https://i.pravatar.cc/150?img=13'),
-                    new FriendCard('Juanito Alimaña', '23/06/2025', 'friend', 'https://i.pravatar.cc/150?img=11'),
-                    new FriendCard('Carlos Ruiz', '10/01/2025', 'request', 'https://i.pravatar.cc/150?img=12'),
-                    new FriendCard('Ana Martínez', '05/04/2025', 'send', 'https://i.pravatar.cc/150?img=10'),
-                    new FriendCard('María González', '15/02/2025', 'friend', 'https://i.pravatar.cc/150?img=9'),
-                    new FriendCard('Pedro Sánchez', '20/05/2025', 'request', 'https://i.pravatar.cc/150?img=8'),
+                    new FriendCard('1', 'Pedrito Navajas', '18/03/2025', 'friend', 'https://i.pravatar.cc/150?img=13'),
+                    new FriendCard('2', 'Juanito Alimaña', '23/06/2025', 'friend', 'https://i.pravatar.cc/150?img=11'),
+                    new FriendCard('3', 'Carlos Ruiz', '10/01/2025', 'request', 'https://i.pravatar.cc/150?img=12'),
+                    new FriendCard('4', 'Ana Martínez', '05/04/2025', 'send', 'https://i.pravatar.cc/150?img=10'),
+                    new FriendCard('5', 'María González', '15/02/2025', 'friend', 'https://i.pravatar.cc/150?img=9'),
+                    new FriendCard('6', 'Pedro Sánchez', '20/05/2025', 'request', 'https://i.pravatar.cc/150?img=8'),
                 ];
 
                 foreach ($friends as $friend) {

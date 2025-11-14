@@ -1,6 +1,8 @@
 <?php
 namespace App\views;
 use App\Components\Post;
+use App\Components\Profile;
+$userId = getCurrentUserId();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -19,31 +21,9 @@ use App\Components\Post;
     ?>
     <div class="main-content">
         <div class="content-wrapper">
-            <div class="profile-section">
-                <div class="profile-photo"></div>
-                <h2 class="profile-name">Manuel Orozco</h2>
-                <p class="profile-bio">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
-                    et dolore magna aliqua. Ut enim ad minim veniam.
-                </p>
-
-                <div class="stats-container">
-                    <div class="stat">
-                        <div class="stat-number">2,100</div>
-                        <div class="stat-label">Amigos</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-number">187</div>
-                        <div class="stat-label">Me gusta</div>
-                    </div>
-                </div>
-
-                <div class="action-buttons">
-                    <a href="/editProfile">
-                        <button class="btn btn-primary">Editar perfil</button>
-                    </a>
-                </div>
-            </div>
+            <?php $profile = new Profile();
+            echo $profile->render();
+            ?>
 
             <?php
             $posts = [
