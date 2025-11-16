@@ -24,18 +24,20 @@ use App\Components\Alert;
     <form action="/register" method="POST">
       <div class="form-group">
         <input type="text" id="full_name" placeholder="Nombre de usuario" name="full_name" required
-          pattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]{2,}$" minlength="3" />
+          pattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]{2,}$" minlength="3"
+          value="<?= safe_output($_POST['full_name'] ?? '') ?>" onpaste="return false;"/>
         <label for="full_name" class="form-label" data-help="Solo letras, mínimo 3 caracteres">Nombre de usuario</label>
       </div>
 
       <div class="form-group">
-        <input type="email" id="email" placeholder="Correo electrónico" name="email" required />
+        <input type="email" id="email" placeholder="Correo electrónico" name="email" required
+          value="<?= safe_output($_POST['email'] ?? '') ?>" onpaste="return false;"/>
         <label for="email" class="form-label" data-help="Formato: correo@ejemplo.com">Correo electrónico</label>
       </div>
 
       <div class="form-group password-field">
         <input type="password" id="password" placeholder="Contraseña" name="password" required
-          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$" minlength="8" />
+          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$" minlength="8" onpaste="return false;"/>
         <label for="password" class="form-label"
           data-help="8+ caracteres, mayúscula, minúscula, número y símbolo">Contraseña</label>
         <img class="eye-icon password" onclick="togglePassword(event)" src="../assets/images/eye-off.png"
@@ -44,7 +46,7 @@ use App\Components\Alert;
 
       <div class="form-group password-field">
         <input type="password" id="confirm-password" placeholder="Confirmar Contraseña" name="confirm_password" required
-          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$" minlength="8" />
+          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$" minlength="8" onpaste="return false;"/>
         <label for="confirm-password" class="form-label" data-help="Debe coincidir con la contraseña">Confirmar
           Contraseña</label>
         <img class="eye-icon confirm-password" onclick="togglePassword(event)" src="../assets/images/eye-off.png"

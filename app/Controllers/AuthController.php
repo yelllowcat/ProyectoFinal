@@ -9,9 +9,10 @@ class AuthController
     public function register()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $full_name = trim($_POST['full_name'] ?? '');
-            $email = trim($_POST['email'] ?? '');
-            $password = trim($_POST['password'] ?? '');
+
+            $full_name = clean_input($_POST['full_name'] ?? '');
+            $email = clean_input($_POST['email'] ?? '');
+            $password = trim($_POST['password'] ?? ''); 
             $confirm_password = trim($_POST['confirm_password'] ?? '');
 
             if (empty($full_name) || empty($email) || empty($password) || empty($confirm_password)) {
@@ -42,8 +43,9 @@ class AuthController
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $email = trim($_POST['email'] ?? '');
-            $password = trim($_POST['password'] ?? '');
+            
+            $email = clean_input($_POST['email'] ?? '');
+            $password = trim($_POST['password'] ?? ''); 
 
             if (empty($email) || empty($password)) {
                 $_SESSION['error'] = 'Por favor completa todos los campos.';

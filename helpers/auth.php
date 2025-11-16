@@ -144,3 +144,11 @@ function hasFlash()
 {
     return !empty($_SESSION['flash']);
 }
+
+function clean_input($data) {
+    return strip_tags(trim($data));
+}
+
+function safe_output($data) {
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+}
