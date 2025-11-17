@@ -89,12 +89,8 @@ class UserModel
             $stmt->execute();
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            error_log("User found: " . ($user ? "YES" : "NO"));
-
             if ($user) {
-                error_log("Stored hash: " . $user['password']);
                 $passwordValid = password_verify($password, $user['password']);
-                error_log("Password valid: " . ($passwordValid ? "YES" : "NO"));
 
                 if ($passwordValid) {
                     return $user;
@@ -116,4 +112,45 @@ class UserModel
             return $this->handleDatabaseError($e, 'Error al iniciar sesión. Por favor intenta de nuevo.');
         }
     }
+
+    public function getUserById($id)
+    {
+        try {
+            $stmt = $this->pdo->prepare("
+            SELECT user_id, full_name, email, profile_picture, biography, role, registration_date
+            FROM users 
+            WHERE user_id = ?
+        ");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("getUserById error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function updateUser($userId, $data)
+{
+    try {
+        
+        $stmt = $this->pdo->prepare("
+            UPDATE users 
+            SET full_name = ?, biography = ?, updated_at = NOW()
+            WHERE user_id = ?
+        ");
+        
+        $result = $stmt->execute([
+            $data['full_name'],
+            $data['biography'],
+            $userId
+        ]);
+        
+        
+        return $result;
+        
+    } catch (PDOException $e) {
+        error_log("updateUser error: " . $e->getMessage());
+        return false;
+    }
+}
 }

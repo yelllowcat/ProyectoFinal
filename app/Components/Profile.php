@@ -10,12 +10,11 @@ class Profile
     private $friendsCount;
     private $likesCount;
 
-
     public function __construct($viewState = 'own', $userName = 'Manuel Orozco', $userBio = '', $friendsCount = 2100, $likesCount = 187)
     {
         $this->viewState = $viewState;
         $this->userName = $userName;
-        $this->userBio = $userBio ?: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.';
+        $this->userBio = $userBio ?: 'No tienes decripcion de tu perfil, puedes agregar una en "Editar perfil"';
         $this->friendsCount = $friendsCount;
         $this->likesCount = $likesCount;
     }
@@ -82,4 +81,3 @@ class Profile
 </div>";
     }
 }
-

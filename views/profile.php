@@ -1,9 +1,15 @@
 <?php
-namespace App\views;
 use App\Components\Post;
 use App\Components\Profile;
-$userId = getCurrentUserId();
-?>
+
+$userId = $_GET['id'] ?? getCurrentUserId();
+$userModel = new App\Models\UserModel();
+$user = $userModel->getUserById($userId);
+
+if (!$user) {
+    flash('error', 'Usuario no encontrado');
+    redirect('/posts');
+}?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -21,7 +27,14 @@ $userId = getCurrentUserId();
     ?>
     <div class="main-content">
         <div class="content-wrapper">
-            <?php $profile = new Profile();
+            <?php 
+            $profile = new Profile(
+                'own', 
+                $user['full_name'], 
+                $user['biography'] ?? '', 
+                2100, 
+                187
+            );
             echo $profile->render();
             ?>
 
