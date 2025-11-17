@@ -11,6 +11,8 @@ class Post
     private $likes;
     private $commentsCount;
     private $comments;
+    private $userId;
+    private $currentUserId;
 
     public function __construct($data)
     {
@@ -23,6 +25,8 @@ class Post
         $this->likes = $data['likes'];
         $this->commentsCount = $data['comments_count'];
         $this->comments = $data['comments'];
+        $this->userId = $data['user_id'] ?? null;
+        $this->currentUserId = $data['current_user_id'] ?? null;
     }
 
     public function getId()
@@ -75,29 +79,35 @@ class Post
         $menuId = 'menu' . $this->id;
         $commentsSection = $this->renderCommentsSection();
 
+        // Menú solo para propietario
+        $menuOptions = '';
+        if ($this->userId == $this->currentUserId) {
+            $menuOptions = "
+            <div class='feed-post-menu' onclick=\"toggleMenu(event, '{$menuId}')\">
+                <img src='/assets/images/more.png' alt='more options' width='25'>
+                <div class='post-menu-modal' id='{$menuId}'>
+                    <div class='menu-option delete' onclick='openConfirmModal(this)'>Eliminar</div>
+                    <a href='/editPost/{$this->id}' class='menu-option edit'>Editar</a>
+                    <div class='menu-option'>Cancelar</div>
+                </div>
+            </div>
+            ";
+        }
+
         return "
         <div class='feed-post-card post-container' data-post-id='{$this->id}'>
             <div class='feed-post-header'>
-                <a href='/profile/{$this->id}' class='feed-post-user'>
+                <a href='/profile/{$this->userId}' class='feed-post-user'>
                     <div class='feed-post-avatar'></div>
                     <div class='feed-post-user-info'>
                         <h3>{$this->author}</h3>
                         <div class='feed-post-date'>Publicado el: {$this->date}</div>
                     </div>
                 </a>
-                <div class='feed-post-menu' onclick=\"toggleMenu(event, '{$menuId}')\">
-                    <img src='/assets/images/more.png' alt='more options' width='25'>
-                    <div class='post-menu-modal' id='{$menuId}'>
-                        <div class='menu-option delete' onclick='openConfirmModal(this)'>Eliminar</div>
-                        <a href='/editPost/{$this->id}' class='menu-option edit'>Editar</a>
-                        <div class='menu-option'>Cancelar</div>
-                    </div>
-                </div>
+                {$menuOptions}
             </div>
 
-            <div class='feed-post-image'>
-                <img src='{$this->image}' alt='{$this->imageAlt}'>
-            </div>
+            " . ($this->image ? "<div class='feed-post-image'><img src='{$this->image}' alt='{$this->imageAlt}'></div>" : "") . "
 
             <p class='feed-post-text'>
                 {$this->text}
@@ -160,12 +170,13 @@ class Post
             {$commentsHtml}
             {$loadMoreBtn}
             <div class='comment-input-container'>
-                <input type='text' class='comment-input' placeholder='Comentar' onkeypress='handleCommentKeyPress(event, this.nextElementSibling)'>
+                <input type='text' class='comment-input' placeholder='Comentar' onkeypress='handleCommentKeyPress(event, this)'>
                 <button class='comment-submit' onclick='addComment(this)'>Publicar</button>
             </div>
         </div>
         ";
     }
+
 }
 
 ?>

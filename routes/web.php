@@ -79,6 +79,13 @@ $router->get('/addPost', function () {
 });
 
 $router->post('/posts', [PostController::class, 'store']);
+$router->get('/posts', function () {
+    requireAuth();
+    require __DIR__ . '/../views/posts.php';
+});
+
+$router->put('/posts/:id', [PostController::class, 'update']);
+$router->delete('/posts/:id', [PostController::class, 'destroy']);
 
 $router->get('/editPost/:id', function ($id) {
     requireAuth();

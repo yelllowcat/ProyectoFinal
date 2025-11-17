@@ -18,36 +18,39 @@ namespace App\views;
 
   <div class="main-content">
     <div class="edit-container">
-      <div class="post-preview">
-        <div class="post-header-section">
-          <div class="post-avatar"></div>
-          <div class="post-user-info">
-            <h3>Manuel Orozco</h3>
-            <div class="post-date-info">Publicado el: 18/03/2025</div>
+      <form action="/posts" method="POST">
+        <div class="post-preview">
+          <div class="post-header-section">
+            <div class="post-avatar"></div>
+            <div class="post-user-info">
+              <h3><?= safe_output($_SESSION['user_name'] ?? 'Usuario') ?></h3>
+              <div class="post-date-info">Publicando ahora</div>
+            </div>
+          </div>
+
+          <div class="post-prompt">
+            <div class="post-prompt-title">¿Qué estás pensando?</div>
+            <div class="post-prompt-subtitle">Comparte con nosotros</div>
+          </div>
+
+          <div class="add-post-image-section">
+            <img class="add-post-image" src="../assets/images/addImage.png" alt="add Image" />
+          </div>
+
+          <div class="post-text-section">
+            <textarea class="post-textarea" id="postText" name="content" maxlength="500" oninput="updateCounter()"
+              placeholder="Escribe lo que quieres compartir..."></textarea>
+            <div class="char-counter"><span id="charCount">0</span>/500</div>
+          </div>
+
+          <div class="action-buttons">
+            <button type="submit" class="btn btn-primary btn-post">Publicar</button>
           </div>
         </div>
-
-        <div class="post-prompt">
-          <div class="post-prompt-title">¿Que estas pensando?</div>
-          <div class="post-prompt-subtitle">Comparte con nosotros</div>
-        </div>
-
-        <div class="add-post-image-section">
-          <img class="add-post-image" src="../assets/images/addImage.png" alt="add Image" />
-        </div>
-
-        <div class="post-text-section">
-          <textarea class="post-textarea" id="postText" maxlength="500" oninput="updateCounter()">
-Blandit habitasse eleifend himenaeos maecenas risus dui congue torquent, felis curae eros cubilia justo iaculis ornare, inceptos est arcu odio mus diam rhoncus. Orci tortor semper parturient nascetur venenatis porta cum i</textarea>
-          <div class="char-counter"><span id="charCount">350</span>/500</div>
-        </div>
-
-        <div class="action-buttons">
-          <button class="btn btn-primary btn-post">Publicar</button>
-        </div>
-      </div>
+      </form>
     </div>
   </div>
+
   <script src="../js/main.js"></script>
 </body>
 
