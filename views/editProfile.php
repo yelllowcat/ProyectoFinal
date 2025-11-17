@@ -32,19 +32,21 @@
             Miembro desde: <?= date('d-m-Y', strtotime($user['registration_date'] ?? 'now')) ?>
           </p>
 
-          <button class="btn btn-delete">Eliminar cuenta</button>
+          <button type="button" class="btn btn-delete">Eliminar cuenta</button>
         </div>
 
         <div class="form-group">
           <label for="full_name">Nombre completo</label>
           <input type="text" id="full_name" name="full_name" value="<?= safe_output($user['full_name'] ?? '') ?>"
-            placeholder="Ingresa tu nombre completo" required maxlength="30">
+            placeholder="Ingresa tu nombre completo" required minlength="2" maxlength="50" onpaste="return false;"
+            pattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s\.\-']{2,50}$">
+
         </div>
 
         <div class="form-group">
           <label for="biography">Biografía</label>
-          <textarea id="postText" name="biography" placeholder="Describe algo sobre ti..."
-            rows="6"maxlength="500" oninput="updateCounter()"><?= safe_output($user['biography'] ?? '') ?></textarea>
+          <textarea id="postText" name="biography" placeholder="Describe algo sobre ti..." rows="6" maxlength="500"
+            oninput="updateCounter()"><?= safe_output($user['biography'] ?? '') ?></textarea>
           <div class="char-counter"><span id="charCount">350</span>/500</div>
         </div>
 
@@ -54,7 +56,7 @@
       </form>
     </div>
   </div>
-    <script src="../js/main.js"></script>
+  <script src="../js/main.js"></script>
 </body>
 
 </html>
