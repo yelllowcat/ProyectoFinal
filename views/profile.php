@@ -10,7 +10,6 @@ $user = $userModel->getUserById($userId);
 
 $postModel = new PostModel();
 $userPosts = $postModel->getPostsByUserId($userId);
-die(json_encode($user));
 if (!$user) {
     flash('error', 'Usuario no encontrado');
     redirect('/posts');
