@@ -1,15 +1,20 @@
 <?php
+
 use App\Components\Post;
 use App\Components\Profile;
+use App\Models\PostModel;
 
 $userId = $_GET['id'] ?? getCurrentUserId();
 $userModel = new App\Models\UserModel();
 $user = $userModel->getUserById($userId);
 
+$postModel = new PostModel();
+$userPosts = $postModel->getPostsByUserId($userId);
+die(json_encode($user));
 if (!$user) {
     flash('error', 'Usuario no encontrado');
     redirect('/posts');
-}?>
+} ?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -27,120 +32,37 @@ if (!$user) {
     ?>
     <div class="main-content">
         <div class="content-wrapper">
-            <?php 
+            <?php
             $profile = new Profile(
-                'own', 
-                $user['full_name'], 
-                $user['biography'] ?? '', 
-                2100, 
+                'own',
+                $user['full_name'],
+                $user['biography'] ?? '',
+                2100,
                 187
             );
             echo $profile->render();
-            ?>
 
-            <?php
-            $posts = [
-                [
-                    'id' => 1,
-                    'author' => 'Manuel Orozco',
-                    'date' => '18/03/2025',
-                    'image' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=350&fit=crop',
-                    'image_alt' => 'Paisaje montañoso',
-                    'text' => 'Blandit habitasse eleifend himenaeos maecenas risus dui congue torquent, felis curae eros cubilia justo iaculis ornare, inceptos est arcu odio mus diam rhoncus. Orci tortor semper parturient nascetur venenatis porta cum nisi suscipit sagittis.',
-                    'likes' => 200,
-                    'comments_count' => 20,
-                    'comments' => [
-                        [
-                            'author' => 'Gabriel Hernández',
-                            'text' => 'Eres publicista o dentista',
-                            'time' => 'Hace 2 hrs',
-                            'date' => '5 de diciembre'
-                        ],
-                        [
-                            'author' => 'Manuel Orozco',
-                            'text' => 'Soy publicista o tecnicista',
-                            'time' => 'Hace 2 hrs',
-                            'date' => '5 de diciembre'
-                        ]
-                    ]
-                ],
-                [
-                    'id' => 2,
-                    'author' => 'Juanito Alimaña',
-                    'date' => '10/03/2025',
-                    'image' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=350&fit=crop',
-                    'image_alt' => 'Gran Cañón',
-                    'text' => 'Blandit habitasse eleifend himenaeos maecenas risus dui congue torquent, felis curae eros cubilia justo iaculis ornare, inceptos est arcu odio mus diam rhoncus. Orci tortor semper parturient nascetur venenatis porta cum nisi suscipit sagittis.',
-                    'likes' => 391,
-                    'comments_count' => 12,
-                    'comments' => [
-                        [
-                            'author' => 'Gabriel Hernández',
-                            'text' => 'Eres publicista o dentista',
-                            'time' => 'Hace 2 hrs',
-                            'date' => '5 de diciembre'
-                        ],
-                        [
-                            'author' => 'Manuel Orozco',
-                            'text' => 'Soy publicista o tecnicista',
-                            'time' => 'Hace 2 hrs',
-                            'date' => '5 de diciembre'
-                        ],
-                        [
-                            'author' => 'Gabriel Hernández',
-                            'text' => 'Eres publicista o dentista',
-                            'time' => 'Hace 2 hrs',
-                            'date' => '5 de diciembre'
-                        ],
-                        [
-                            'author' => 'Manuel Orozco',
-                            'text' => 'Soy publicista o tecnicista',
-                            'time' => 'Hace 2 hrs',
-                            'date' => '5 de diciembre'
-                        ],
-                        [
-                            'author' => 'Gabriel Hernández',
-                            'text' => 'Eres publicista o dentista',
-                            'time' => 'Hace 2 hrs',
-                            'date' => '5 de diciembre'
-                        ],
-                        [
-                            'author' => 'Manuel Orozco',
-                            'text' => 'Soy publicista o tecnicista',
-                            'time' => 'Hace 2 hrs',
-                            'date' => '5 de diciembre'
-                        ]
-                    ]
-                ],
-                [
-                    'id' => 3,
-                    'author' => 'María González',
-                    'date' => '05/03/2025',
-                    'image' => 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=350&fit=crop',
-                    'image_alt' => 'Naturaleza',
-                    'text' => 'Blandit habitasse eleifend himenaeos maecenas risus dui congue torquent, felis curae eros cubilia justo iaculis ornare, inceptos est arcu odio mus diam rhoncus. Orci tortor semper parturient nascetur venenatis porta cum nisi suscipit sagittis.',
-                    'likes' => 95,
-                    'comments_count' => 12,
-                    'comments' => [
-                        [
-                            'author' => 'Gabriel Hernández',
-                            'text' => 'Eres publicista o dentista',
-                            'time' => 'Hace 2 hrs',
-                            'date' => '5 de diciembre'
-                        ],
-                        [
-                            'author' => 'Manuel Orozco',
-                            'text' => 'Soy publicista o tecnicista',
-                            'time' => 'Hace 2 hrs',
-                            'date' => '5 de diciembre'
-                        ]
-                    ]
-                ]
-            ];
 
-            foreach ($posts as $postData) {
-                $post = new Post($postData);
-                echo $post->render();
+            if (empty($userPosts)) {
+                echo '<div class="no-posts">Aún no tienes publicaciones... <a href="/addPost">¡Haz tu primera publicación!</a></div>';
+            } else {
+
+                foreach ($userPosts as $postData) {
+                    $postComponent = new Post([
+                        'id' => $postData['post_id'],
+                        'author' => $postData['full_name'],
+                        'date' => date('d/m/Y', strtotime($postData['created_at'])),
+                        'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=350&fit=crop',
+                        'image_alt' => 'Imagen del post',
+                        'text' => $postData['content'],
+                        'likes' => 0,
+                        'comments_count' => 0,
+                        'comments' => [],
+                        'user_id' => $postData['user_id'],
+                        'current_user_id' => $userId
+                    ]);
+                    echo $postComponent->render();
+                }
             }
             ?>
 

@@ -22,9 +22,9 @@ class PostModel
                 INSERT INTO posts (user_id, content, image, created_at, updated_at) 
                 VALUES (?, ?, ?, NOW(), NOW())
             ");
-            
+
             return $stmt->execute([$userId, $content, $image]);
-            
+
         } catch (PDOException $e) {
             error_log("createPost error: " . $e->getMessage());
             return false;
@@ -43,7 +43,7 @@ class PostModel
             ");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
         } catch (PDOException $e) {
             error_log("getAllPosts error: " . $e->getMessage());
             return [];
@@ -61,7 +61,7 @@ class PostModel
             ");
             $stmt->execute([$postId]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
-            
+
         } catch (PDOException $e) {
             error_log("getPostById error: " . $e->getMessage());
             return false;
@@ -77,7 +77,7 @@ class PostModel
                 WHERE post_id = ?
             ");
             return $stmt->execute([$content, $postId]);
-            
+
         } catch (PDOException $e) {
             error_log("updatePost error: " . $e->getMessage());
             return false;
@@ -91,10 +91,29 @@ class PostModel
                 UPDATE posts SET active = 0 WHERE post_id = ?
             ");
             return $stmt->execute([$postId]);
-            
+
         } catch (PDOException $e) {
             error_log("deletePost error: " . $e->getMessage());
             return false;
+        }
+    }
+
+    public function getPostsByUserId($userId)
+    {
+        try {
+            $stmt = $this->pdo->prepare("
+            SELECT p.*, u.full_name, u.profile_picture 
+            FROM posts p 
+            JOIN users u ON p.user_id = u.user_id 
+            WHERE p.user_id = ? AND p.active = 1 
+            ORDER BY p.created_at DESC
+        ");
+            $stmt->execute([$userId]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        } catch (PDOException $e) {
+            error_log("getPostsByUserId error: " . $e->getMessage());
+            return [];
         }
     }
 }
