@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\PostModel;
+use App\Models\LikeModel;
+use App\Models\CommentModel;
 
 class PostController
 {
@@ -92,7 +94,27 @@ class PostController
     public function like($id)
     {
         requireAuth();
-        return ['success' => true];
+        
+        $userId = $_SESSION['user_id'];
+        $likeModel = new LikeModel();
+        
+        if ($likeModel->hasLiked($id, $userId)) {
+            $result = $likeModel->removeLike($id, $userId);
+            $action = 'removed';
+        } else {
+            $result = $likeModel->addLike($id, $userId);
+            $action = 'added';
+        }
+        
+        if ($result) {
+            $likeCount = $likeModel->getLikeCount($id);
+            return jsonSuccess([
+                'likes' => $likeCount,
+                'action' => $action
+            ], $action === 'added' ? 'Like agregado' : 'Like removido');
+        } else {
+            return jsonError('Error al procesar el like');
+        }
     }
 
     public function unlike($id)
@@ -104,13 +126,62 @@ class PostController
     public function addComment($postId)
     {
         requireAuth();
-        $comment = $_POST['comment'] ?? '';
-        return ['success' => true, 'message' => 'Comment added'];
+        
+        $userId = $_SESSION['user_id'];
+        $commentModel = new CommentModel();
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $input = json_decode(file_get_contents('php://input'), true);
+            $comment = clean_input($input['comment'] ?? '');
+            
+            if (empty($comment)) {
+                return jsonError('El comentario no puede estar vacío');
+            }
+            
+            $result = $commentModel->createComment($postId, $userId, $comment);
+            
+            if ($result) {
+                $comments = $commentModel->getCommentsByPost($postId);
+                $commentCount = $commentModel->getCommentCount($postId);
+                
+                return jsonSuccess([
+                    'comments' => $comments,
+                    'comment_count' => $commentCount
+                ], 'Comentario agregado');
+            } else {
+                return jsonError('Error al agregar el comentario');
+            }
+        }
+        
+        return jsonError('Método no permitido');
     }
 
     public function deleteComment($id)
     {
         requireAuth();
-        return ['success' => true, 'message' => 'Comment deleted'];
+        
+        $userId = $_SESSION['user_id'];
+        $commentModel = new CommentModel();
+        
+        $result = $commentModel->deleteComment($id, $userId);
+        
+        if ($result) {
+            return jsonSuccess(null, 'Comentario eliminado');
+        } else {
+            return jsonError('Error al eliminar el comentario o no tienes permisos');
+        }
+    }
+
+    public function getComments($postId)
+    {
+        requireAuth();
+        
+        $commentModel = new CommentModel();
+        $comments = $commentModel->getCommentsByPost($postId);
+        
+        return jsonSuccess([
+            'comments' => $comments,
+            'comment_count' => count($comments)
+        ]);
     }
 }

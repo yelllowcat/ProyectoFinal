@@ -11,8 +11,7 @@ class PostModel
 
     public function __construct()
     {
-        global $pdo;
-        $this->pdo = $pdo;
+        $this->pdo = getDB(); 
     }
 
     public function createPost($userId, $content, $image = null)
@@ -113,6 +112,27 @@ class PostModel
 
         } catch (PDOException $e) {
             error_log("getPostsByUserId error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getPostsWithCounts()
+    {
+        try {
+            $stmt = $this->pdo->prepare("
+            SELECT p.*, u.full_name, u.profile_picture,
+                   (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id) as likes_count,
+                   (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.post_id AND c.active = 1) as comments_count
+            FROM posts p 
+            JOIN users u ON p.user_id = u.user_id 
+            WHERE p.active = 1 
+            ORDER BY p.created_at DESC
+        ");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        } catch (PDOException $e) {
+            error_log("getPostsWithCounts error: " . $e->getMessage());
             return [];
         }
     }
