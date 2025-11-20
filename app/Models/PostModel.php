@@ -71,10 +71,10 @@ class PostModel
     {
         try {
             $stmt = $this->pdo->prepare("
-                UPDATE posts 
-                SET content = ?, updated_at = NOW() 
-                WHERE post_id = ?
-            ");
+            UPDATE posts 
+            SET content = ?, updated_at = NOW() 
+            WHERE post_id = ?
+        ");
             return $stmt->execute([$content, $postId]);
 
         } catch (PDOException $e) {

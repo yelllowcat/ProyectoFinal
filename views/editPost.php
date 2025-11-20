@@ -1,7 +1,25 @@
 <?php
 namespace App\views;
 
-$post = $_GET['post_id'];
+use App\Models\PostModel;
+
+requireAuth();
+
+$postId = $_GET['post_id'] ?? null;
+$currentUserId = $_SESSION['user_id'];
+
+if (!$postId) {
+  flash('error', 'Publicación no encontrada');
+  redirect('/posts');
+}
+
+$postModel = new PostModel();
+$post = $postModel->getPostById($postId);
+
+if (!$post || $post['user_id'] != $currentUserId) {
+  flash('error', 'No tienes permisos para editar esta publicación');
+  redirect('/posts');
+}
 
 ?>
 <!DOCTYPE html>
@@ -17,43 +35,53 @@ $post = $_GET['post_id'];
 <body>
   <?php
   $currentPage = 'editPost';
-  require_once 'assets/sidebar.php' ?>
+  require_once 'assets/sidebar.php';
+  ?>
 
   <div class="main-content">
     <div class="edit-container">
-      <div class="post-preview">
-        <div class="post-header-section">
-          <div class="post-avatar"></div>
-          <div class="post-user-info">
-            <h3>Manuel Orozco</h3>
-            <div class="post-date-info">Publicado el: 18/03/2025</div>
+      <form id="editPostForm" method="POST">
+        <div class="post-preview">
+          <div class="post-header-section">
+            <div class="post-avatar"></div>
+            <div class="post-user-info">
+              <h3><?= safe_output($_SESSION['user_name'] ?? 'Usuario') ?></h3>
+              <div class="post-date-info">Publicado el: <?= date('d/m/Y', strtotime($post['created_at'])) ?></div>
+            </div>
+          </div>
+
+          <div class="post-prompt">
+            <div class="post-prompt-title">¿Qué estás pensando?</div>
+            <div class="post-prompt-subtitle">Edita tu publicación</div>
+          </div>
+
+          <?php if ($post['image']): ?>
+            <div class="post-image-section">
+              <img src="/assets/imagesPosts/<?= $post['image'] ?>" alt="Imagen del post" class="post-image" />
+              <div class="image-note">* La imagen no se puede editar</div>
+            </div>
+          <?php endif; ?>
+
+          <div class="post-text-section">
+            <textarea class="post-textarea" id="postText" name="content" maxlength="500" oninput="updateCounter()"
+              placeholder="Escribe lo que quieres compartir..." minlength="2"
+              required><?= safe_output($post['content']) ?></textarea>
+            <div class="char-counter"><span id="charCount"><?= strlen($post['content']) ?></span>/500</div>
+          </div>
+
+          <div class="action-buttons">
+            <button type="button" class="btn btn-delete-post" onclick="deletePost(<?= $postId ?>)">Eliminar
+              publicación</button>
+            <button type="submit" class="btn btn-save">Guardar Cambios</button>
           </div>
         </div>
-
-        <div class="post-prompt">
-          <div class="post-prompt-title">¿Que estas pensando?</div>
-          <div class="post-prompt-subtitle">Comparte con nosotros</div>
-        </div>
-
-        <div class="post-image-section">
-          <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=350&fit=crop"
-            alt="Paisaje montañoso" class="post-image" />
-        </div>
-
-        <div class="post-text-section">
-          <textarea class="post-textarea" id="postText" maxlength="500" oninput="updateCounter()">
-Blandit habitasse eleifend himenaeos maecenas risus dui congue torquent, felis curae eros cubilia justo iaculis ornare, inceptos est arcu odio mus diam rhoncus. Orci tortor semper parturient nascetur venenatis porta cum i</textarea>
-          <div class="char-counter"><span id="charCount">350</span>/500</div>
-        </div>
-
-        <div class="action-buttons">
-          <button class="btn btn-delete-post">Eliminar publicación</button>
-          <button class="btn btn-save">Guardar Cambios</button>
-        </div>
-      </div>
+      </form>
     </div>
   </div>
 
+  <script>
+    const POST_ID = <?= $postId ?>;
+  </script>
   <script src="../js/main.js"></script>
 </body>
 
