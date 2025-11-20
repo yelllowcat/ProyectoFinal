@@ -2,7 +2,8 @@ const COMMENTS_PER_LOAD = 3;
 
 function loadMoreComments(button) {
   const commentsSection = button.closest(".comments-section");
-  const comments = commentsSection.querySelectorAll(".comment.hidden");
+  const commentsContainer = commentsSection.querySelector(".comments-container");
+  const comments = commentsContainer.querySelectorAll(".comment.hidden");
   const loadMoreBtn = button;
 
   let loaded = 0;
@@ -11,25 +12,9 @@ function loadMoreComments(button) {
     loaded++;
   }
 
-  const remainingComments = commentsSection.querySelectorAll(".comment.hidden");
+  const remainingComments = commentsContainer.querySelectorAll(".comment.hidden");
   if (remainingComments.length === 0) {
     loadMoreBtn.classList.add("hidden");
-  }
-}
-function toggleMenu(event, menuId) {
-  event.stopPropagation();
-
-  const menu = document.getElementById(menuId);
-  const allMenus = document.querySelectorAll(".post-menu-modal");
-
-  const wasActive = menu.classList.contains("active");
-
-  allMenus.forEach((m) => {
-    m.classList.remove("active");
-  });
-
-  if (!wasActive) {
-    menu.classList.toggle("active");
   }
 }
 
@@ -83,11 +68,31 @@ if (confirmModal) {
   });
 }
 
-function toggleComments(button) {
-  const postCard = button.closest(".post-container");
-  const commentsSection = postCard.querySelector(".comments-section");
+async function toggleComments(button) {
+  const postContainer = button.closest(".post-container");
+  const postId = postContainer.dataset.postId;
+  const commentsSection = postContainer.querySelector(".comments-section");
+
+  if (commentsSection.classList.contains("hidden")) {
+    await loadComments(postId, postContainer);
+  }
 
   commentsSection.classList.toggle("hidden");
+}
+
+async function loadComments(postId, postContainer) {
+  try {
+    const response = await fetch(`/posts/${postId}/comments`);
+    const result = await response.json();
+
+    if (result.success) {
+      updateCommentsSection(postContainer, result.data.comments, result.data.comment_count);
+    } else {
+      console.error('Error al cargar comentarios:', result.message);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
 }
 
 async function handleLike(button) {
@@ -134,9 +139,10 @@ async function handleLike(button) {
   }
 }
 
-function addComment(button) {
-  const postCard = button.closest(".post-container");
-  const commentInput = postCard.querySelector(".comment-input");
+async function addComment(button) {
+  const postContainer = button.closest(".post-container");
+  const postId = postContainer.dataset.postId;
+  const commentInput = postContainer.querySelector(".comment-input");
   const commentText = commentInput.value.trim();
 
   if (!commentText) {
@@ -144,45 +150,119 @@ function addComment(button) {
     return;
   }
 
-  const now = new Date();
-  const dateString = now.toLocaleDateString("es-MX", {
-    day: "numeric",
-    month: "long",
-  });
-  const timeAgo = "Justo ahora";
+  try {
+    const response = await fetch(`/posts/${postId}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ comment: commentText })
+    });
 
-  const commentHTML = `
-        <div class="comment">
-            <div class="comment-header">Manuel Orozco: ${escapeHtml(
-    commentText
-  )}</div>
-            <div class="comment-date">${timeAgo} • ${dateString}</div>
-        </div>
+    const result = await response.json();
+
+    if (result.success) {
+      commentInput.value = "";
+
+      updateCommentsSection(postContainer, result.data.comments, result.data.comment_count);
+
+      updateCommentCount(postContainer, result.data.comment_count);
+
+    } else {
+      alert('Error al agregar comentario: ' + result.message);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Error de conexión');
+  }
+}
+
+function updateCommentsSection(postContainer, comments, commentCount) {
+  const commentsSection = postContainer.querySelector(".comments-section");
+
+  let commentsContainer = commentsSection.querySelector('.comments-container');
+  if (!commentsContainer) {
+    commentsContainer = document.createElement('div');
+    commentsContainer.className = 'comments-container';
+
+    const commentInputContainer = commentsSection.querySelector('.comment-input-container');
+    commentsSection.insertBefore(commentsContainer, commentInputContainer);
+  }
+
+  commentsContainer.innerHTML = '';
+
+  const title = document.createElement('h4');
+  title.style.marginBottom = '15px';
+  title.style.fontSize = '15px';
+  title.textContent = `Comentarios (${commentCount})`;
+  commentsContainer.appendChild(title);
+
+  comments.forEach((comment, index) => {
+    const isHidden = index >= 3 ? ' hidden' : '';
+    const date = new Date(comment.created_at);
+    const dateString = date.toLocaleDateString("es-MX", {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    });
+    const timeAgo = getTimeAgo(comment.created_at);
+
+    const commentHTML = `
+      <div class="comment${isHidden}">
+        <div class="comment-header">${comment.full_name}: ${escapeHtml(comment.content)}</div>
+        <div class="comment-date">${timeAgo} • ${dateString}</div>
+      </div>
     `;
 
-  const commentInputContainer = postCard.querySelector(
-    ".comment-input-container"
-  );
-  commentInputContainer.insertAdjacentHTML("beforebegin", commentHTML);
+    commentsContainer.insertAdjacentHTML('beforeend', commentHTML);
+  });
 
-  commentInput.value = "";
+  if (comments.length > 3) {
+    const loadMoreContainer = document.createElement('div');
+    loadMoreContainer.className = 'load-more-container';
+    loadMoreContainer.innerHTML = `
+      <button class="load-more-btn" onclick="loadMoreComments(this)">
+        Ver más comentarios
+      </button>
+    `;
+    commentsContainer.appendChild(loadMoreContainer);
+  }
 
-  const newComment = commentInputContainer.previousElementSibling;
-  newComment.style.opacity = "0";
-  newComment.style.transform = "translateY(-10px)";
-  setTimeout(() => {
-    newComment.style.transition = "all 0.3s ease";
-    newComment.style.opacity = "1";
-    newComment.style.transform = "translateY(0)";
-  }, 10);
+  const newComments = commentsContainer.querySelectorAll('.comment');
+  if (newComments.length > 0) {
+    const lastComment = newComments[newComments.length - 1];
+    lastComment.style.opacity = "0";
+    lastComment.style.transform = "translateY(-10px)";
+    setTimeout(() => {
+      lastComment.style.transition = "all 0.3s ease";
+      lastComment.style.opacity = "1";
+      lastComment.style.transform = "translateY(0)";
+    }, 10);
+  }
+}
 
-  const commentsButton = postCard.querySelector(".action-btn.comments");
-  const currentCount = parseInt(commentsButton.textContent.match(/\d+/)[0]);
-  const newCount = currentCount + 1;
+function updateCommentCount(postContainer, commentCount) {
+  const commentsButton = postContainer.querySelector(".action-btn.comments");
   commentsButton.innerHTML = `
     <img src='/assets/images/comments.png' alt='comments icon' width='25'>
-    ${newCount} Comentarios
+    ${commentCount} Comentarios
   `;
+}
+
+function getTimeAgo(dateString) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Justo ahora';
+  if (diffMins < 60) return `Hace ${diffMins} minuto${diffMins > 1 ? 's' : ''}`;
+  if (diffHours < 24) return `Hace ${diffHours} hora${diffHours > 1 ? 's' : ''}`;
+  if (diffDays < 7) return `Hace ${diffDays} día${diffDays > 1 ? 's' : ''}`;
+
+  return date.toLocaleDateString('es-MX');
 }
 
 function escapeHtml(text) {
@@ -197,6 +277,7 @@ function handleCommentKeyPress(event, button) {
     addComment(button);
   }
 }
+
 function updateCounter() {
   const textarea = document.getElementById("postText");
   const counter = document.getElementById("charCount");

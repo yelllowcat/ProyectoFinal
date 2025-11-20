@@ -102,6 +102,7 @@ $router->post('/posts/:id/like', [PostController::class, 'like']);
 $router->delete('/posts/:id/like', [PostController::class, 'unlike']);
 
 $router->post('/posts/:id/comments', [PostController::class, 'addComment']);
+$router->get('/posts/:id/comments', [PostController::class, 'getComments']);
 $router->delete('/comments/:id', [PostController::class, 'deleteComment']);
 
 $router->get('/dashboard', function () {

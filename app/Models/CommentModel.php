@@ -17,12 +17,11 @@ class CommentModel
     public function createComment($postId, $userId, $content)
     {
         try {
-            $stmt = $this->pdo->prepare("
-                INSERT INTO comments (post_id, user_id, content, created_at) 
-                VALUES (?, ?, ?, NOW())
-            ");
+            $stmt = $this->pdo->prepare("CALL sp_create_comment(?, ?, ?)");
+            $stmt->execute([$postId, $userId, $content]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            return $stmt->execute([$postId, $userId, $content]);
+            return $result['comment_id'] ?? false;
             
         } catch (PDOException $e) {
             error_log("createComment error: " . $e->getMessage());
@@ -33,13 +32,7 @@ class CommentModel
     public function getCommentsByPost($postId)
     {
         try {
-            $stmt = $this->pdo->prepare("
-                SELECT c.*, u.full_name, u.profile_picture 
-                FROM comments c 
-                JOIN users u ON c.user_id = u.user_id 
-                WHERE c.post_id = ? AND c.active = 1 
-                ORDER BY c.created_at ASC
-            ");
+            $stmt = $this->pdo->prepare("CALL sp_get_comments_by_post(?)");
             $stmt->execute([$postId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
             
@@ -52,11 +45,11 @@ class CommentModel
     public function deleteComment($commentId, $userId)
     {
         try {
-            $stmt = $this->pdo->prepare("
-                UPDATE comments SET active = 0 
-                WHERE comment_id = ? AND user_id = ?
-            ");
-            return $stmt->execute([$commentId, $userId]);
+            $stmt = $this->pdo->prepare("CALL sp_delete_comment(?, ?)");
+            $stmt->execute([$commentId, $userId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            return ($result['affected_rows'] ?? 0) > 0;
             
         } catch (PDOException $e) {
             error_log("deleteComment error: " . $e->getMessage());
@@ -67,17 +60,28 @@ class CommentModel
     public function getCommentCount($postId)
     {
         try {
-            $stmt = $this->pdo->prepare("
-                SELECT COUNT(*) as count FROM comments 
-                WHERE post_id = ? AND active = 1
-            ");
+            $stmt = $this->pdo->prepare("CALL sp_get_comment_count(?)");
             $stmt->execute([$postId]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $result['count'] ?? 0;
+            
+            return $result['comment_count'] ?? 0;
             
         } catch (PDOException $e) {
             error_log("getCommentCount error: " . $e->getMessage());
             return 0;
+        }
+    }
+
+    public function getCommentById($commentId)
+    {
+        try {
+            $stmt = $this->pdo->prepare("CALL sp_get_comment_by_id(?)");
+            $stmt->execute([$commentId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+            
+        } catch (PDOException $e) {
+            error_log("getCommentById error: " . $e->getMessage());
+            return false;
         }
     }
 }

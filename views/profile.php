@@ -4,6 +4,7 @@ use App\Components\Post;
 use App\Components\Profile;
 use App\Models\PostModel;
 use App\Models\LikeModel;
+use App\Models\CommentModel;
 
 $userId = $_GET['id'] ?? getCurrentUserId();
 $userModel = new App\Models\UserModel();
@@ -11,8 +12,9 @@ $user = $userModel->getUserById($userId);
 
 $postModel = new PostModel();
 $likeModel = new LikeModel();
+$commentModel = new CommentModel(); 
 $userPosts = $postModel->getPostsByUserId($userId);
-$currentUserId = getCurrentUserId(); // ID del usuario que está viendo el perfil
+$currentUserId = getCurrentUserId(); 
 
 if (!$user) {
     flash('error', 'Usuario no encontrado');
@@ -51,6 +53,9 @@ if (!$user) {
                 foreach ($userPosts as $postData) {
                     $likesCount = $likeModel->getLikeCount($postData['post_id']);
                     $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
+
+                    $comments = $commentModel->getCommentsByPost($postData['post_id']); 
+                    $commentsCount = $commentModel->getCommentCount($postData['post_id']); 
                     
                     $postComponent = new Post([
                         'id' => $postData['post_id'],
@@ -60,8 +65,8 @@ if (!$user) {
                         'image_alt' => 'Imagen del post',
                         'text' => $postData['content'],
                         'likes' => $likesCount,
-                        'comments_count' => 0, 
-                        'comments' => [],
+                        'comments_count' => $commentsCount,
+                        'comments' => $comments,
                         'user_id' => $postData['user_id'],
                         'current_user_id' => $currentUserId, 
                         'has_liked' => $hasLiked 

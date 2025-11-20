@@ -13,7 +13,7 @@ class Post
     private $comments;
     private $userId;
     private $currentUserId;
-    private $data; 
+    private $data;
 
     public function __construct($data)
     {
@@ -28,7 +28,7 @@ class Post
         $this->comments = $data['comments'];
         $this->userId = $data['user_id'] ?? null;
         $this->currentUserId = $data['current_user_id'] ?? null;
-        $this->data = $data; 
+        $this->data = $data;
     }
 
     public function getId()
@@ -144,45 +144,47 @@ class Post
 
         foreach ($this->comments as $index => $comment) {
             $isHidden = $index >= 3 ? ' hidden' : '';
-            $author = htmlspecialchars($comment['author']);
-            $text = htmlspecialchars($comment['text']);
-            $time = htmlspecialchars($comment['time']);
-            $date = htmlspecialchars($comment['date']);
+            $author = htmlspecialchars($comment['full_name'] ?? $comment['author']);
+            $text = htmlspecialchars($comment['content'] ?? $comment['text']);
+            $time = htmlspecialchars($comment['time'] ?? '');
+            $date = htmlspecialchars($comment['date'] ?? date('d/m/Y', strtotime($comment['created_at'])));
 
             $commentsHtml .= "
-            <div class='comment{$isHidden}'>
-                <div class='comment-header'>
-                    {$author}: {$text}
-                </div>
-                <div class='comment-date'>
-                    {$time} • {$date}
-                </div>
+        <div class='comment{$isHidden}'>
+            <div class='comment-header'>
+                {$author}: {$text}
             </div>
-            ";
+            <div class='comment-date'>
+                {$time} • {$date}
+            </div>
+        </div>
+        ";
         }
 
         $loadMoreBtn = '';
         if ($totalComments > 3) {
             $loadMoreBtn = "
-            <div class='load-more-container'>
-                <button class='load-more-btn' id='loadMoreBtn{$this->id}' onclick='loadMoreComments(this)'>
-                   Ver más comentarios
-                </button>
-            </div>
-            ";
+        <div class='load-more-container'>
+            <button class='load-more-btn' onclick='loadMoreComments(this)'>
+               Ver más comentarios
+            </button>
+        </div>
+        ";
         }
 
         return "
-        <div class='comments-section hidden'>
-            <h4 style='margin-bottom: 15px; font-size: 15px;'>Comentarios</h4>
+    <div class='comments-section hidden'>
+        <div class='comments-container'>
+            <h4 style='margin-bottom: 15px; font-size: 15px;'>Comentarios ({$this->commentsCount})</h4>
             {$commentsHtml}
             {$loadMoreBtn}
-            <div class='comment-input-container'>
-                <input type='text' class='comment-input' placeholder='Comentar' onkeypress='handleCommentKeyPress(event, this)'>
-                <button class='comment-submit' onclick='addComment(this)'>Publicar</button>
-            </div>
         </div>
-        ";
+        <div class='comment-input-container'>
+            <input type='text' class='comment-input' placeholder='Comentar' onkeypress='handleCommentKeyPress(event, this)'>
+            <button class='comment-submit' onclick='addComment(this)'>Publicar</button>
+        </div>
+    </div>
+    ";
     }
 }
 ?>
