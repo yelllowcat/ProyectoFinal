@@ -1,5 +1,6 @@
 <?php
 namespace App\Components;
+
 class Post
 {
     private $id;
@@ -14,6 +15,7 @@ class Post
     private $userId;
     private $currentUserId;
     private $data;
+    private $userAvatar;
 
     public function __construct($data)
     {
@@ -29,6 +31,12 @@ class Post
         $this->userId = $data['user_id'] ?? null;
         $this->currentUserId = $data['current_user_id'] ?? null;
         $this->data = $data;
+        
+        $this->userAvatar = $data['user_avatar'] ?? '/assets/imagesProfile/default_avatar.png';
+        
+        if ($this->userAvatar && !str_starts_with($this->userAvatar, '/assets/')) {
+            $this->userAvatar = '/assets/imagesProfile/' . $this->userAvatar;
+        }
     }
 
     public function getId()
@@ -76,7 +84,7 @@ class Post
         return $this->comments;
     }
 
-    public function render(): string
+     public function render(): string
     {
         $menuId = 'menu' . $this->id;
         $commentsSection = $this->renderCommentsSection();
@@ -106,7 +114,9 @@ class Post
     <div class='feed-post-card post-container' data-post-id='{$this->id}'>
         <div class='feed-post-header'>
             <a href='/profile/{$this->userId}' class='feed-post-user'>
-                <div class='feed-post-avatar'></div>
+                <div class='feed-post-avatar'>
+                    <img src='{$this->userAvatar}' alt='Avatar de {$this->author}' class='post-user-avatar'>
+                </div>
                 <div class='feed-post-user-info'>
                     <h3>{$this->author}</h3>
                     <div class='feed-post-date'>Publicado el: {$this->date}</div>

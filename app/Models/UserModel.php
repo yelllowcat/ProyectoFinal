@@ -129,28 +129,27 @@ class UserModel
         }
     }
 
-    public function updateUser($userId, $data)
-{
-    try {
-        
-        $stmt = $this->pdo->prepare("
-            UPDATE users 
-            SET full_name = ?, biography = ?, updated_at = NOW()
-            WHERE user_id = ?
-        ");
-        
-        $result = $stmt->execute([
-            $data['full_name'],
-            $data['biography'],
-            $userId
-        ]);
-        
-        
-        return $result;
-        
-    } catch (PDOException $e) {
-        error_log("updateUser error: " . $e->getMessage());
-        return false;
+    public function updateUser($userId, $fullName, $biography, $profilePicture = null)
+    {
+        try {
+            if ($profilePicture) {
+                $stmt = $this->pdo->prepare("
+                UPDATE users 
+                SET full_name = ?, biography = ?, profile_picture = ?, updated_at = NOW() 
+                WHERE user_id = ?
+            ");
+                return $stmt->execute([$fullName, $biography, $profilePicture, $userId]);
+            } else {
+                $stmt = $this->pdo->prepare("
+                UPDATE users 
+                SET full_name = ?, biography = ?, updated_at = NOW() 
+                WHERE user_id = ?
+            ");
+                return $stmt->execute([$fullName, $biography, $userId]);
+            }
+        } catch (PDOException $e) {
+            error_log("updateUser error: " . $e->getMessage());
+            return false;
+        }
     }
-}
 }

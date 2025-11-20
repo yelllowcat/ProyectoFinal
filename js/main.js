@@ -400,6 +400,47 @@ function removeImage() {
   addImageSection.style.display = 'flex';
 }
 
+function handleProfileImageSelect(event) {
+  const file = event.target.files[0];
+  const preview = document.getElementById('profileImagePreview');
+  const previewImage = document.getElementById('previewProfileImage');
+  const currentImage = document.getElementById('currentProfileImage');
+
+  if (file) {
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen no puede ser mayor a 5MB');
+      event.target.value = '';
+      return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Solo se permiten imágenes JPEG y PNG');
+      event.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      previewImage.src = e.target.result;
+      preview.style.display = 'block';
+      currentImage.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function removeProfileImage() {
+  const fileInput = document.getElementById('profile_picture');
+  const preview = document.getElementById('profileImagePreview');
+  const currentImage = document.getElementById('currentProfileImage');
+
+  fileInput.value = '';
+  preview.style.display = 'none';
+  currentImage.style.display = 'block';
+}
+
+
 //update post
 
 document.getElementById('editPostForm').addEventListener('submit', async function (e) {
