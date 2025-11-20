@@ -91,52 +91,51 @@ class Post
         $menuOptions = '';
         if ($this->userId == $this->currentUserId) {
             $menuOptions = "
-            <div class='feed-post-menu' onclick=\"toggleMenu(event, '{$menuId}')\">
-                <img src='/assets/images/more.png' alt='more options' width='25'>
-                <div class='post-menu-modal' id='{$menuId}'>
-                    <div class='menu-option delete' onclick='openConfirmModal(this)'>Eliminar</div>
-                    <a href='/editPost/{$this->id}' class='menu-option edit'>Editar</a>
-                    <div class='menu-option'>Cancelar</div>
-                </div>
+        <div class='feed-post-menu' onclick=\"toggleMenu(event, '{$menuId}')\">
+            <img src='/assets/images/more.png' alt='more options' width='25'>
+            <div class='post-menu-modal' id='{$menuId}'>
+                <div class='menu-option delete' onclick='openConfirmModal(this)'>Eliminar</div>
+                <a href='/editPost/{$this->id}' class='menu-option edit'>Editar</a>
+                <div class='menu-option'>Cancelar</div>
             </div>
-            ";
+        </div>
+        ";
         }
 
         return "
-        <div class='feed-post-card post-container' data-post-id='{$this->id}'>
-            <div class='feed-post-header'>
-                <a href='/profile/{$this->userId}' class='feed-post-user'>
-                    <div class='feed-post-avatar'></div>
-                    <div class='feed-post-user-info'>
-                        <h3>{$this->author}</h3>
-                        <div class='feed-post-date'>Publicado el: {$this->date}</div>
-                    </div>
-                </a>
-                {$menuOptions}
-            </div>
-
-            " . ($this->image ? "<div class='feed-post-image'><img src='{$this->image}' alt='{$this->imageAlt}'></div>" : "") . "
-
-            <p class='feed-post-text'>
-                {$this->text}
-            </p>
-
-            <div class='feed-post-actions'>
-                <button class='{$likeButtonClass}' onclick='handleLike(this)'>
-                    <img src='/assets/images/{$heartIcon}' alt='{$heartAlt}' width='25'>
-                    {$this->likes} Me gusta
-                </button>
-                <button class='action-btn comments' onclick='toggleComments(this)'>
-                    <img src='/assets/images/comments.png' alt='comments icon' width='25'>
-                    {$this->commentsCount} Comentarios
-                </button>
-            </div>
-
-            {$commentsSection}
+    <div class='feed-post-card post-container' data-post-id='{$this->id}'>
+        <div class='feed-post-header'>
+            <a href='/profile/{$this->userId}' class='feed-post-user'>
+                <div class='feed-post-avatar'></div>
+                <div class='feed-post-user-info'>
+                    <h3>{$this->author}</h3>
+                    <div class='feed-post-date'>Publicado el: {$this->date}</div>
+                </div>
+            </a>
+            {$menuOptions}
         </div>
-        ";
-    }
 
+        " . ($this->image ? "<div class='feed-post-image'><img src='{$this->image}' 
+        alt='{$this->imageAlt}'></div>" : "") . "
+        <p class='feed-post-text'>
+            {$this->text}
+        </p>
+
+        <div class='feed-post-actions'>
+            <button class='{$likeButtonClass}' onclick='handleLike(this)'>
+                <img src='/assets/images/{$heartIcon}' alt='{$heartAlt}' width='25'>
+                {$this->likes} Me gusta
+            </button>
+            <button class='action-btn comments' onclick='toggleComments(this)'>
+                <img src='/assets/images/comments.png' alt='comments icon' width='25'>
+                {$this->commentsCount} Comentarios
+            </button>
+        </div>
+
+        {$commentsSection}
+    </div>
+    ";
+    }
     private function renderCommentsSection(): string
     {
         $totalComments = count($this->comments);
@@ -160,18 +159,16 @@ class Post
         </div>
         ";
         }
-
-        $loadMoreBtn = '';
-        if ($totalComments > 3) {
-            $loadMoreBtn = "
+$loadMoreBtn = '';
+    if ($totalComments > 3) {
+        $loadMoreBtn = "
         <div class='load-more-container'>
             <button class='load-more-btn' onclick='loadMoreComments(this)'>
                Ver más comentarios
             </button>
         </div>
         ";
-        }
-
+    }
         return "
     <div class='comments-section hidden'>
         <div class='comments-container'>

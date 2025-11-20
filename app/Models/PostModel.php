@@ -11,18 +11,17 @@ class PostModel
 
     public function __construct()
     {
-        $this->pdo = getDB(); 
+        $this->pdo = getDB();
     }
 
     public function createPost($userId, $content, $image = null)
     {
         try {
-            $stmt = $this->pdo->prepare("
-                INSERT INTO posts (user_id, content, image, created_at, updated_at) 
-                VALUES (?, ?, ?, NOW(), NOW())
-            ");
+            $stmt = $this->pdo->prepare("CALL sp_create_post(?, ?, ?)");
+            $stmt->execute([$userId, $content, $image]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            return $stmt->execute([$userId, $content, $image]);
+            return $result['post_id'] ?? false;
 
         } catch (PDOException $e) {
             error_log("createPost error: " . $e->getMessage());
@@ -30,6 +29,7 @@ class PostModel
         }
     }
 
+    // Los demás métodos se mantienen igual...
     public function getAllPosts()
     {
         try {

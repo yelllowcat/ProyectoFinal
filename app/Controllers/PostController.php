@@ -17,16 +17,26 @@ class PostController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $content = clean_input($_POST['content'] ?? '');
 
-            if (empty($content)) {
-                flash('error', 'El contenido del post no puede estar vacío');
-                redirect('/addPost');
+            if (empty($content) || strlen(trim($content)) < 1) {
+            flash('error', 'El contenido del post debe tener al menos 1 caracteres');
+            redirect('/addPost');
+        }
+
+            $imageName = null;
+
+            if (isset($_FILES['post_image']) && $_FILES['post_image']['error'] === 0) {
+                $imageName = $this->handleImageUpload($_FILES['post_image']);
+
+                if ($imageName === null) {
+                    redirect('/addPost');
+                }
             }
 
             $postModel = new PostModel();
-            $result = $postModel->createPost($userId, $content, null);
+            $result = $postModel->createPost($userId, $content, $imageName);
 
             if ($result) {
-                flash('success', 'Post publicado correctamente');
+                flash('success', 'Post publicado correctamente' . ($imageName ? ' con imagen' : ''));
                 redirect('/posts');
             } else {
                 flash('error', 'Error al publicar el post');
@@ -35,6 +45,35 @@ class PostController
         }
 
         redirect('/addPost');
+    }
+
+    private function handleImageUpload($imageFile)
+    {
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+        $maxSize = 5 * 1024 * 1024;
+
+        if (!in_array($imageFile['type'], $allowedTypes)) {
+            flash('error', 'Solo se permiten imágenes JPEG, PNG y GIF');
+            return null;
+        }
+
+        if ($imageFile['size'] > $maxSize) {
+            flash('error', 'La imagen no puede ser mayor a 5MB');
+            return null;
+        }
+
+        $uploadDir = __DIR__ . '/../../assets/imagesPosts/';
+
+        $extension = pathinfo($imageFile['name'], PATHINFO_EXTENSION);
+        $fileName = microtime(true) . '_' . uniqid() . '.' . $extension;
+        $filePath = $uploadDir . $fileName;
+
+        if (move_uploaded_file($imageFile['tmp_name'], $filePath)) {
+            return $fileName;
+        } else {
+            flash('error', 'Error al subir la imagen');
+            return null;
+        }
     }
 
     public function update($id)
@@ -126,7 +165,6 @@ class PostController
         return ['success' => true];
     }
 
-    // En tu PostController, actualiza el método addComment:
     public function addComment($postId)
     {
         requireAuth();

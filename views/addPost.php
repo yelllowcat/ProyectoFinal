@@ -18,7 +18,7 @@ namespace App\views;
 
   <div class="main-content">
     <div class="edit-container">
-      <form action="/posts" method="POST">
+      <form action="/posts" method="POST" enctype="multipart/form-data">
         <div class="post-preview">
           <div class="post-header-section">
             <div class="post-avatar"></div>
@@ -33,13 +33,28 @@ namespace App\views;
             <div class="post-prompt-subtitle">Comparte con nosotros</div>
           </div>
 
-          <div class="add-post-image-section">
+          <div class="add-post-image-section" onclick="document.getElementById('post_image').click()">
             <img class="add-post-image" src="../assets/images/addImage.png" alt="add Image" />
+            <div class="image-upload-text">Haz clic para agregar una imagen</div>
+          </div>
+
+          <input 
+            type="file" 
+            id="post_image" 
+            name="post_image" 
+            accept="image/png, image/jpeg, image/jpg, image/gif" 
+            style="display: none;"
+            onchange="handleImageSelect(event)"
+          >
+
+          <div id="imagePreview" class="image-preview" style="display: none;">
+            <img id="previewImage" src="" alt="Vista previa">
+            <button type="button" class="btn-remove-image" onclick="removeImage()">Quitar imagen</button>
           </div>
 
           <div class="post-text-section">
             <textarea class="post-textarea" id="postText" name="content" maxlength="500" oninput="updateCounter()"
-              placeholder="Escribe lo que quieres compartir..."></textarea>
+              placeholder="Escribe lo que quieres compartir..." minlength="1" required></textarea>
             <div class="char-counter"><span id="charCount">0</span>/500</div>
           </div>
 
@@ -52,6 +67,35 @@ namespace App\views;
   </div>
 
   <script src="../js/main.js"></script>
+
+
+  <style>
+    .add-post-image-section {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 2px dashed #ddd;
+      border-radius: 10px;
+      margin: 15px 0;
+    }
+
+    .image-preview {
+      position: relative;
+      text-align: center;
+    }
+
+    .image-preview img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 10px;
+    }
+
+    .btn-remove-image {
+      background: rgba(220, 53, 69, 0.9);
+    }
+
+  </style>
 </body>
 
 </html>

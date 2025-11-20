@@ -3,9 +3,11 @@ namespace App\views;
 use App\Components\Post;
 use App\Models\PostModel;
 use App\Models\LikeModel;
+use App\Models\CommentModel;
 
 $postModel = new PostModel();
 $likeModel = new LikeModel();
+$commentModel = new CommentModel(); 
 $postsData = $postModel->getPostsWithCounts();
 $currentUserId = $_SESSION['user_id'];
 
@@ -35,17 +37,19 @@ $currentUserId = $_SESSION['user_id'];
                 foreach ($postsData as $postData) {
                     $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
                     $likesCount = $likeModel->getLikeCount($postData['post_id']);
+                    $comments = $commentModel->getCommentsByPost($postData['post_id']); 
+                    $commentsCount = $commentModel->getCommentCount($postData['post_id']); 
 
                     $postComponent = new Post([
                         'id' => $postData['post_id'],
                         'author' => $postData['full_name'],
                         'date' => date('d/m/Y', strtotime($postData['created_at'])),
-                        'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=350&fit=crop',
+                        'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : '',
                         'image_alt' => 'Imagen del post',
                         'text' => $postData['content'],
                         'likes' => $likesCount,
-                        'comments_count' => $postData['comments_count'] ?? 0,
-                        'comments' => [],
+                        'comments_count' => $commentsCount, 
+                        'comments' => $comments,
                         'user_id' => $postData['user_id'],
                         'current_user_id' => $currentUserId,
                         'has_liked' => $hasLiked

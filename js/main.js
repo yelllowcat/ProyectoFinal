@@ -1,5 +1,30 @@
 const COMMENTS_PER_LOAD = 3;
 
+async function toggleMenu(event, menuId) {
+    event.stopPropagation();
+
+    const menu = document.getElementById(menuId);
+    const allMenus = document.querySelectorAll(".post-menu-modal");
+
+    const wasActive = menu.classList.contains("active");
+
+    allMenus.forEach((m) => {
+        m.classList.remove("active");
+    });
+
+    if (!wasActive) {
+        menu.classList.add("active");
+    }
+}
+
+async function openConfirmModal(deleteButton) {    
+    postToDelete = deleteButton.closest(".post-container");
+
+    if (confirmModal) {
+        confirmModal.showModal();
+    }
+}
+
 function loadMoreComments(button) {
   const commentsSection = button.closest(".comments-section");
   const commentsContainer = commentsSection.querySelector(".comments-container");
@@ -332,3 +357,46 @@ function fetchSendRequests(event) {
   event.currentTarget.classList.add("active");
 }
 console.log("Main.js loaded");
+
+// imagen
+
+function handleImageSelect(event) {
+  const file = event.target.files[0];
+  const preview = document.getElementById('imagePreview');
+  const previewImage = document.getElementById('previewImage');
+  const addImageSection = document.querySelector('.add-post-image-section');
+
+  if (file) {
+    if (file.size > 5 * 1024 * 1024) {
+      alert('La imagen no puede ser mayor a 5MB');
+      event.target.value = '';
+      return;
+    }
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Solo se permiten imágenes JPEG, PNG y GIF');
+      event.target.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      previewImage.src = e.target.result;
+      preview.style.display = 'block';
+      addImageSection.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function removeImage() {
+  const fileInput = document.getElementById('post_image');
+  const preview = document.getElementById('imagePreview');
+  const addImageSection = document.querySelector('.add-post-image-section');
+
+  fileInput.value = '';
+  preview.style.display = 'none';
+  addImageSection.style.display = 'flex';
+}
+
