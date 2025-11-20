@@ -62,7 +62,7 @@ function openConfirmModal(deleteButton) {
         }
       }
       if (modalName) modalName.textContent = name || "[Nombre del amigo]";
-    } catch (e) {}
+    } catch (e) { }
 
     confirmModal.showModal();
   }
@@ -90,27 +90,47 @@ function toggleComments(button) {
   commentsSection.classList.toggle("hidden");
 }
 
-function handleLike(button) {
-  const isLiked = button.classList.contains("liked");
-  const img = button.querySelector("img");
-  const currentCount = parseInt(button.textContent.match(/\d+/)[0]);
+async function handleLike(button) {
 
-  if (isLiked) {
-    button.classList.remove("liked");
-    img.src = "../assets/images/heartOutline.png";
-    img.alt = "Like";
-    button.innerHTML = `
-            <img src="../assets/images/heartOutline.png" alt="Like" width="25" height="25">
-            ${currentCount - 1} Me gusta
-        `;
-  } else {
-    button.classList.add("liked");
-    img.src = "../assets/images/heartFilled.png";
-    img.alt = "Liked";
-    button.innerHTML = `
-            <img src="../assets/images/heartFilled.png" alt="Liked" width="25" height="25">
-            ${currentCount + 1} Me gusta
-        `;
+  const postContainer = button.closest('.post-container');
+  const postId = postContainer.dataset.postId;
+  const isCurrentlyLiked = button.classList.contains("liked");
+
+  try {
+    const response = await fetch(`/posts/${postId}/like`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      let action = result.data.action;
+      if (action === undefined) {
+        action = isCurrentlyLiked ? 'removed' : 'added';
+      }
+
+      const img = button.querySelector("img");
+
+      if (action === 'added') {
+        button.classList.add("liked");
+        img.src = "/assets/images/heartFilled.png";
+        img.alt = "Liked";
+      } else {
+        button.classList.remove("liked");
+        img.src = "/assets/images/heartOutline.png";
+        img.alt = "Like";
+      }
+
+      button.innerHTML = `
+        <img src="${img.src}" alt="${img.alt}" width="25" height="25">
+        ${result.data.likes} Me gusta
+      `;
+    }
+  } catch (error) {
+    console.error('Fetch error:', error);
   }
 }
 
@@ -134,8 +154,8 @@ function addComment(button) {
   const commentHTML = `
         <div class="comment">
             <div class="comment-header">Manuel Orozco: ${escapeHtml(
-              commentText
-            )}</div>
+    commentText
+  )}</div>
             <div class="comment-date">${timeAgo} • ${dateString}</div>
         </div>
     `;

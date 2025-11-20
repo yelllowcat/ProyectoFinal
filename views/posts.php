@@ -2,9 +2,11 @@
 namespace App\views;
 use App\Components\Post;
 use App\Models\PostModel;
+use App\Models\LikeModel;
 
 $postModel = new PostModel();
-$postsData = $postModel->getAllPosts();
+$likeModel = new LikeModel();
+$postsData = $postModel->getPostsWithCounts();
 $currentUserId = $_SESSION['user_id'];
 
 ?>
@@ -31,6 +33,9 @@ $currentUserId = $_SESSION['user_id'];
                 echo '<div class="no-posts">No hay publicaciones aún. <a href="/addPost">Sé el primero en publicar</a></div>';
             } else {
                 foreach ($postsData as $postData) {
+                    $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
+                    $likesCount = $likeModel->getLikeCount($postData['post_id']);
+
                     $postComponent = new Post([
                         'id' => $postData['post_id'],
                         'author' => $postData['full_name'],
@@ -38,11 +43,12 @@ $currentUserId = $_SESSION['user_id'];
                         'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=350&fit=crop',
                         'image_alt' => 'Imagen del post',
                         'text' => $postData['content'],
-                        'likes' => 0,
-                        'comments_count' => 0,
+                        'likes' => $likesCount,
+                        'comments_count' => $postData['comments_count'] ?? 0,
                         'comments' => [],
                         'user_id' => $postData['user_id'],
-                        'current_user_id' => $currentUserId
+                        'current_user_id' => $currentUserId,
+                        'has_liked' => $hasLiked
                     ]);
                     echo $postComponent->render();
                 }

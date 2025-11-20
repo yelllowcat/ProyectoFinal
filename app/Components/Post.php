@@ -13,6 +13,7 @@ class Post
     private $comments;
     private $userId;
     private $currentUserId;
+    private $data; 
 
     public function __construct($data)
     {
@@ -27,6 +28,7 @@ class Post
         $this->comments = $data['comments'];
         $this->userId = $data['user_id'] ?? null;
         $this->currentUserId = $data['current_user_id'] ?? null;
+        $this->data = $data; 
     }
 
     public function getId()
@@ -79,6 +81,12 @@ class Post
         $menuId = 'menu' . $this->id;
         $commentsSection = $this->renderCommentsSection();
 
+        $hasLiked = $this->data['has_liked'] ?? false;
+
+        $heartIcon = $hasLiked ? 'heartFilled.png' : 'heartOutline.png';
+        $heartAlt = $hasLiked ? 'Liked' : 'Like';
+        $likeButtonClass = $hasLiked ? 'action-btn liked' : 'action-btn';
+
         // Menú solo para propietario
         $menuOptions = '';
         if ($this->userId == $this->currentUserId) {
@@ -114,8 +122,8 @@ class Post
             </p>
 
             <div class='feed-post-actions'>
-                <button class='action-btn' onclick='handleLike(this)'>
-                    <img src='/assets/images/heartOutline.png' alt='heart icon' width='25'>
+                <button class='{$likeButtonClass}' onclick='handleLike(this)'>
+                    <img src='/assets/images/{$heartIcon}' alt='{$heartAlt}' width='25'>
                     {$this->likes} Me gusta
                 </button>
                 <button class='action-btn comments' onclick='toggleComments(this)'>
@@ -176,7 +184,5 @@ class Post
         </div>
         ";
     }
-
 }
-
 ?>

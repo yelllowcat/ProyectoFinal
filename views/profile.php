@@ -3,13 +3,17 @@
 use App\Components\Post;
 use App\Components\Profile;
 use App\Models\PostModel;
+use App\Models\LikeModel;
 
 $userId = $_GET['id'] ?? getCurrentUserId();
 $userModel = new App\Models\UserModel();
 $user = $userModel->getUserById($userId);
 
 $postModel = new PostModel();
+$likeModel = new LikeModel();
 $userPosts = $postModel->getPostsByUserId($userId);
+$currentUserId = getCurrentUserId(); // ID del usuario que está viendo el perfil
+
 if (!$user) {
     flash('error', 'Usuario no encontrado');
     redirect('/posts');
@@ -20,7 +24,7 @@ if (!$user) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNIRED - Perfil de Usuario</title>
+    <title>UNIRED - Perfil de <?php echo htmlspecialchars($user['full_name']); ?></title>
     <link rel="stylesheet" href="/assets/styles/styles.css">
 </head>
 
@@ -41,12 +45,13 @@ if (!$user) {
             );
             echo $profile->render();
 
-
             if (empty($userPosts)) {
-                echo '<div class="no-posts">Aún no tienes publicaciones... <a href="/addPost">¡Haz tu primera publicación!</a></div>';
+                echo '<div class="no-posts">Aún no hay publicaciones... <a href="/addPost">¡Haz tu primera publicación!</a></div>';
             } else {
-
                 foreach ($userPosts as $postData) {
+                    $likesCount = $likeModel->getLikeCount($postData['post_id']);
+                    $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
+                    
                     $postComponent = new Post([
                         'id' => $postData['post_id'],
                         'author' => $postData['full_name'],
@@ -54,11 +59,12 @@ if (!$user) {
                         'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=350&fit=crop',
                         'image_alt' => 'Imagen del post',
                         'text' => $postData['content'],
-                        'likes' => 0,
-                        'comments_count' => 0,
+                        'likes' => $likesCount,
+                        'comments_count' => 0, 
                         'comments' => [],
                         'user_id' => $postData['user_id'],
-                        'current_user_id' => $userId
+                        'current_user_id' => $currentUserId, 
+                        'has_liked' => $hasLiked 
                     ]);
                     echo $postComponent->render();
                 }

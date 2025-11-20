@@ -20,7 +20,7 @@
           <div class="profile-photo-edit">
             <?php if (!empty($user['profile_picture']) && $user['profile_picture'] !== 'default_avatar.png'): ?>
               <img src="/assets/images/<?= safe_output($user['profile_picture']) ?>" alt="Foto de perfil"
-                onerror="this.src='/assets/images/default_avatar.png'">
+               >
             <?php else: ?>
               <div class="default-avatar"></div>
             <?php endif; ?>

@@ -107,22 +107,24 @@ function jsonResponse($data, $statusCode = 200)
     exit();
 }
 
-function jsonSuccess($data = null, $message = 'Success', $statusCode = 200)
-{
-    jsonResponse([
+function jsonSuccess($data = null, $message = '') {
+    header('Content-Type: application/json');
+    echo json_encode([
         'success' => true,
         'message' => $message,
         'data' => $data
-    ], $statusCode);
+    ]);
+    exit;
 }
 
-function jsonError($message = 'Error', $statusCode = 400, $errors = null)
-{
-    jsonResponse([
+function jsonError($message = 'Error', $code = 400) {
+    http_response_code($code);
+    header('Content-Type: application/json');
+    echo json_encode([
         'success' => false,
-        'message' => $message,
-        'errors' => $errors
-    ], $statusCode);
+        'message' => $message
+    ]);
+    exit;
 }
 
 function flash($type, $message)

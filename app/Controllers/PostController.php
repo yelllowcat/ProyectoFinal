@@ -92,30 +92,33 @@ class PostController
     }
 
     public function like($id)
-    {
-        requireAuth();
-        
-        $userId = $_SESSION['user_id'];
-        $likeModel = new LikeModel();
-        
-        if ($likeModel->hasLiked($id, $userId)) {
-            $result = $likeModel->removeLike($id, $userId);
-            $action = 'removed';
-        } else {
-            $result = $likeModel->addLike($id, $userId);
-            $action = 'added';
-        }
-        
-        if ($result) {
-            $likeCount = $likeModel->getLikeCount($id);
-            return jsonSuccess([
-                'likes' => $likeCount,
-                'action' => $action
-            ], $action === 'added' ? 'Like agregado' : 'Like removido');
-        } else {
-            return jsonError('Error al procesar el like');
-        }
+{
+    requireAuth();
+    
+    $userId = $_SESSION['user_id'];
+    $likeModel = new LikeModel();
+    
+    $hasLiked = $likeModel->hasLiked($id, $userId);
+    
+    if ($hasLiked) {
+        $result = $likeModel->removeLike($id, $userId);
+        $action = 'removed';
+    } else {
+        $result = $likeModel->addLike($id, $userId);
+        $action = 'added';
     }
+    
+    if ($result) {
+        $likeCount = $likeModel->getLikeCount($id);
+        
+        return jsonSuccess([
+            'likes' => $likeCount,
+            'action' => $action 
+        ], $action === 'added' ? 'Like agregado' : 'Like removido');
+    } else {
+        return jsonError('Error al procesar el like');
+    }
+}
 
     public function unlike($id)
     {
