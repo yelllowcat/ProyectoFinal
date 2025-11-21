@@ -1,6 +1,14 @@
 <?php
 namespace App\views;
 use App\Components\FriendCard;
+
+//use App\Models\FriendModel;
+
+//$friendModel = new FriendModel();
+//$friends = $friendModel->getFriends();
+//$requests = $friendModel->getRequests();
+//$suggestions = $friendModel->getSuggestions();
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -32,7 +40,8 @@ use App\Components\FriendCard;
                     <div class="tab active" data-filter="friend" onclick="filterFriends(event, 'friend')">Todos los
                         amigos</div>
                     <div class="tab" data-filter="request" onclick="filterFriends(event, 'request')">Solicitudes</div>
-                    <div class="tab" data-filter="send" onclick="filterFriends(event, 'send')">Enviar solicitud</div>
+                    <div class="tab" data-filter="suggestion" onclick="filterFriends(event, 'suggestion')">Sugerencias
+                    </div>
                 </div>
             </div>
 
@@ -44,7 +53,7 @@ use App\Components\FriendCard;
                     new FriendCard('1', 'Pedrito Navajas', '18/03/2025', 'friend', 'https://i.pravatar.cc/150?img=13'),
                     new FriendCard('2', 'Juanito Alimaña', '23/06/2025', 'friend', 'https://i.pravatar.cc/150?img=11'),
                     new FriendCard('3', 'Carlos Ruiz', '10/01/2025', 'request', 'https://i.pravatar.cc/150?img=12'),
-                    new FriendCard('4', 'Ana Martínez', '05/04/2025', 'send', 'https://i.pravatar.cc/150?img=10'),
+                    new FriendCard('4', 'Ana Martínez', '05/04/2025', 'suggestion', 'https://i.pravatar.cc/150?img=10'),
                     new FriendCard('5', 'María González', '15/02/2025', 'friend', 'https://i.pravatar.cc/150?img=9'),
                     new FriendCard('6', 'Pedro Sánchez', '20/05/2025', 'request', 'https://i.pravatar.cc/150?img=8'),
                 ];

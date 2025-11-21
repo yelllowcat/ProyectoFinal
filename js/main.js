@@ -443,5 +443,53 @@ document.addEventListener("DOMContentLoaded", function () {
       mainContent.classList.toggle("sidebar-hidden");
     });
   }
+
+  setupDragAndDrop();
 });
+
+function setupDragAndDrop() {
+  const dropZone = document.getElementById("drop-zone");
+  const fileInput = document.getElementById("post_image");
+
+  if (!dropZone || !fileInput) return;
+
+  ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ["dragenter", "dragover"].forEach((eventName) => {
+    dropZone.addEventListener(eventName, highlight, false);
+  });
+
+  ["dragleave", "drop"].forEach((eventName) => {
+    dropZone.addEventListener(eventName, unhighlight, false);
+  });
+
+  function highlight(e) {
+    dropZone.classList.add("dragover");
+  }
+
+  function unhighlight(e) {
+    dropZone.classList.remove("dragover");
+  }
+
+  dropZone.addEventListener("drop", handleDrop, false);
+
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+
+    if (files.length > 0) {
+      fileInput.files = files;
+      // Trigger the change event manually
+      const event = new Event("change", { bubbles: true });
+      fileInput.dispatchEvent(event);
+    }
+  }
+}
 console.log("Main.js loaded");

@@ -33,19 +33,13 @@ namespace App\views;
             <div class="post-prompt-subtitle">Comparte con nosotros</div>
           </div>
 
-          <div class="add-post-image-section" onclick="document.getElementById('post_image').click()">
+          <div class="add-post-image-section" id="drop-zone" onclick="document.getElementById('post_image').click()">
             <img class="add-post-image" src="../assets/images/addImage.png" alt="add Image" />
-            <div class="image-upload-text">Haz clic para agregar una imagen</div>
+            <div class="image-upload-text">Haz clic o arrastra una imagen aquí</div>
           </div>
 
-          <input 
-            type="file" 
-            id="post_image" 
-            name="post_image" 
-            accept="image/png, image/jpeg, image/jpg, image/gif" 
-            style="display: none;"
-            onchange="handleImageSelect(event)"
-          >
+          <input type="file" id="post_image" name="post_image" accept="image/png, image/jpeg, image/jpg, image/gif"
+            style="display: none;" onchange="handleImageSelect(event)">
 
           <div id="imagePreview" class="image-preview" style="display: none;">
             <img id="previewImage" src="" alt="Vista previa">
@@ -78,6 +72,13 @@ namespace App\views;
       border: 2px dashed #ddd;
       border-radius: 10px;
       margin: 15px 0;
+      transition: all 0.3s ease;
+    }
+
+    .add-post-image-section.dragover {
+      background-color: rgba(0, 0, 0, 0.05);
+      border-color: #007bff;
+      transform: scale(1.02);
     }
 
     .image-preview {
@@ -94,7 +95,6 @@ namespace App\views;
     .btn-remove-image {
       background: rgba(220, 53, 69, 0.9);
     }
-
   </style>
 </body>
 

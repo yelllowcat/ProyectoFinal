@@ -48,13 +48,13 @@ class FriendCard
                     <button class='btn btn-primary btn-accept'>Aceptar</button>
                     <button class='btn btn-deny'>Eliminar</button>
                 ";
-            case 'send':
+            case 'suggestion':
                 return "
                     <button class='btn btn-primary btn-add'>Agregar</button>
                     <button class='btn btn-deny'>Eliminar</button>
                 ";
             default:
-                return "<button class='btn btn-view-profile'>Ver perfil</button>";
+                return "<a href='/profile/{$this->id}'><button class='btn btn-view-profile'>Ver perfil</button></a>";
         }
     }
 }

@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (card.querySelector(".btn-accept")) {
       card.dataset.status = "request";
     } else if (card.querySelector(".btn-add")) {
-      card.dataset.status = "send";
+      card.dataset.status = "suggestion";
     } else {
       card.dataset.status = "friend";
     }
