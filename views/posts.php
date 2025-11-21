@@ -4,12 +4,26 @@ use App\Components\Post;
 use App\Models\PostModel;
 use App\Models\LikeModel;
 use App\Models\CommentModel;
+use App\Models\UserModel;
 
 $postModel = new PostModel();
 $likeModel = new LikeModel();
-$commentModel = new CommentModel(); 
+$commentModel = new CommentModel();
+$userModel = new UserModel();
+
 $postsData = $postModel->getPostsWithCounts();
 $currentUserId = $_SESSION['user_id'];
+
+function getProfilePicture($filename) {
+    $imagePath = $_SERVER['DOCUMENT_ROOT'] . "/assets/imagesProfile/{$filename}";
+    $defaultImage = "/assets/imagesProfile/default_avatar.png?v=" . time();
+    
+    if (empty($filename) || !file_exists($imagePath)) {
+        return $defaultImage;
+    }
+    
+    return "/assets/imagesProfile/{$filename}?v=" . time();
+}
 
 ?>
 <!DOCTYPE html>
@@ -37,8 +51,12 @@ $currentUserId = $_SESSION['user_id'];
                 foreach ($postsData as $postData) {
                     $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
                     $likesCount = $likeModel->getLikeCount($postData['post_id']);
-                    $comments = $commentModel->getCommentsByPost($postData['post_id']); 
-                    $commentsCount = $commentModel->getCommentCount($postData['post_id']); 
+                    $comments = $commentModel->getCommentsByPost($postData['post_id']);
+                    $commentsCount = $commentModel->getCommentCount($postData['post_id']);
+
+                    $author = $userModel->getUserById($postData['user_id']);
+
+                    $authorPicture = getProfilePicture($author['profile_picture']);
 
                     $postComponent = new Post([
                         'id' => $postData['post_id'],
@@ -48,12 +66,14 @@ $currentUserId = $_SESSION['user_id'];
                         'image_alt' => 'Imagen del post',
                         'text' => $postData['content'],
                         'likes' => $likesCount,
-                        'comments_count' => $commentsCount, 
+                        'comments_count' => $commentsCount,
                         'comments' => $comments,
                         'user_id' => $postData['user_id'],
                         'current_user_id' => $currentUserId,
-                        'has_liked' => $hasLiked
+                        'has_liked' => $hasLiked,
+                        'user_avatar' => $authorPicture
                     ]);
+
                     echo $postComponent->render();
                 }
             }

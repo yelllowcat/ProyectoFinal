@@ -55,7 +55,6 @@ class UserController
             
             $profilePicture = null;
             
-            // Procesar imagen de perfil si se subió
             if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
                 $profilePicture = $this->handleProfileImageUpload($_FILES['profile_picture']);
             }
@@ -63,7 +62,6 @@ class UserController
             $result = $this->userModel->updateUser($userId, $fullName, $biography, $profilePicture);
             
             if ($result) {
-                // Actualizar datos en sesión
                 $_SESSION['user_name'] = $fullName;
                 flash('success', 'Perfil actualizado correctamente' . ($profilePicture ? ' con nueva foto de perfil' : ''));
                 redirect('/profile');
@@ -79,35 +77,24 @@ class UserController
     private function handleProfileImageUpload($imageFile)
     {
         $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-        $maxSize = 5 * 1024 * 1024; // 5MB
+        $maxSize = 5 * 1024 * 1024; 
         
-        // Validar tipo de archivo
         if (!in_array($imageFile['type'], $allowedTypes)) {
             flash('error', 'Solo se permiten imágenes JPEG y PNG');
             return null;
         }
         
-        // Validar tamaño
         if ($imageFile['size'] > $maxSize) {
             flash('error', 'La imagen no puede ser mayor a 5MB');
             return null;
         }
         
-        // Crear directorio si no existe
         $uploadDir = __DIR__ . '/../../assets/imagesProfile/';
-        if (!is_dir($uploadDir)) {
-            if (!mkdir($uploadDir, 0755, true)) {
-                flash('error', 'Error al crear directorio de imágenes');
-                return null;
-            }
-        }
         
-        // Generar nombre único CON EL MISMO FORMATO QUE POSTS
         $extension = pathinfo($imageFile['name'], PATHINFO_EXTENSION);
-        $fileName = microtime(true) . '_' . uniqid() . '.' . $extension; // Mismo formato que posts
+        $fileName = microtime(true) . '_' . uniqid() . '.' . $extension; 
         $filePath = $uploadDir . $fileName;
         
-        // Mover archivo
         if (move_uploaded_file($imageFile['tmp_name'], $filePath)) {
             return $fileName;
         } else {
