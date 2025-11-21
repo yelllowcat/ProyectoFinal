@@ -26,9 +26,18 @@ foreach ($userPosts as $post) {
 
 $isOwnProfile = ($userId == $currentUserId);
 
-$profilePicture = $user['profile_picture'] 
-    ? "/assets/imagesProfile/{$user['profile_picture']}" 
-    : '/assets/imagesProfile/default_avatar.png';
+function getProfilePicture($filename) {
+    $imagePath = $_SERVER['DOCUMENT_ROOT'] . "/assets/imagesProfile/{$filename}";
+    $defaultImage = "/assets/imagesProfile/default_avatar.png?v=" . time();
+    
+    if (empty($filename) || !file_exists($imagePath)) {
+        return $defaultImage;
+    }
+    
+    return "/assets/imagesProfile/{$filename}?v=" . time();
+}
+
+$profilePicture = getProfilePicture($user['profile_picture']);
 
 if (!$user) {
     flash('error', 'Usuario no encontrado');
@@ -74,7 +83,11 @@ if (!$user) {
                     $likesCount = $likeModel->getLikeCount($postData['post_id']);
                     $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
                     $comments = $commentModel->getCommentsByPost($postData['post_id']); 
-                    $commentsCount = $commentModel->getCommentCount($postData['post_id']); 
+                    $commentsCount = $commentModel->getCommentCount($postData['post_id']);
+
+                    $author = $userModel->getUserById($postData['user_id']);
+
+                    $authorPicture = getProfilePicture($author['profile_picture']); 
                     
                     $postComponent = new Post([
                         'id' => $postData['post_id'],
@@ -87,9 +100,11 @@ if (!$user) {
                         'comments_count' => $commentsCount,
                         'comments' => $comments,
                         'user_id' => $postData['user_id'],
-                        'current_user_id' => $currentUserId, 
-                        'has_liked' => $hasLiked 
+                        'current_user_id' => $currentUserId,
+                        'has_liked' => $hasLiked,
+                        'user_avatar' => $authorPicture
                     ]);
+
                     echo $postComponent->render();
                 }
             }

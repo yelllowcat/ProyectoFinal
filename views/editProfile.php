@@ -1,3 +1,17 @@
+<?php
+function getProfilePicture($filename)
+{
+  $imagePath = $_SERVER['DOCUMENT_ROOT'] . "/assets/imagesProfile/{$filename}";
+  $defaultImage = "/assets/imagesProfile/default_avatar.png?v=" . time();
+
+  if (empty($filename) || !file_exists($imagePath)) {
+    return $defaultImage;
+  }
+
+  return "/assets/imagesProfile/{$filename}?v=" . time();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -18,29 +32,16 @@
       <form action="/updateProfile" method="POST" enctype="multipart/form-data">
         <div class="profile-section-edit">
           <div class="profile-photo-edit">
+
             <div id="profilePreview" class="profile-preview">
-              <?php if (!empty($user['profile_picture']) && $user['profile_picture'] !== 'default_avatar.png'): ?>
-                <img src="/assets/imagesProfile/<?= safe_output($user['profile_picture']) ?>" alt="Foto de perfil" id="currentProfileImage">
-              <?php else: ?>
-                <img src="/assets/imagesProfile/default_avatar.png" alt="Foto de perfil por defecto" id="currentProfileImage">
-              <?php endif; ?>
+              <img src="<?= getProfilePicture($user['profile_picture']) ?>" alt="Foto de perfil"
+                id="currentProfileImage">
             </div>
-            
-            <input 
-              type="file" 
-              id="profile_picture" 
-              name="profile_picture" 
-              accept="image/png, image/jpeg, image/jpg" 
-              style="display: none;"
-              onchange="handleProfileImageSelect(event)"
-            >
-            
-            <div id="profileImagePreview" class="image-preview" style="display: none;">
-              <img id="previewProfileImage" src="" alt="Vista previa">
-              <button type="button" class="btn-remove-image" onclick="removeProfileImage()">Quitar imagen</button>
-            </div>
+
+            <input type="file" id="profile_picture" name="profile_picture" accept="image/png, image/jpeg, image/jpg"
+              style="display: none;" onchange="handleProfileImageSelect(event)">
           </div>
-          
+
           <button type="button" class="btn-change-photo" onclick="document.getElementById('profile_picture').click()">
             Cambiar foto de perfil
           </button>
@@ -77,7 +78,7 @@
 
   <script src="../js/main.js"></script>
 
- 
+
 </body>
 
 </html>

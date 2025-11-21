@@ -20,7 +20,7 @@ class Profile
         $this->postCount = $postCount;
         $this->likesCount = $likesCount;
         $this->userId = $userId;
-        $this->profilePicture = $profilePicture ?: '/assets/imagesProfile/default_avatar.png';
+        $this->profilePicture = $profilePicture;
     }
 
     private function getDefaultBio()
@@ -74,7 +74,7 @@ class Profile
             <div class='stat-label'>Me gusta</div>
         </div>
         <div class='stat'>
-            <div class='stat-number'>0</div>
+            <div class='stat-number'>10</div>
             <div class='stat-label'>Seguidores</div>
         </div>
     </div>

@@ -429,17 +429,6 @@ function handleProfileImageSelect(event) {
   }
 }
 
-function removeProfileImage() {
-  const fileInput = document.getElementById('profile_picture');
-  const preview = document.getElementById('profileImagePreview');
-  const currentImage = document.getElementById('currentProfileImage');
-
-  fileInput.value = '';
-  preview.style.display = 'none';
-  currentImage.style.display = 'block';
-}
-
-
 //update post
 
 async function deletePost(postId) {

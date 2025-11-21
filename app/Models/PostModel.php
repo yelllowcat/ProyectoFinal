@@ -29,7 +29,6 @@ class PostModel
         }
     }
 
-    // Los demás métodos se mantienen igual...
     public function getAllPosts()
     {
         try {
