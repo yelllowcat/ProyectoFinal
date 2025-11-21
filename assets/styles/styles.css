@@ -13,14 +13,6 @@ body {
   min-height: 100vh;
 }
 
-.sidebar {
-  width: 250px;
-  background-color: #ffffff;
-  padding: 20px;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  height: 100vh;
-}
 a {
   text-decoration: none;
 }
@@ -28,10 +20,13 @@ a {
 .logo-container {
   display: flex;
   align-items: center;
+  justify-content: end;
   gap: 10px;
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 1px solid #e0e0e0;
+  width: 80%;
+  margin-left: auto;
 }
 
 .logo {
@@ -336,6 +331,7 @@ a {
   text-decoration: none;
   display: block;
 }
+
 .menu-option.edit:hover {
   background-color: #f5f5f5;
 }
@@ -1216,6 +1212,91 @@ a {
 .tab.active {
   color: #007bff;
   border-bottom-color: #007bff;
+}
+
+.sidebar-toggle-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-toggle-btn:hover {
+  background: #f5f5f5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-toggle-btn img {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 250px;
+  background: white;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: transform 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+/* When sidebar is open, move toggle button */
+.sidebar.open~.sidebar-toggle-btn {
+  left: 270px;
+}
+
+/* Collapsed state */
+/* Collapsed state */
+.sidebar.sidebar-hidden {
+  transform: translateX(-100%);
+}
+
+.main-content.sidebar-hidden {
+  margin-left: 0;
+}
+
+
+/* Overlay for mobile */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 280px;
+  }
+
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+  }
 }
 
 @media (max-width: 768px) {

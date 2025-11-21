@@ -356,7 +356,6 @@ function fetchSendRequests(event) {
   tabs.forEach((tab) => tab.classList.remove("active"));
   event.currentTarget.classList.add("active");
 }
-console.log("Main.js loaded");
 
 // imagen
 
@@ -443,37 +442,6 @@ function removeProfileImage() {
 
 //update post
 
-document.getElementById('editPostForm').addEventListener('submit', async function (e) {
-  e.preventDefault();
-
-  const content = document.getElementById('postText').value.trim();
-
-  if (content.length < 1) {
-    alert('El texto debe tener al menos 2 caracteres');
-    return;
-  }
-
-  try {
-    const response = await fetch('/posts/' + POST_ID, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content })
-    });
-
-    const result = await response.json();
-
-    if (result.success) {
-      alert('Publicación actualizada correctamente');
-      window.location.href = '/posts';
-    } else {
-      alert('Error: ' + result.message);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Error de conexión');
-  }
-});
-
 async function deletePost(postId) {
   if (!confirm('¿Estás seguro de que deseas eliminar esta publicación?')) return;
 
@@ -496,3 +464,16 @@ async function deletePost(postId) {
     alert('Error de conexión');
   }
 }
+document.addEventListener('DOMContentLoaded', function() {
+    const btnSidebar = document.getElementById('sidebarToggle');
+    const sidebar = document.querySelector('.sidebar');
+    const mainContent = document.querySelector('.main-content');
+    
+    if (btnSidebar && sidebar && mainContent) {
+        btnSidebar.addEventListener('click', function() {
+            sidebar.classList.toggle('sidebar-hidden');
+            mainContent.classList.toggle('sidebar-hidden');
+        });
+    }
+});
+console.log("Main.js loaded");

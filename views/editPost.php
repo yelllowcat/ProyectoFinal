@@ -83,6 +83,7 @@ if (!$post || $post['user_id'] != $currentUserId) {
     const POST_ID = <?= $postId ?>;
   </script>
   <script src="../js/main.js"></script>
+  <script src="../js/editPost.js"></script>
 </body>
 
 </html>
