@@ -20,13 +20,11 @@ a {
 .logo-container {
   display: flex;
   align-items: center;
-  justify-content: end;
   gap: 10px;
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 1px solid #e0e0e0;
   width: 80%;
-  margin-left: auto;
 }
 
 .logo {
@@ -119,7 +117,6 @@ a {
   width: 200px;
   height: 140px;
   background-color: #d4b896;
-  background-image: url("/assets/images/profilePicture.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -133,11 +130,20 @@ a {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
 .profile-photo-edit {
   width: 200px;
   height: 140px;
   background-color: #d4b896;
-  background-image: url("/assets/images/profilePicture.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -149,6 +155,40 @@ a {
   left: 50%;
   transform: translateX(-50%);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+#currentProfileImage,
+#previewProfileImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.btn-remove-image {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.3s;
+}
+
+.btn-remove-image:hover {
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .profile-name {
@@ -1215,9 +1255,9 @@ a {
 }
 
 .sidebar-toggle-btn {
-  position: fixed;
-  top: 20px;
-  left: 20px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
   z-index: 1001;
   background: white;
   border: 1px solid #ddd;
@@ -1253,23 +1293,22 @@ a {
   overflow-y: auto;
 }
 
-/* When sidebar is open, move toggle button */
-.sidebar.open~.sidebar-toggle-btn {
-  left: 270px;
+.sidebar.sidebar-hidden .sidebar-toggle-btn {
+  right: auto;
+  left: 100%;
+  margin-left: 10px;
 }
 
-/* Collapsed state */
-/* Collapsed state */
 .sidebar.sidebar-hidden {
   transform: translateX(-100%);
+  overflow: visible;
 }
 
 .main-content.sidebar-hidden {
-  margin-left: 0;
+  margin: auto;
 }
 
 
-/* Overlay for mobile */
 .sidebar-overlay {
   position: fixed;
   top: 0;
@@ -1288,18 +1327,20 @@ a {
   visibility: visible;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .sidebar {
     width: 280px;
   }
 
-  .sidebar.collapsed {
+  .sidebar.sidebar-hidden {
     transform: translateX(-100%);
   }
-}
 
-@media (max-width: 768px) {
+  .main-content {
+    margin-left: 280px;
+    padding: 20px;
+  }
+
   .search-bar {
     max-width: 100%;
   }
@@ -1312,31 +1353,6 @@ a {
     flex: 1;
     min-width: 120px;
     text-align: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .confirm-box {
-    width: calc(100% - 30px);
-  }
-
-  .confirm-head h3 {
-    font-size: 18px;
-  }
-
-  .confirm-actions button {
-    font-size: 18px;
-  }
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    width: 200px;
-  }
-
-  .main-content {
-    margin-left: 200px;
-    padding: 20px;
   }
 
   .profile-header {
@@ -1375,5 +1391,19 @@ a {
 
   .friend-request-bio {
     max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .confirm-box {
+    width: calc(100% - 30px);
+  }
+
+  .confirm-head h3 {
+    font-size: 18px;
+  }
+
+  .confirm-actions button {
+    font-size: 18px;
   }
 }

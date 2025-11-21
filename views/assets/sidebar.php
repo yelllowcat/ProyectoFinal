@@ -1,11 +1,13 @@
-<button class="sidebar-toggle-btn" id="sidebarToggle">
-    <img src="../../assets/images/menu.png" alt="Toggle Menu">
-</button>
 <div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle-btn" id="sidebarToggle">
+        <img src="../../assets/images/menu.png" alt="Toggle Menu">
+    </button>
 
-    <div class="logo-container">
-        <img class="logo" src="../assets/images/logoUnired.png" alt="UNIRED Logo">
-    </div>
+    <a href="/">
+        <div class="logo-container">
+            <img class="logo" src="../assets/images/logoUnired.png" alt="UNIRED Logo">
+        </div>
+    </a>
 
     <a href="/addPost" class="menu-item">
         <span class="menu-icon">➕</span>
