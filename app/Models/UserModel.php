@@ -152,4 +152,39 @@ class UserModel
             return false;
         }
     }
+
+    public function getAllUsers($excludeUserId = null)
+    {
+        $sql = "SELECT user_id, full_name, profile_picture, biography, registration_date 
+                FROM users 
+                WHERE active = 1";
+
+        $params = [];
+
+        if ($excludeUserId) {
+            $sql .= " AND user_id != ?";
+            $params[] = $excludeUserId;
+        }
+
+        $sql .= " ORDER BY full_name ASC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getSimpleSuggestions($currentUserId, $limit = 6)
+    {
+        $sql = "SELECT u.user_id, u.full_name, u.profile_picture, u.biography, u.registration_date
+                FROM users u
+                WHERE u.active = 1 
+                AND u.user_id != ?
+                ORDER BY u.registration_date DESC
+                LIMIT ?";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$currentUserId, $limit]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
 }

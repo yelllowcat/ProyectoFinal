@@ -71,7 +71,13 @@ $router->get('/friendReqs', function () {
 $router->post('/friend/request/:id', [FriendController::class, 'sendRequest']);
 $router->post('/friend/accept/:id', [FriendController::class, 'acceptRequest']);
 $router->post('/friend/reject/:id', [FriendController::class, 'rejectRequest']);
+$router->post('/friend/cancel/:id', [FriendController::class, 'cancelRequest']);
 $router->delete('/friend/remove/:id', [FriendController::class, 'removeFriend']);
+
+$router->get('/friend/requests', [FriendController::class, 'getPendingRequests']);
+$router->get('/friend/status', [FriendController::class, 'getFriendshipStatus']);
+$router->get('/friend/counts', [FriendController::class, 'getFriendsCounts']);
+$router->get('/friends/list', [FriendController::class, 'getFriends']);
 
 $router->get('/addPost', function () {
     requireAuth();
