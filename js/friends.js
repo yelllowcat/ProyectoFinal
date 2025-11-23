@@ -85,5 +85,66 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   filterAndSearch();
+
+  document.addEventListener('click', function(event) {
+    if (event.target && event.target.classList.contains('btn-action')) {
+      const button = event.target;
+      const action = button.dataset.action;
+      const id = button.dataset.requestId || button.dataset.suggestionId;
+      if (!id) return;
+      console.log("ID: ", id);
+      console.log("Action: ", action);
+
+      if (action === 'accept') {
+        handleFriendAction(id, button, '/friend/accept/');
+      } else if (action === 'deny') {
+        handleFriendAction(id, button, '/friend/reject/');
+      } else if (action === 'add') {
+        handleFriendAction(id, button, '/friend/request/');
+      }
+    }
+  });
 });
+
+function handleFriendAction(id, button, endpoint) {
+  console.log("ID: ", id);
+  console.log("Endpoint: ", endpoint);
+  console.log("Button: ", button);
+  button.disabled = true;
+  const originalText = button.textContent;
+  button.textContent = 'Procesando...';
+
+  fetch(`${endpoint}${id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({})
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      const card = button.closest('.friend-card');
+      if (card) {
+        card.style.transition = 'opacity 0.5s';
+        card.style.opacity = '0';
+        setTimeout(() => {
+            card.remove();
+            filterAndSearch();
+        }, 500);
+      }
+    } else {
+      alert('Error: ' + (data.message || 'Acción fallida'));
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Ocurrió un error');
+    button.disabled = false;
+    button.textContent = originalText;
+  });
+}
+
 console.log("Friends.js loaded");

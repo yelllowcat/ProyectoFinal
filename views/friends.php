@@ -2,12 +2,15 @@
 namespace App\views;
 use App\Components\FriendCard;
 
-//use App\Models\FriendModel;
+use App\Models\FriendModel;
+use App\Models\UserModel;
 
-//$friendModel = new FriendModel();
-//$friends = $friendModel->getFriends();
-//$requests = $friendModel->getRequests();
-//$suggestions = $friendModel->getSuggestions();
+$userModel = new UserModel();
+$friendModel = new FriendModel();
+$friends = $friendModel->getFriends(1);
+
+$requests = $friendModel->getPendingRequests(1);
+$suggestions = $friendModel->getSuggestions(1);
 
 ?>
 <!DOCTYPE html>
@@ -49,17 +52,37 @@ use App\Components\FriendCard;
 
             <div class="friends-grid" id="friendsGrid">
                 <?php
-                $friends = [
-                    new FriendCard('1', 'Pedrito Navajas', '18/03/2025', 'friend', 'https://i.pravatar.cc/150?img=13'),
-                    new FriendCard('2', 'Juanito Alimaña', '23/06/2025', 'friend', 'https://i.pravatar.cc/150?img=11'),
-                    new FriendCard('3', 'Carlos Ruiz', '10/01/2025', 'request', 'https://i.pravatar.cc/150?img=12'),
-                    new FriendCard('4', 'Ana Martínez', '05/04/2025', 'suggestion', 'https://i.pravatar.cc/150?img=10'),
-                    new FriendCard('5', 'María González', '15/02/2025', 'friend', 'https://i.pravatar.cc/150?img=9'),
-                    new FriendCard('6', 'Pedro Sánchez', '20/05/2025', 'request', 'https://i.pravatar.cc/150?img=8'),
-                ];
-
                 foreach ($friends as $friend) {
-                    echo $friend->render();
+
+                    $friendCard = new FriendCard(
+                        $friend['user_id'],
+                        $friend['full_name'],
+                        date('d/m/Y', strtotime($userModel->getUserById($friend['user_id'])['registration_date'])),
+                        'friend',
+                        $userModel->getUserById($friend['user_id'])['profile_picture']
+                    );
+                    echo $friendCard->render();
+                }
+                foreach ($requests as $request) {
+                    $friendCard = new FriendCard(
+                        $request['sender_id'],
+                        $userModel->getUserById($request['sender_id'])['full_name'],
+                        date('d/m/Y', strtotime($userModel->getUserById($request['sender_id'])['registration_date'])),
+                        'request',
+                        $userModel->getUserById($request['sender_id'])['profile_picture'],
+                        $request['request_id'],
+                    );
+                    echo $friendCard->render();
+                }
+                foreach ($suggestions as $suggestion) {
+                    $friendCard = new FriendCard(
+                        $suggestion['user_id'],
+                        $suggestion['full_name'],
+                        date('d/m/Y', strtotime($userModel->getUserById($suggestion['user_id'])['registration_date'])),
+                        'suggestion',
+                        $suggestion['profile_picture']
+                    );
+                    echo $friendCard->render();
                 }
                 ?>
 

@@ -9,14 +9,18 @@ class FriendCard
     private string $joinDate;
     private string $status;
     private ?string $avatarUrl;
+    private ?string $requestId;
 
-    public function __construct(string $id, string $name, string $joinDate, string $status = 'friend', ?string $avatarUrl = null)
+    private ?string $suggestionId;
+
+    public function __construct(string $id, string $name, string $joinDate, string $status = 'friend', ?string $avatarUrl = null, ?string $requestId = null)
     {
         $this->id = $id;
         $this->name = htmlspecialchars($name);
         $this->joinDate = htmlspecialchars($joinDate);
         $this->status = htmlspecialchars($status);
         $this->avatarUrl = $avatarUrl;
+        $this->requestId = $requestId;
     }
 
     public function render(): string
@@ -45,16 +49,16 @@ class FriendCard
         switch ($this->status) {
             case 'request':
                 return "
-                    <button class='btn btn-primary btn-accept'>Aceptar</button>
-                    <button class='btn btn-deny'>Eliminar</button>
+                    <button data-request-id='{$this->requestId}' data-action='accept' class='btn btn-primary btn-accept btn-action'>Aceptar</button>
+                    <button data-request-id='{$this->requestId}' data-action='deny' class='btn btn-deny btn-action'>Eliminar</button>
                 ";
             case 'suggestion':
                 return "
-                    <button class='btn btn-primary btn-add'>Agregar</button>
-                    <button class='btn btn-deny'>Eliminar</button>
+                    <button data-suggestion-id='{$this->id}' data-action='add' class='btn btn-primary btn-add btn-action'>Agregar</button>
+                    <button data-suggestion-id='{$this->id}' data-action='deny' class='btn btn-deny btn-action'>Eliminar</button>
                 ";
             default:
-                return "<a href='/profile/{$this->id}'><button class='btn btn-view-profile'>Ver perfil</button></a>";
+                return "<a href='/profile/{$this->id}'><button data-user-id='{$this->id}' data-action='view' class='btn btn-view-profile btn-action'>Ver perfil</button></a>";
         }
     }
 }

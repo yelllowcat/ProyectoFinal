@@ -38,40 +38,38 @@ class FriendController
         ];
     }
 
-    public function acceptRequest($params)
+    public function acceptRequest($id)
     {
         requireAuth();
-
-        $requestId = $params['id'] ?? null;
+        $requestId = $id;
         $receiverId = $_SESSION['user_id'];
 
-        if (!$requestId)
+        if (!$requestId) {
             return ['success' => false, 'message' => 'ID requerido'];
-
+        }
         $ok = $this->friendModel->acceptRequest($requestId, $receiverId);
 
         return ['success' => $ok];
     }
 
-    public function rejectRequest($params)
+    public function rejectRequest($id)
     {
         requireAuth();
-
-        $requestId = $params['id'] ?? null;
+        $requestId = $id;
         $receiverId = $_SESSION['user_id'];
 
-        if (!$requestId)
+        if (!$requestId) {
             return ['success' => false, 'message' => 'ID requerido'];
-
+        }
         return ['success' => $this->friendModel->rejectRequest($requestId, $receiverId)];
     }
 
-    public function removeFriend($params)
+    public function removeFriend($id)
     {
         requireAuth();
 
         $currentEmail = $_SESSION['email'];
-        $otherEmail = $params['email'] ?? null;
+        $otherEmail = $id;
 
         if (!$otherEmail)
             return ['success' => false, 'message' => 'Email requerido'];

@@ -127,7 +127,7 @@ class FriendModel
             )->execute([$requestId]);
 
             $this->pdo->prepare(
-                "INSERT INTO friends (user_id1,user_id2,created_at) VALUES (?,?,NOW())"
+                "INSERT INTO friends (user_id1,user_id2,friendship_date) VALUES (?,?,NOW())"
             )->execute([$req['sender_id'], $req['receiver_id']]);
 
             $this->pdo->commit();
