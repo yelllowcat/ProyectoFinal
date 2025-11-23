@@ -6,14 +6,18 @@ class FriendCard
 {
     private string $id;
     private string $name;
+
     private string $joinDate;
     private string $status;
+
     private ?string $avatarUrl;
     private ?string $requestId;
 
     private ?string $suggestionId;
+    private ?string $email;
 
-    public function __construct(string $id, string $name, string $joinDate, string $status = 'friend', ?string $avatarUrl = null, ?string $requestId = null)
+
+    public function __construct(string $id, string $name, string $joinDate, string $status = 'friend', ?string $avatarUrl = null, ?string $requestId = null, ?string $email = null)
     {
         $this->id = $id;
         $this->name = htmlspecialchars($name);
@@ -21,6 +25,7 @@ class FriendCard
         $this->status = htmlspecialchars($status);
         $this->avatarUrl = $avatarUrl;
         $this->requestId = $requestId;
+        $this->email = $email ? htmlspecialchars($email) : null;
     }
 
     public function render(): string

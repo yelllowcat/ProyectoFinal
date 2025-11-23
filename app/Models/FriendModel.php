@@ -71,23 +71,39 @@ class FriendModel
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function getSuggestions($userId)
+    public function getSuggestions($userId, $limit = 10)
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT u.user_id, u.full_name, u.email, u.profile_picture
+         FROM users u
+         WHERE u.user_id != ?
+         AND u.user_id NOT IN (
+             SELECT user_id1 FROM friends WHERE user_id2 = ?
+             UNION
+             SELECT user_id2 FROM friends WHERE user_id1 = ?
+         )
+         AND u.user_id NOT IN (
+             SELECT receiver_id FROM friend_requests 
+             WHERE sender_id = ? AND status = 'pending'
+             UNION
+             SELECT sender_id FROM friend_requests 
+             WHERE receiver_id = ? AND status = 'pending'
+         )
+         ORDER BY u.registration_date DESC
+         LIMIT ?"
+        );
+        $stmt->execute([$userId, $userId, $userId, $userId, $userId, $limit]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function sendRequest($senderId, $receiverId)
     {
         $sql = "
-            SELECT u.user_id, u.full_name, u.email, u.profile_picture, u.registration_date
-            FROM users u
-            WHERE u.user_id != ?
-            AND u.user_id NOT IN (
-                SELECT user_id1 FROM friends WHERE user_id2 = ?
-                UNION
-                SELECT user_id2 FROM friends WHERE user_id1 = ?
-            )
-            LIMIT 10
+            INSERT INTO friend_requests (sender_id, receiver_id, status)
+            VALUES (?, ?, 'pending')
         ";
-
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$userId, $userId, $userId]);
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $stmt->execute([$senderId, $receiverId]);
     }
 
     public function sendRequestByEmail($senderEmail, $receiverEmail)
@@ -159,5 +175,68 @@ class FriendModel
         $sql = "DELETE FROM friends 
                 WHERE (user_id1=? AND user_id2=?) OR (user_id1=? AND user_id2=?)";
         return $this->pdo->prepare($sql)->execute([$u1, $u2, $u2, $u1]);
+    }
+
+    public function removeFriendById($userId, $friendId)
+    {
+        $stmt = $this->pdo->prepare(
+            "DELETE FROM friends 
+         WHERE (user_id1 = ? AND user_id2 = ?) 
+            OR (user_id1 = ? AND user_id2 = ?)"
+        );
+        return $stmt->execute([$userId, $friendId, $friendId, $userId]);
+    }
+
+    public function requestExists($senderId, $receiverId)
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT 1 FROM friend_requests 
+         WHERE ((sender_id = ? AND receiver_id = ?) 
+            OR (sender_id = ? AND receiver_id = ?))
+         AND status = 'pending'"
+        );
+        $stmt->execute([$senderId, $receiverId, $receiverId, $senderId]);
+        return $stmt->fetch() !== false;
+    }
+
+    public function getSentRequests($userId)
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT fr.request_id, fr.receiver_id, fr.request_date,
+                u.full_name, u.email, u.profile_picture
+         FROM friend_requests fr
+         JOIN users u ON fr.receiver_id = u.user_id
+         WHERE fr.sender_id = ? AND fr.status = 'pending'
+         ORDER BY fr.request_date DESC"
+        );
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getFriendshipStatus($userId, $otherUserId)
+    {
+        if ($this->alreadyFriends($userId, $otherUserId)) {
+            return 'friends';
+        }
+
+        $stmt = $this->pdo->prepare(
+            "SELECT 1 FROM friend_requests 
+         WHERE sender_id = ? AND receiver_id = ? AND status = 'pending'"
+        );
+        $stmt->execute([$userId, $otherUserId]);
+        if ($stmt->fetch()) {
+            return 'pending_sent';
+        }
+
+        $stmt = $this->pdo->prepare(
+            "SELECT 1 FROM friend_requests 
+         WHERE sender_id = ? AND receiver_id = ? AND status = 'pending'"
+        );
+        $stmt->execute([$otherUserId, $userId]);
+        if ($stmt->fetch()) {
+            return 'pending_received';
+        }
+
+        return 'none';
     }
 }

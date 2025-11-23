@@ -1,17 +1,21 @@
 <?php
 namespace App\views;
 use App\Components\FriendCard;
-
+use App\Controllers\FriendController;
 use App\Models\FriendModel;
 use App\Models\UserModel;
 
+
+$userId = $_GET['id'] ?? getCurrentUserId();
+
 $userModel = new UserModel();
 $friendModel = new FriendModel();
-$friends = $friendModel->getFriends(1);
+$friendController = new FriendController();
 
-$requests = $friendModel->getPendingRequests(1);
-$suggestions = $friendModel->getSuggestions(1);
+$friends = $friendModel->getFriends($userId);
 
+$requests = $friendModel->getPendingRequests($userId);
+$suggestions = $friendController->getSuggestions()['data'];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -53,13 +57,13 @@ $suggestions = $friendModel->getSuggestions(1);
             <div class="friends-grid" id="friendsGrid">
                 <?php
                 foreach ($friends as $friend) {
-
                     $friendCard = new FriendCard(
                         $friend['user_id'],
                         $friend['full_name'],
                         date('d/m/Y', strtotime($userModel->getUserById($friend['user_id'])['registration_date'])),
-                        'friend',
-                        $userModel->getUserById($friend['user_id'])['profile_picture']
+                        'friends',
+                        $userModel->getUserById($friend['user_id'])['profile_picture'],
+                        null
                     );
                     echo $friendCard->render();
                 }
@@ -71,6 +75,7 @@ $suggestions = $friendModel->getSuggestions(1);
                         'request',
                         $userModel->getUserById($request['sender_id'])['profile_picture'],
                         $request['request_id'],
+                        null
                     );
                     echo $friendCard->render();
                 }
@@ -80,8 +85,11 @@ $suggestions = $friendModel->getSuggestions(1);
                         $suggestion['full_name'],
                         date('d/m/Y', strtotime($userModel->getUserById($suggestion['user_id'])['registration_date'])),
                         'suggestion',
-                        $suggestion['profile_picture']
+                        $suggestion['profile_picture'],
+                        null,
+                        $suggestion['email'],
                     );
+
                     echo $friendCard->render();
                 }
                 ?>

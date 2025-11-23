@@ -38,6 +38,33 @@ class FriendController
         ];
     }
 
+    public function sendRequestById($id)
+    {
+        requireAuth();
+
+        $senderId = $_SESSION['user_id'];
+        $receiverId = $id;
+
+        error_log("--------------------------------------");
+        error_log("Sender ID: " . $senderId);
+        error_log("Receiver ID: " . $receiverId);
+
+        if (!$receiverId)
+            return ['success' => false, 'message' => 'ID no especificado'];
+        if ($senderId === $receiverId)
+            return ['success' => false, 'message' => 'No puedes enviarte solicitud a ti mismo'];
+
+        if (!$this->userModel->getUserById($receiverId))
+            return ['success' => false, 'message' => 'Usuario no encontrado'];
+
+        $ok = $this->friendModel->sendRequest($senderId, $receiverId);
+
+        return [
+            'success' => $ok,
+            'message' => $ok ? 'Solicitud enviada' : 'No se pudo enviar'
+        ];
+    }
+
     public function acceptRequest($id)
     {
         requireAuth();
@@ -77,5 +104,60 @@ class FriendController
         $ok = $this->friendModel->removeFriend($currentEmail, $otherEmail);
 
         return ['success' => $ok];
+    }
+
+    public function getPendingRequests()
+    {
+        requireAuth();
+        $userId = $_SESSION['user_id'];
+
+        $requests = $this->friendModel->getPendingRequests($userId);
+
+        return ['success' => true, 'data' => $requests];
+    }
+
+    public function getSentRequests()
+    {
+        requireAuth();
+        $userId = $_SESSION['user_id'];
+
+        $requests = $this->friendModel->getSentRequests($userId);
+
+        return ['success' => true, 'data' => $requests];
+    }
+
+    public function getFriends()
+    {
+        requireAuth();
+        $userId = $_SESSION['user_id'];
+
+        $friends = $this->friendModel->getFriends($userId);
+
+        return ['success' => true, 'data' => $friends];
+    }
+
+    public function getSuggestions()
+    {
+        requireAuth();
+        $userId = $_SESSION['user_id'];
+
+        $suggestions = $this->friendModel->getSuggestions($userId);
+
+        return ['success' => true, 'data' => $suggestions];
+    }
+
+    public function getStatus($params)
+    {
+        requireAuth();
+        $userId = $_SESSION['user_id'];
+        $otherUserId = $params['id'] ?? null;
+
+        if (!$otherUserId) {
+            return ['success' => false, 'message' => 'ID requerido'];
+        }
+
+        $status = $this->friendModel->getFriendshipStatus($userId, $otherUserId);
+
+        return ['success' => true, 'status' => $status];
     }
 }

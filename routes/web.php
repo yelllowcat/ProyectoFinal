@@ -68,7 +68,7 @@ $router->get('/friendReqs', function () {
     require __DIR__ . '/../views/friendReqs.php';
 });
 
-$router->post('/friend/request/:id', [FriendController::class, 'sendRequest']);
+$router->post('/friend/request/:id', [FriendController::class, 'sendRequestById']);
 $router->post('/friend/accept/:id', [FriendController::class, 'acceptRequest']);
 $router->post('/friend/reject/:id', [FriendController::class, 'rejectRequest']);
 $router->post('/friend/cancel/:id', [FriendController::class, 'cancelRequest']);
