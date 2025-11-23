@@ -124,6 +124,7 @@ function handleFriendAction(id, button, endpoint) {
   .then(response => response.json())
   .then(data => {
     if (data.success) {
+      window.location.reload();
       const card = button.closest('.friend-card');
       if (card) {
         card.style.transition = 'opacity 0.5s';

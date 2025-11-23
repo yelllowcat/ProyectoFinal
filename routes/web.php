@@ -70,9 +70,12 @@ $router->get('/friendReqs', function () {
 
 $router->post('/friend/request/:id', [FriendController::class, 'sendRequestById']);
 $router->post('/friend/accept/:id', [FriendController::class, 'acceptRequest']);
+$router->post('/friend/acceptUser/:id', [FriendController::class, 'acceptRequestByUserId']);
 $router->post('/friend/reject/:id', [FriendController::class, 'rejectRequest']);
 $router->post('/friend/cancel/:id', [FriendController::class, 'cancelRequest']);
+$router->post('/friend/cancelUser/:id', [FriendController::class, 'cancelRequestByUserId']);
 $router->delete('/friend/remove/:id', [FriendController::class, 'removeFriend']);
+$router->post('/friend/remove/:id', [FriendController::class, 'removeFriendById']);
 
 $router->get('/friend/requests', [FriendController::class, 'getPendingRequests']);
 $router->get('/friend/status', [FriendController::class, 'getFriendshipStatus']);

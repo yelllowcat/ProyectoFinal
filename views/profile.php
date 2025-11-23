@@ -6,16 +6,22 @@ use App\Models\PostModel;
 use App\Models\LikeModel;
 use App\Models\CommentModel;
 use App\Models\UserModel;
+use App\Models\FriendModel;
 
-$userId = $_GET['id'] ?? getCurrentUserId();
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$segments = explode('/', trim($path, '/'));
+$userId = $segments[1] ?? getCurrentUserId();
+
 $userModel = new UserModel();
 $user = $userModel->getUserById($userId);
 
 $postModel = new PostModel();
 $likeModel = new LikeModel();
-$commentModel = new CommentModel(); 
+$commentModel = new CommentModel();
+$friendModel = new FriendModel();
+
 $userPosts = $postModel->getPostsByUserId($userId);
-$currentUserId = getCurrentUserId(); 
+$currentUserId = getCurrentUserId();
 
 $totalLikes = 0;
 $postCount = count($userPosts);
@@ -25,15 +31,38 @@ foreach ($userPosts as $post) {
 }
 
 $isOwnProfile = ($userId == $currentUserId);
+$friendsCount = count($friendModel->getFriends($userId));
 
-function getProfilePicture($filename) {
+if ($isOwnProfile) {
+    $state = 'own';
+} else {
+    $friendshipStatus = $friendModel->getFriendshipStatus($currentUserId, $userId);
+
+    switch ($friendshipStatus) {
+        case 'friends':
+            $state = 'friend';
+            break;
+        case 'pending_received':
+            $state = 'request';
+            break;
+        case 'pending_sent':
+            $state = 'pending';
+            break;
+        default:
+            $state = 'stranger';
+            break;
+    }
+}
+
+function getProfilePicture($filename)
+{
     $imagePath = $_SERVER['DOCUMENT_ROOT'] . "/assets/imagesProfile/{$filename}";
     $defaultImage = "/assets/imagesProfile/default_avatar.png?v=" . time();
-    
+
     if (empty($filename) || !file_exists($imagePath)) {
         return $defaultImage;
     }
-    
+
     return "/assets/imagesProfile/{$filename}?v=" . time();
 }
 
@@ -42,7 +71,7 @@ $profilePicture = getProfilePicture($user['profile_picture']);
 if (!$user) {
     flash('error', 'Usuario no encontrado');
     redirect('/posts');
-} ?>    
+} ?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -62,13 +91,14 @@ if (!$user) {
         <div class="content-wrapper">
             <?php
             $profile = new Profile(
-                $isOwnProfile ? 'own' : 'other', 
-                $user['full_name'],              
-                $user['biography'] ?? '',        
-                $postCount,                      
-                $totalLikes,                     
-                $userId,                        
-                $profilePicture                  
+                $state,
+                $user['full_name'],
+                $user['biography'] ?? '',
+                $postCount,
+                $totalLikes,
+                $friendsCount,
+                $userId,
+                $profilePicture
             );
             echo $profile->render();
 
@@ -82,13 +112,13 @@ if (!$user) {
                 foreach ($userPosts as $postData) {
                     $likesCount = $likeModel->getLikeCount($postData['post_id']);
                     $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
-                    $comments = $commentModel->getCommentsByPost($postData['post_id']); 
+                    $comments = $commentModel->getCommentsByPost($postData['post_id']);
                     $commentsCount = $commentModel->getCommentCount($postData['post_id']);
 
                     $author = $userModel->getUserById($postData['user_id']);
 
-                    $authorPicture = getProfilePicture($author['profile_picture']); 
-                    
+                    $authorPicture = getProfilePicture($author['profile_picture']);
+
                     $postComponent = new Post([
                         'id' => $postData['post_id'],
                         'author' => $postData['full_name'],

@@ -9,16 +9,18 @@ class Profile
     private $userBio;
     private $postCount;
     private $likesCount;
+    private $friendsCount;
     private $userId;
     private $profilePicture;
 
-    public function __construct($viewState = 'own', $userName = 'Usuario', $userBio = '', $postCount = 0, $likesCount = 0, $userId = null, $profilePicture = null)
+    public function __construct($viewState = 'own', $userName = 'Usuario', $userBio = '', $postCount = 0, $likesCount = 0, $friendsCount = 0, $userId = null, $profilePicture = null)
     {
         $this->viewState = $viewState;
         $this->userName = htmlspecialchars($userName);
         $this->userBio = $userBio ? htmlspecialchars($userBio) : $this->getDefaultBio();
         $this->postCount = $postCount;
         $this->likesCount = $likesCount;
+        $this->friendsCount = $friendsCount;
         $this->userId = $userId;
         $this->profilePicture = $profilePicture;
     }
@@ -41,12 +43,32 @@ class Profile
                         Editar perfil
                     </a>
                 </div>";
-        } else {
+        } else if ($this->viewState === 'friend') {
             return "
                 <div class='profile-actions'>
-                    <button class='btn btn-secondary' onclick='followUser({$this->userId})' style='background: #6c757d;'>
-                        <img src='/assets/images/follow.png' alt='Seguir' width='16'>
-                        Seguir
+                    <button class='btn btn-remove profile-action-btn' data-action='remove' data-user-id='{$this->userId}'>
+                        Eliminar Amistad
+                    </button>
+                </div>";
+        } else if ($this->viewState === 'request') {
+            return "
+                <div class='profile-actions'>
+                    <button class='btn btn-primary profile-action-btn' data-action='accept' data-user-id='{$this->userId}'>
+                        Aceptar
+                    </button>
+                </div>";
+        } else if ($this->viewState === 'pending') {
+            return "
+                <div class='profile-actions'>
+                    <button class='btn btn-remove profile-action-btn' data-action='reject' data-user-id='{$this->userId}'>
+                        Cancelar solicitud
+                    </button>
+                </div>";
+        } else if ($this->viewState === 'stranger') {
+            return "
+                <div class='profile-actions'>
+                    <button class='btn btn-primary profile-action-btn' data-action='add' data-user-id='{$this->userId}'>
+                        Agregar amigo
                     </button>
                 </div>";
         }
@@ -74,8 +96,8 @@ class Profile
             <div class='stat-label'>Me gusta</div>
         </div>
         <div class='stat'>
-            <div class='stat-number'>10</div>
-            <div class='stat-label'>Seguidores</div>
+            <div class='stat-number'>" . number_format($this->friendsCount) . "</div>
+            <div class='stat-label'>Amigos</div>
         </div>
     </div>
 

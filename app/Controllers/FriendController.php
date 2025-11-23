@@ -79,6 +79,21 @@ class FriendController
         return ['success' => $ok];
     }
 
+    public function acceptRequestByUserId($id)
+    {
+        requireAuth();
+        $senderId = $id;
+        $receiverId = $_SESSION['user_id'];
+
+        if (!$senderId) {
+            return ['success' => false, 'message' => 'ID requerido'];
+        }
+
+        $ok = $this->friendModel->acceptRequestByUserId($senderId, $receiverId);
+
+        return ['success' => $ok];
+    }
+
     public function rejectRequest($id)
     {
         requireAuth();
@@ -89,6 +104,21 @@ class FriendController
             return ['success' => false, 'message' => 'ID requerido'];
         }
         return ['success' => $this->friendModel->rejectRequest($requestId, $receiverId)];
+    }
+
+    public function cancelRequestByUserId($id)
+    {
+        requireAuth();
+        $senderId = $_SESSION['user_id'];
+        $receiverId = $id;
+
+        if (!$receiverId) {
+            return ['success' => false, 'message' => 'ID requerido'];
+        }
+
+        $ok = $this->friendModel->cancelRequestByUserId($senderId, $receiverId);
+
+        return ['success' => $ok];
     }
 
     public function removeFriend($id)
@@ -102,6 +132,20 @@ class FriendController
             return ['success' => false, 'message' => 'Email requerido'];
 
         $ok = $this->friendModel->removeFriend($currentEmail, $otherEmail);
+
+        return ['success' => $ok];
+    }
+
+    public function removeFriendById($id)
+    {
+        requireAuth();
+        $currentUserId = $_SESSION['user_id'];
+        $friendId = $id;
+
+        if (!$friendId)
+            return ['success' => false, 'message' => 'ID requerido'];
+
+        $ok = $this->friendModel->removeFriendById($currentUserId, $friendId);
 
         return ['success' => $ok];
     }

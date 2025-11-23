@@ -155,6 +155,22 @@ class FriendModel
         }
     }
 
+    public function acceptRequestByUserId($senderId, $receiverId)
+    {
+        $stmt = $this->pdo->prepare(
+            "SELECT request_id FROM friend_requests 
+             WHERE sender_id = ? AND receiver_id = ? AND status = 'pending'"
+        );
+        $stmt->execute([$senderId, $receiverId]);
+        $request = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$request) {
+            return false;
+        }
+
+        return $this->acceptRequest($request['request_id'], $receiverId);
+    }
+
     public function rejectRequest($requestId, $receiverId)
     {
         $stmt = $this->pdo->prepare(
@@ -162,6 +178,15 @@ class FriendModel
              WHERE request_id=? AND receiver_id=?"
         );
         return $stmt->execute([$requestId, $receiverId]);
+    }
+
+    public function cancelRequestByUserId($senderId, $receiverId)
+    {
+        $stmt = $this->pdo->prepare(
+            "UPDATE friend_requests SET status='cancelled', response_date=NOW()
+             WHERE sender_id = ? AND receiver_id = ? AND status = 'pending'"
+        );
+        return $stmt->execute([$senderId, $receiverId]);
     }
 
     public function removeFriend($emailA, $emailB)

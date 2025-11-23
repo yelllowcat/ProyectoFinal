@@ -34,7 +34,7 @@ $suggestions = $friendController->getSuggestions()['data'];
     <div class="main-content">
         <div class="friends-container">
             <div class="friends-header">
-                <h1 class="friends-title">Manuel Orozco</h1>
+                <h1 class="friends-title"><?= $userModel->getUserById($userId)['full_name'] ?></h1>
 
                 <div class="search-bar">
                     <input type="text" id="friendSearchInput" class="search-input" placeholder="Buscar amigos..."

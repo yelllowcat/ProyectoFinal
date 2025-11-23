@@ -486,10 +486,73 @@ function setupDragAndDrop() {
 
     if (files.length > 0) {
       fileInput.files = files;
-      // Trigger the change event manually
       const event = new Event("change", { bubbles: true });
       fileInput.dispatchEvent(event);
     }
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', function(event) {
+    if (event.target && event.target.classList.contains('profile-action-btn')) {
+      const button = event.target;
+      const action = button.dataset.action;
+      const userId = button.dataset.userId;
+      
+      if (!userId || !action) return;
+      
+      handleProfileFriendAction(action, userId, button);
+    }
+  });
+});
+
+async function handleProfileFriendAction(action, userId, button) {
+  const endpoints = {
+    'add': `/friend/request/${userId}`,
+    'accept': `/friend/acceptUser/${userId}`,
+    'reject': `/friend/cancelUser/${userId}`,
+    'remove': `/friend/remove/${userId}`
+  };
+  
+  const messages = {
+    'add': 'Enviando solicitud...',
+    'accept': 'Aceptando solicitud...',
+    'reject': 'Cancelando solicitud...',
+    'remove': 'Eliminando amistad...'
+  };
+  
+  const endpoint = endpoints[action];
+  if (!endpoint) return;
+  
+  button.disabled = true;
+  const originalText = button.textContent;
+  button.textContent = messages[action];
+  
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      window.location.reload();
+    } else {
+      alert('Error: ' + (data.message || 'Acción fallida'));
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('Ocurrió un error al procesar la solicitud');
+    button.disabled = false;
+    button.textContent = originalText;
+  }
+}
+
 console.log("Main.js loaded");
+
