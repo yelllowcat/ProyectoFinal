@@ -47,20 +47,23 @@ class Profile
             return "
                 <div class='profile-actions'>
                     <button class='btn btn-remove profile-action-btn' data-action='remove' data-user-id='{$this->userId}'>
-                        Eliminar Amistad
+                        Eliminar amistad
                     </button>
                 </div>";
         } else if ($this->viewState === 'request') {
             return "
-                <div class='profile-actions'>
+                <div class='profile-actions' style='display: flex; gap: 10px; justify-content: space-evenly;'>
                     <button class='btn btn-primary profile-action-btn' data-action='accept' data-user-id='{$this->userId}'>
-                        Aceptar
+                        Aceptar solicitud
+                    </button>
+                    <button class='btn btn-remove profile-action-btn' data-action='reject' data-user-id='{$this->userId}'>
+                        Rechazar solicitud
                     </button>
                 </div>";
         } else if ($this->viewState === 'pending') {
             return "
                 <div class='profile-actions'>
-                    <button class='btn btn-remove profile-action-btn' data-action='reject' data-user-id='{$this->userId}'>
+                    <button class='btn btn-primary profile-action-btn' data-action='reject' data-user-id='{$this->userId}'>
                         Cancelar solicitud
                     </button>
                 </div>";
