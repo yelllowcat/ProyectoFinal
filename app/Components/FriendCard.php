@@ -23,7 +23,17 @@ class FriendCard
         $this->name = htmlspecialchars($name);
         $this->joinDate = htmlspecialchars($joinDate);
         $this->status = htmlspecialchars($status);
-        $this->avatarUrl = $avatarUrl;
+
+        if ($avatarUrl) {
+            if (strpos($avatarUrl, '/') !== 0) {
+                $this->avatarUrl = "/assets/imagesProfile/{$avatarUrl}";
+            } else {
+                $this->avatarUrl = $avatarUrl;
+            }
+        } else {
+            $this->avatarUrl = "/assets/imagesProfile/default_avatar.png";
+        }
+
         $this->requestId = $requestId;
         $this->email = $email ? htmlspecialchars($email) : null;
     }
@@ -31,16 +41,14 @@ class FriendCard
     public function render(): string
     {
         $buttons = $this->getButtons();
-        $avatarStyle = $this->avatarUrl
-            ? "background-image: url('" . htmlspecialchars($this->avatarUrl, ENT_QUOTES) . "');"
-            : '';
+        $escapedAvatarUrl = htmlspecialchars($this->avatarUrl, ENT_QUOTES, 'UTF-8'); // Escape only in output
 
         return "
         <div class='friend-card' data-status='{$this->status}'>
             <a href='/profile/{$this->id}'>
-            <div class='friend-avatar' style=\"{$avatarStyle}\"></div>
-            <h3 class='friend-name'>{$this->name}</h3>
-            <p class='friend-date'>Se unió el: {$this->joinDate}</p>
+                <img src='{$escapedAvatarUrl}' alt='Avatar de {$this->name}' class='friend-avatar'>
+                <h3 class='friend-name'>{$this->name}</h3>
+                <p class='friend-date'>Se unió el: {$this->joinDate}</p>
             </a>
             <div class='friend-actions'>
                 {$buttons}
