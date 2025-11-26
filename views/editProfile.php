@@ -1,15 +1,4 @@
 <?php
-function getProfilePicture($filename)
-{
-  $imagePath = $_SERVER['DOCUMENT_ROOT'] . "/assets/imagesProfile/{$filename}";
-  $defaultImage = "/assets/imagesProfile/default_avatar.png?v=" . time();
-
-  if (empty($filename) || !file_exists($imagePath)) {
-    return $defaultImage;
-  }
-
-  return "/assets/imagesProfile/{$filename}?v=" . time();
-}
 ?>
 
 <!DOCTYPE html>

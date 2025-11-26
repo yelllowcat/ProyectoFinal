@@ -5,7 +5,6 @@ use App\Controllers\FriendController;
 use App\Models\FriendModel;
 use App\Models\UserModel;
 
-
 $userId = $_GET['id'] ?? getCurrentUserId();
 
 $userModel = new UserModel();
@@ -13,7 +12,6 @@ $friendModel = new FriendModel();
 $friendController = new FriendController();
 
 $friends = $friendModel->getFriends($userId);
-
 $requests = $friendModel->getPendingRequests($userId);
 $suggestions = $friendController->getSuggestions()['data'];
 ?>
@@ -62,7 +60,7 @@ $suggestions = $friendController->getSuggestions()['data'];
                         $friend['full_name'],
                         date('d/m/Y', strtotime($userModel->getUserById($friend['user_id'])['registration_date'])),
                         'friends',
-                        $userModel->getUserById($friend['user_id'])['profile_picture'],
+                        getProfilePicture($userModel->getUserById($friend['user_id'])['profile_picture']),
                         null
                     );
                     echo $friendCard->render();
@@ -74,7 +72,7 @@ $suggestions = $friendController->getSuggestions()['data'];
                         date('d/m/Y', strtotime($userModel->getUserById($request['sender_id'])['registration_date'])),
                         'request',
                         $userModel->getUserById($request['sender_id'])['profile_picture'],
-                        $request['request_id'],
+                        getProfilePicture($request['request_id']),
                         null
                     );
                     echo $friendCard->render();
@@ -85,7 +83,7 @@ $suggestions = $friendController->getSuggestions()['data'];
                         $suggestion['full_name'],
                         date('d/m/Y', strtotime($userModel->getUserById($suggestion['user_id'])['registration_date'])),
                         'suggestion',
-                        $suggestion['profile_picture'],
+                        getProfilePicture($suggestion['profile_picture']),
                         null,
                         $suggestion['email'],
                     );
