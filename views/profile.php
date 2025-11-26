@@ -59,7 +59,13 @@ $profilePicture = getProfilePicture($user['profile_picture']);
 if (!$user) {
     flash('error', 'Usuario no encontrado');
     redirect('/posts');
-} ?>
+}
+
+$safe_full_name = safe_output($user['full_name']);
+$safe_biography = safe_output($user['biography'] ?? '');
+$safe_email = safe_output($user['email'] ?? '');
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -80,8 +86,8 @@ if (!$user) {
             <?php
             $profile = new Profile(
                 $state,
-                $user['full_name'],
-                $user['biography'] ?? '',
+                $safe_full_name,
+                $safe_biography,
                 $postCount,
                 $totalLikes,
                 $friendsCount,
@@ -104,16 +110,18 @@ if (!$user) {
                     $commentsCount = $commentModel->getCommentCount($postData['post_id']);
 
                     $author = $userModel->getUserById($postData['user_id']);
-
                     $authorPicture = getProfilePicture($author['profile_picture']);
+
+                    $safe_author_name = safe_output($postData['full_name']);
+                    $safe_post_content = safe_output($postData['content']);
 
                     $postComponent = new Post([
                         'id' => $postData['post_id'],
-                        'author' => $postData['full_name'],
+                        'author' => $safe_author_name,
                         'date' => date('d/m/Y', strtotime($postData['created_at'])),
                         'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : '',
                         'image_alt' => 'Imagen del post',
-                        'text' => $postData['content'],
+                        'text' => $safe_post_content,
                         'likes' => $likesCount,
                         'comments_count' => $commentsCount,
                         'comments' => $comments,

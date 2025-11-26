@@ -12,7 +12,7 @@ class AuthController
 
             $full_name = clean_input($_POST['full_name'] ?? '');
             $email = clean_input($_POST['email'] ?? '');
-            $password = trim($_POST['password'] ?? ''); 
+            $password = trim($_POST['password'] ?? '');
             $confirm_password = trim($_POST['confirm_password'] ?? '');
 
             if (empty($full_name) || empty($email) || empty($password) || empty($confirm_password)) {
@@ -43,9 +43,9 @@ class AuthController
     public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            
+
             $email = clean_input($_POST['email'] ?? '');
-            $password = trim($_POST['password'] ?? ''); 
+            $password = trim($_POST['password'] ?? '');
 
             if (empty($email) || empty($password)) {
                 $_SESSION['error'] = 'Por favor completa todos los campos.';
@@ -63,9 +63,9 @@ class AuthController
                 redirect('/login');
             } else {
                 $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_name'] = $user['full_name'];
-                $_SESSION['user_role'] = $user['role'];
+                $_SESSION['user_email'] = safe_output($user['email']);
+                $_SESSION['user_name'] = safe_output($user['full_name']);
+                $_SESSION['user_role'] = safe_output($user['role'] ?? 'user');
 
                 $_SESSION['success'] = 'Inicio de sesión exitoso.';
                 redirect('/posts');

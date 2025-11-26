@@ -18,9 +18,9 @@ class PostController
             $content = clean_input($_POST['content'] ?? '');
 
             if (empty($content) || strlen(trim($content)) < 1) {
-            flash('error', 'El contenido del post debe tener al menos 1 caracteres');
-            redirect('/addPost');
-        }
+                flash('error', 'El contenido del post debe tener al menos 1 caracteres');
+                redirect('/addPost');
+            }
 
             $imageName = null;
 
@@ -33,7 +33,9 @@ class PostController
             }
 
             $postModel = new PostModel();
-            $result = $postModel->createPost($userId, $content, $imageName);
+
+            $safeContent = safe_output($content);
+            $result = $postModel->createPost($userId, $safeContent, $imageName);
 
             if ($result) {
                 flash('success', 'Post publicado correctamente' . ($imageName ? ' con imagen' : ''));
@@ -77,37 +79,38 @@ class PostController
     }
 
     public function update($id)
-{
-    requireAuth();
+    {
+        requireAuth();
 
-    $userId = $_SESSION['user_id'];
+        $userId = $_SESSION['user_id'];
 
-    if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-        $input = json_decode(file_get_contents('php://input'), true);
-        $content = clean_input($input['content'] ?? '');
+        if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+            $input = json_decode(file_get_contents('php://input'), true);
+            $content = clean_input($input['content'] ?? '');
 
-        if (empty($content) || strlen(trim($content)) < 2) {
-            return jsonError('El contenido del post debe tener al menos 2 caracteres');
+            if (empty($content) || strlen(trim($content)) < 2) {
+                return jsonError('El contenido del post debe tener al menos 2 caracteres');
+            }
+
+            $postModel = new PostModel();
+            $post = $postModel->getPostById($id);
+
+            if (!$post || $post['user_id'] != $userId) {
+                return jsonError('No tienes permisos para editar este post', 403);
+            }
+
+            $safeContent = safe_output($content);
+            $result = $postModel->updatePost($id, $safeContent, $post['image']);
+
+            if ($result) {
+                return jsonSuccess(null, 'Post actualizado correctamente');
+            } else {
+                return jsonError('Error al actualizar el post');
+            }
         }
 
-        $postModel = new PostModel();
-        $post = $postModel->getPostById($id);
-
-        if (!$post || $post['user_id'] != $userId) {
-            return jsonError('No tienes permisos para editar este post', 403);
-        }
-
-        $result = $postModel->updatePost($id, $content, $post['image']);
-
-        if ($result) {
-            return jsonSuccess(null, 'Post actualizado correctamente');
-        } else {
-            return jsonError('Error al actualizar el post');
-        }
+        return jsonError('Método no permitido');
     }
-
-    return jsonError('Método no permitido');
-}
 
     public function destroy($id)
     {
@@ -181,7 +184,8 @@ class PostController
                 return jsonError('El comentario no puede estar vacío');
             }
 
-            $commentId = $commentModel->createComment($postId, $userId, $comment);
+            $safeComment = safe_output($comment);
+            $commentId = $commentModel->createComment($postId, $userId, $safeComment);
 
             if ($commentId) {
                 $newComment = $commentModel->getCommentById($commentId);

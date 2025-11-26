@@ -24,14 +24,14 @@ use App\Components\Alert;
     <form method="post" action="/login">
       <div class="form-group">
         <input type="email" id="email" placeholder="Correo electronico" name="email"
-          value="<?= safe_output($_POST['email'] ?? '') ?>" required onpaste="return false;" />
+          value="<?= safe_output($_POST['email'] ?? '') ?>" required onpaste="return false;" maxlength="200" />
         <label for="email" class="form-label" data-help="Formato: correo@ejemplo.com">Correo electronico</label>
       </div>
 
       <div class="form-group password-field">
         <input type="password" id="password" name="password" placeholder="Contraseña" required
           pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$" minlength="8"
-          onpaste="return false;" />
+          onpaste="return false;" maxlength="64" />
         <label for="password" class="form-label"
           data-help="8+ caracteres, mayúscula, minúscula, número y símbolo">Contraseña</label>
         <img class="eye-icon" onclick="togglePassword()" src="../assets/images/eye-off.png" alt="Ocultar contraseña" />

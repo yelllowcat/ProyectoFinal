@@ -20,7 +20,7 @@ class FriendController
         requireAuth();
 
         $senderEmail = $_SESSION['email'];
-        $receiverEmail = $params['email'] ?? null;
+        $receiverEmail = clean_input($params['email'] ?? '');
 
         if (!$receiverEmail)
             return ['success' => false, 'message' => 'Email no especificado'];
@@ -43,7 +43,7 @@ class FriendController
         requireAuth();
 
         $senderId = $_SESSION['user_id'];
-        $receiverId = $id;
+        $receiverId = intval(clean_input($id));
 
         error_log("--------------------------------------");
         error_log("Sender ID: " . $senderId);
@@ -68,7 +68,7 @@ class FriendController
     public function acceptRequest($id)
     {
         requireAuth();
-        $requestId = $id;
+        $requestId = intval(clean_input($id));
         $receiverId = $_SESSION['user_id'];
 
         if (!$requestId) {
@@ -194,7 +194,7 @@ class FriendController
     {
         requireAuth();
         $userId = $_SESSION['user_id'];
-        $otherUserId = $params['id'] ?? null;
+        $otherUserId = intval(clean_input($params['id'] ?? ''));
 
         if (!$otherUserId) {
             return ['success' => false, 'message' => 'ID requerido'];

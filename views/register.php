@@ -31,13 +31,13 @@ use App\Components\Alert;
 
       <div class="form-group">
         <input type="email" id="email" placeholder="Correo electrónico" name="email" required
-          value="<?= safe_output($_POST['email'] ?? '') ?>" onpaste="return false;"/>
+          value="<?= safe_output($_POST['email'] ?? '') ?>" onpaste="return false;" maxlength="200"/>
         <label for="email" class="form-label" data-help="Formato: correo@ejemplo.com">Correo electrónico</label>
       </div>
 
       <div class="form-group password-field">
         <input type="password" id="password" placeholder="Contraseña" name="password" required
-          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$" minlength="8"/>
+          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$" minlength="8" maxlength="64"/>
         <label for="password" class="form-label"
           data-help="8+ caracteres, mayúscula, minúscula, número y símbolo">Contraseña</label>
         <img class="eye-icon password" onclick="togglePassword(event)" src="../assets/images/eye-off.png"
@@ -46,7 +46,7 @@ use App\Components\Alert;
 
       <div class="form-group password-field">
         <input type="password" id="confirm-password" placeholder="Confirmar Contraseña" name="confirm_password" required
-          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$" minlength="8"/>
+          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$" minlength="8" maxlength="64"/>
         <label for="confirm-password" class="form-label" data-help="Debe coincidir con la contraseña">Confirmar
           Contraseña</label>
         <img class="eye-icon confirm-password" onclick="togglePassword(event)" src="../assets/images/eye-off.png"
