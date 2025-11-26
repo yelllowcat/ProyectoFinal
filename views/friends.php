@@ -71,8 +71,8 @@ $suggestions = $friendController->getSuggestions()['data'];
                         $userModel->getUserById($request['sender_id'])['full_name'],
                         date('d/m/Y', strtotime($userModel->getUserById($request['sender_id'])['registration_date'])),
                         'request',
-                        $userModel->getUserById($request['sender_id'])['profile_picture'],
-                        getProfilePicture($request['request_id']),
+                        getProfilePicture($userModel->getUserById($request['sender_id'])['profile_picture']),
+                        $request['request_id'],
                         null
                     );
                     echo $friendCard->render();
