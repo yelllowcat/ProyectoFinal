@@ -1,5 +1,7 @@
 <?php
 namespace App\views\admin;
+
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -33,71 +35,20 @@ namespace App\views\admin;
 
         <div class="users-table-container">
             <table class="users-table">
-                <thead>
+                <thead id="statsTableHeader">
                     <tr>
                         <th>Id</th>
                         <th>Nombre</th>
-                        <th>correo electronico</th>
+                        <th>Correo electrónico</th>
                         <th>Nº publicaciones</th>
                         <th></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="statsTableBody">
                     <tr>
-                        <td>1</td>
-                        <td>John Doe</td>
-                        <td>John.Doe@gmail.com</td>
-                        <td>120</td>
-                        <td><a href="/profile/1"><button class="btn-view-profile-table">Ver perfil</button></a></td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Jane Smith</td>
-                        <td>Jane.Smith@gmail.com</td>
-                        <td>100</td>
-                        <td><a href="/profile/2"><button class="btn-view-profile-table">Ver perfil</button></a></td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Carlos Pérez</td>
-                        <td>Carlos.Pérez@gmail.com</td>
-                        <td>80</td>
-                        <td><a href="/profile/3"><button class="btn-view-profile-table">Ver perfil</button></a></td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td>María López</td>
-                        <td>Maria.López@gmail.com</td>
-                        <td>57</td>
-                        <td><a href="/profile/4"></a><button class="btn-view-profile-table">Ver perfil</button></td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td>Ana Torres</td>
-                        <td>Ana.Torres@gmail.com</td>
-                        <td>41</td>
-                        <td><a href="/profile/5"><button class="btn-view-profile-table">Ver perfil</button></a></td>
-                    </tr>
-                    <tr>
-                        <td>6</td>
-                        <td>Pedro Martínez</td>
-                        <td>Pedro.Martinez@gmail.com</td>
-                        <td>35</td>
-                        <td><a href="/profile/6"><button class="btn-view-profile-table">Ver perfil</button></a></td>
-                    </tr>
-                    <tr>
-                        <td>7</td>
-                        <td>Laura García</td>
-                        <td>Laura.Garcia@gmail.com</td>
-                        <td>28</td>
-                        <td><a href="/profile/7"><button class="btn-view-profile-table">Ver perfil</button></a></td>
-                    </tr>
-                    <tr>
-                        <td>8</td>
-                        <td>Miguel Rodríguez</td>
-                        <td>Miguel.Rodriguez@gmail.com</td>
-                        <td>22</td>
-                        <td><a href="/profile/8"><button class="btn-view-profile-table">Ver perfil</button></a></td>
+                        <td colspan="5" style="text-align: center; padding: 40px;">
+                            Cargando estadísticas...
+                        </td>
                     </tr>
                 </tbody>
             </table>

@@ -17,9 +17,20 @@ function requireAdmin()
     requireAuth();
 
     $user = getCurrentUser();
-    if (!$user || !isset($user['role']) || $user['role'] !== 'admin') {
+    if (!$user || !isset($user['user_role']) || $user['user_role'] !== 'admin') {
         http_response_code(403);
         die('Access denied. Admin privileges required.');
+    }
+}
+
+function requireUser()
+{
+    requireAuth();
+
+    $user = getCurrentUser();
+    if (!$user || !isset($user['user_role']) || $user['user_role'] !== 'user') {
+        http_response_code(403);
+        die('Access denied. User privileges required.');
     }
 }
 
@@ -34,15 +45,19 @@ function getCurrentUser()
         return null;
     }
 
-    return $_SESSION['user_data'] ?? null;
+    return $_SESSION ?? null;
 }
 
 function isAdmin()
 {
     $user = getCurrentUser();
-    return $user && isset($user['role']) && $user['role'] === 'admin';
+    return $user && isset($user['user_role']) && $user['user_role'] === 'admin';
 }
-
+function isUser()
+{
+    $user = getCurrentUser();
+    return $user && isset($user['user_role']) && $user['user_role'] === 'user';
+}
 function isOwner($resourceUserId)
 {
     return getCurrentUserId() == $resourceUserId;
@@ -107,7 +122,8 @@ function jsonResponse($data, $statusCode = 200)
     exit();
 }
 
-function jsonSuccess($data = null, $message = '') {
+function jsonSuccess($data = null, $message = '')
+{
     header('Content-Type: application/json');
     echo json_encode([
         'success' => true,
@@ -117,7 +133,8 @@ function jsonSuccess($data = null, $message = '') {
     exit;
 }
 
-function jsonError($message = 'Error', $code = 400) {
+function jsonError($message = 'Error', $code = 400)
+{
     http_response_code($code);
     header('Content-Type: application/json');
     echo json_encode([
@@ -147,11 +164,13 @@ function hasFlash()
     return !empty($_SESSION['flash']);
 }
 
-function clean_input($data) {
+function clean_input($data)
+{
     return strip_tags(trim($data));
 }
 
-function safe_output($data) {
+function safe_output($data)
+{
     return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
 

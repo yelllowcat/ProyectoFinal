@@ -68,7 +68,11 @@ class AuthController
                 $_SESSION['user_role'] = safe_output($user['role'] ?? 'user');
 
                 $_SESSION['success'] = 'Inicio de sesión exitoso.';
-                redirect('/posts');
+                if (isAdmin()) {
+                    redirect('/dashboard');
+                } else {
+                    redirect('/posts');
+                }
             }
         } else {
             redirect('/login');
