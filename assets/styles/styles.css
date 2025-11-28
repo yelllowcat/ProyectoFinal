@@ -9,6 +9,9 @@ body {
   background-color: #f5f5f5;
   background-image: url("../images/fondoDiamante.png");
   background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   display: flex;
   min-height: 100vh;
 }
@@ -750,7 +753,7 @@ a {
 
 .feed-post-card {
   background-color: white;
-  border-radius: 20px;
+  border-radius: 12px;
   padding: 20px;
   margin-bottom: 30px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -1141,10 +1144,41 @@ a {
 .add-post-image-section {
   display: flex;
   justify-content: center;
+  border: 2px dashed #ddd;
+  border-radius: 10px;
+}
+
+.add-post-image-section.dragover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: #007bff;
+  transform: scale(1.02);
+}
+
+.add-post-image-section:hover {
+  cursor: pointer;
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+  border-color: #ddd;
+}
+
+.add-post-image-section.dragover .add-post-image {
+  transform: scale(1.02);
+}
+
+.add-post-image-section {
+  cursor: pointer;
 }
 
 .add-post-image {
   width: 15%;
+}
+
+.add-post-image.dragover {
+  transform: scale(1.02);
+}
+
+.add-post-image.dragover .image-upload-text {
+  opacity: 0;
 }
 
 .search-bar {

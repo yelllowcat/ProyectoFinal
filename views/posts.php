@@ -22,7 +22,7 @@ $currentUserId = $_SESSION['user_id'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNIRED - Publicaciones</title>
-    <link rel="stylesheet" href="/assets/styles/styles.css">
+    <link rel="stylesheet" href="../assets/styles/styles.css">
 </head>
 
 <body>
