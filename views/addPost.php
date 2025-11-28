@@ -1,5 +1,12 @@
 <?php
 namespace App\views;
+use App\Models\UserModel;
+
+$userId = getCurrentUserId();
+$userModel = new UserModel();
+$user = $userModel->getUserById($userId);
+$profilePicture = getProfilePicture($user['profile_picture']);
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -21,7 +28,7 @@ namespace App\views;
       <form action="/posts" method="POST" enctype="multipart/form-data">
         <div class="post-preview">
           <div class="post-header-section">
-            <img src="../assets/images/user.png" alt="User Avatar" class="post-avatar">
+            <img src="<?= $profilePicture ?>" alt="User Avatar" class="post-avatar">
             <div class="post-user-info">
               <h3><?= safe_output($_SESSION['user_name'] ?? 'Usuario') ?></h3>
               <div class="post-date-info">Publicando ahora</div>

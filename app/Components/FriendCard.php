@@ -41,7 +41,7 @@ class FriendCard
     public function render(): string
     {
         $buttons = $this->getButtons();
-        $escapedAvatarUrl = htmlspecialchars($this->avatarUrl, ENT_QUOTES, 'UTF-8'); // Escape only in output
+        $escapedAvatarUrl = htmlspecialchars($this->avatarUrl, ENT_QUOTES, 'UTF-8');
 
         return "
         <div class='friend-card' data-status='{$this->status}'>
