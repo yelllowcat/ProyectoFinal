@@ -75,7 +75,7 @@ function openConfirmModal(deleteButton) {
         }
       }
       if (modalName) modalName.textContent = name || "[Nombre del amigo]";
-    } catch (e) {}
+    } catch (e) { }
 
     confirmModal.showModal();
   }
@@ -367,10 +367,15 @@ function removeImage() {
 
 function handleProfileImageSelect(event) {
   const file = event.target.files[0];
-  const preview = document.getElementById("profileImagePreview");
+  const preview = document.getElementById("profilePreview");
   const previewImage = document.getElementById("previewProfileImage");
   const currentImage = document.getElementById("currentProfileImage");
 
+  console.log(file);
+  console.log(preview);
+  console.log(previewImage);
+  console.log(currentImage);
+  
   if (file) {
     if (file.size > 5 * 1024 * 1024) {
       alert("La imagen no puede ser mayor a 5MB");
@@ -388,6 +393,7 @@ function handleProfileImageSelect(event) {
     const reader = new FileReader();
     reader.onload = function (e) {
       previewImage.src = e.target.result;
+      previewImage.style.display = "block";
       preview.style.display = "block";
       currentImage.style.display = "none";
     };
@@ -395,15 +401,6 @@ function handleProfileImageSelect(event) {
   }
 }
 
-function removeProfileImage() {
-  const fileInput = document.getElementById("profile_picture");
-  const preview = document.getElementById("profileImagePreview");
-  const currentImage = document.getElementById("currentProfileImage");
-
-  fileInput.value = "";
-  preview.style.display = "none";
-  currentImage.style.display = "block";
-}
 
 //update post
 
@@ -493,14 +490,14 @@ function setupDragAndDrop() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.addEventListener('click', function(event) {
+  document.addEventListener('click', function (event) {
     if (event.target && event.target.classList.contains('profile-action-btn')) {
       const button = event.target;
       const action = button.dataset.action;
       const userId = button.dataset.userId;
-      
+
       if (!userId || !action) return;
-      
+
       handleProfileFriendAction(action, userId, button);
     }
   });
@@ -513,21 +510,21 @@ async function handleProfileFriendAction(action, userId, button) {
     'reject': `/friend/cancelUser/${userId}`,
     'remove': `/friend/remove/${userId}`
   };
-  
+
   const messages = {
     'add': 'Enviando solicitud...',
     'accept': 'Aceptando solicitud...',
     'reject': 'Cancelando solicitud...',
     'remove': 'Eliminando amistad...'
   };
-  
+
   const endpoint = endpoints[action];
   if (!endpoint) return;
-  
+
   button.disabled = true;
   const originalText = button.textContent;
   button.textContent = messages[action];
-  
+
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -536,9 +533,9 @@ async function handleProfileFriendAction(action, userId, button) {
       },
       body: JSON.stringify({})
     });
-    
+
     const data = await response.json();
-    
+
     if (data.success) {
       window.location.reload();
     } else {

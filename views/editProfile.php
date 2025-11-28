@@ -25,7 +25,10 @@
             <div id="profilePreview" class="profile-preview">
               <img src="<?= getProfilePicture($user['profile_picture']) ?>" alt="Foto de perfil"
                 id="currentProfileImage">
+
+              <img id="previewProfileImage" alt="Vista previa" style="display:none;">
             </div>
+
 
             <input type="file" id="profile_picture" name="profile_picture" accept="image/png, image/jpeg, image/jpg"
               style="display: none;" onchange="handleProfileImageSelect(event)">
