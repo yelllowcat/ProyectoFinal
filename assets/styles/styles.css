@@ -1045,6 +1045,7 @@ a {
 }
 
 #confirm-delete-modal,
+#confirm-logout-modal,
 #confirm-delete-modal.confirm-dialog {
   border: none;
   padding: 0;
@@ -1058,7 +1059,8 @@ a {
   z-index: 9999;
 }
 
-#confirm-delete-modal::backdrop {
+#confirm-delete-modal::backdrop,
+#confirm-logout-modal::backdrop {
   background: rgba(0, 0, 0, 0.9);
 }
 
@@ -1073,7 +1075,8 @@ a {
   text-align: center;
 }
 
-#confirm-delete-modal[open] {
+#confirm-delete-modal[open],
+#confirm-logout-modal[open] {
   position: fixed !important;
   inset: 0 !important;
   top: 0 !important;
@@ -1128,7 +1131,8 @@ a {
   cursor: pointer;
 }
 
-.confirm-delete {
+.confirm-delete,
+.confirm-logout {
   color: #d93025;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
   font-weight: 600;

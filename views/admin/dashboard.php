@@ -19,7 +19,7 @@ namespace App\views\admin;
             <img src="../assets/images/logoUnired.png" alt="UNIRED Logo">
         </div>
         <h1 class="admin-title">Administrador</h1>
-        <a href="/logout">
+        <a href="/logout" id="admin-logout">
             <button class="btn-logout">Cerrar sesión</button>
         </a>
     </div>
@@ -54,6 +54,19 @@ namespace App\views\admin;
             </table>
         </div>
     </div>
+    <dialog id="confirm-logout-modal" class="confirm-dialog" aria-labelledby="confirm-logout-title">
+        <div class="confirm-box">
+            <div class="confirm-head">
+                <h3 id="confirm-logout-title">Confirmar cierre de sesión</h3>
+                <p class="confirm-subtitle">¿Estás seguro/a de que deseas cerrar sesión?</p>
+            </div>
+            <div class="confirm-sep"></div>
+            <form method="dialog" class="confirm-actions">
+                <button value="confirm" class="confirm-logout">Cerrar sesión</button>
+                <button value="cancel" class="confirm-cancel">Cancelar</button>
+            </form>
+        </div>
+    </dialog>
     <script src="../../js/main.js"></script>
     <script src="../../js/dashboard.js"></script>
 </body>

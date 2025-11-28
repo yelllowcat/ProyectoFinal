@@ -551,5 +551,24 @@ async function handleProfileFriendAction(action, userId, button) {
   }
 }
 
+document.addEventListener("DOMContentLoaded", function () {
+  const logoutLink = document.getElementById("logout");
+  const logoutModal = document.getElementById("confirm-logout-modal");
+
+  if (logoutLink && logoutModal) {
+    logoutLink.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      logoutModal.showModal();
+    });
+
+    logoutModal.addEventListener("close", function () {
+      if (logoutModal.returnValue === "confirm") {
+        window.location.href = "/logout";
+      }
+    });
+  }
+});
+
 console.log("Main.js loaded");
 

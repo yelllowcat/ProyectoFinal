@@ -205,4 +205,21 @@ document.addEventListener("DOMContentLoaded", () => {
   if (firstTab) {
     fetchUsersWithMostPosts({ currentTarget: firstTab });
   }
+
+  const adminLogoutLink = document.getElementById("admin-logout");
+  const logoutModal = document.getElementById("confirm-logout-modal");
+
+  if (adminLogoutLink && logoutModal) {
+    adminLogoutLink.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      logoutModal.showModal();
+    });
+
+    logoutModal.addEventListener("close", function () {
+      if (logoutModal.returnValue === "confirm") {
+        window.location.href = "/logout";
+      }
+    });
+  }
 });
