@@ -69,11 +69,8 @@ a {
   color: white;
 }
 
-.menu-icon {
-  font-size: 18px;
-}
 
-.menu-icon img {
+.menu-icon {
   width: 24px;
   height: 24px;
 }
@@ -1453,6 +1450,7 @@ a {
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
+  display: none;
 }
 
 .sidebar-overlay.active {
@@ -1463,10 +1461,16 @@ a {
 @media (max-width: 768px) {
   .sidebar {
     width: 280px;
+    height: 100vh;
+    position: fixed;
   }
 
   .sidebar.sidebar-hidden {
     transform: translateX(-100%);
+  }
+
+  .sidebar-overlay {
+    display: block;
   }
 
   .main-content {

@@ -433,11 +433,33 @@ document.addEventListener("DOMContentLoaded", function () {
   const btnSidebar = document.getElementById("sidebarToggle");
   const sidebar = document.querySelector(".sidebar");
   const mainContent = document.querySelector(".main-content");
+  const overlay = document.getElementById("sidebarOverlay");
 
   if (btnSidebar && sidebar && mainContent) {
     btnSidebar.addEventListener("click", function () {
-      sidebar.classList.toggle("sidebar-hidden");
+      const isHidden = sidebar.classList.toggle("sidebar-hidden");
       mainContent.classList.toggle("sidebar-hidden");
+      
+      if (overlay) {
+        overlay.classList.toggle("active");
+        
+        if (!isHidden) {
+          document.body.style.overflow = "hidden";
+        } else {
+          document.body.style.overflow = "";
+        }
+      }
+    });
+  }
+
+  if (overlay) {
+    overlay.addEventListener("click", function () {
+      if (sidebar && mainContent) {
+        sidebar.classList.add("sidebar-hidden");
+        mainContent.classList.add("sidebar-hidden");
+        overlay.classList.remove("active");
+        document.body.style.overflow = "";
+      }
     });
   }
 

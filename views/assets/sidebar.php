@@ -10,26 +10,26 @@
     </a>
 
     <a href="/addPost" class="menu-item">
-        <span class="menu-icon"><img src="../assets/images/addPost.png" alt="Nueva publicación"></span>
+        <img src="../assets/images/addPost.png" alt="Nueva publicación" class="menu-icon">
         <span>Nueva publicación</span>
     </a>
 
     <a href="/posts" class="menu-item <?php echo ($currentPage === 'posts') ? 'active' : ''; ?>">
-        <span class="menu-icon"><img src="../assets/images/posts.png" alt="Publicaciones"></span>
+        <img src="../assets/images/posts.png" alt="Publicaciones" class="menu-icon">
         <span>Publicaciones</span>
     </a>
 
     <a href="/friends" class="menu-item <?php echo ($currentPage === 'friends') ? 'active' : ''; ?>">
-        <span class="menu-icon"><img src="../assets/images/friends.png" alt="Amigos"></span>
+        <img src="../assets/images/friends.png" alt="Amigos" class="menu-icon">
         <span>Amigos</span>
     </a>
     <a href="/profile" class="menu-item <?php echo ($currentPage === 'profile') ? 'active' : ''; ?>">
-        <span class="menu-icon"><img src="../assets/images/profile.png" alt="Perfil" class="profile-icon"></span>
+        <img src="../assets/images/profile.png" alt="Perfil" class="menu-icon">
         <span>Perfil</span>
     </a>
 
     <a href="/logout" class="menu-item <?php echo ($currentPage === 'logout') ? 'active' : ''; ?>" id="logout">
-        <span class="menu-icon"><img src="../assets/images/logout.png" alt="Cerrar sesión" class="logout-icon"></span>
+        <img src="../assets/images/logout.png" alt="Cerrar sesión" class="menu-icon">
         <span>Cerrar sesión</span>
     </a>
     <dialog id="confirm-logout-modal" class="confirm-dialog" aria-labelledby="confirm-logout-title">
@@ -46,3 +46,4 @@
         </div>
     </dialog>
 </div>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
