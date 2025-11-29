@@ -15,7 +15,8 @@ $profilePicture = getProfilePicture($user['profile_picture']);
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UNIRED - Nueva Publicación</title>
-  <link rel="stylesheet" href="../assets/styles/styles.css" />
+  <link rel="stylesheet" href="<?php echo asset('assets/styles/styles.css'); ?>">
+  <script src="<?php echo asset('js/main.js'); ?>"></script>
 </head>
 
 <body>
@@ -66,9 +67,6 @@ $profilePicture = getProfilePicture($user['profile_picture']);
       </form>
     </div>
   </div>
-
-  <script src="../js/main.js"></script>
-
 
   <style>
     .add-post-image-section {

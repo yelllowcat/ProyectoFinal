@@ -29,7 +29,9 @@ if (!$post || $post['user_id'] != $currentUserId) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UNIRED - Editar Publicación</title>
-  <link rel="stylesheet" href="../assets/styles/styles.css" />
+  <link rel="stylesheet" href="<?php echo asset('assets/styles/styles.css'); ?>">
+  <script src="<?php echo asset('js/main.js'); ?>"></script>
+  <script src="<?php echo asset('js/editPost.js'); ?>"></script>
 </head>
 
 <body>
@@ -82,8 +84,6 @@ if (!$post || $post['user_id'] != $currentUserId) {
   <script>
     const POST_ID = <?= $postId ?>;
   </script>
-  <script src="../js/main.js"></script>
-  <script src="../js/editPost.js"></script>
 </body>
 
 </html>

@@ -8,8 +8,9 @@ use App\Components\Alert;
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UNIRED - Iniciar Sesión</title>
+  <link rel="stylesheet" href="<?php echo asset('assets/styles/login.css'); ?>">
+  <script src="<?php echo asset('js/login.js'); ?>"></script>
 </head>
-<link rel="stylesheet" href="../assets/styles/login.css" />
 
 <body>
   <div class="container">
@@ -43,8 +44,6 @@ use App\Components\Alert;
 
       <button type="submit">Iniciar sesion</button>
     </form>
-
-    <script src="../js/login.js"></script>
 </body>
 
 </html>

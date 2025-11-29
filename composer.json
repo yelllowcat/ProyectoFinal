@@ -10,7 +10,8 @@
             "App\\": "app/"
         },
         "files": [
-            "helpers/auth.php"
+            "helpers/auth.php",
+            "helpers/files.php"
         ]
     },
     "config": {

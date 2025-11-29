@@ -73,7 +73,8 @@ $safe_email = safe_output($user['email'] ?? '');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNIRED - Perfil de <?php echo htmlspecialchars($user['full_name']); ?></title>
-    <link rel="stylesheet" href="/assets/styles/styles.css">
+    <link rel="stylesheet" href="<?php echo asset('assets/styles/styles.css'); ?>">
+    <script src="<?php echo asset('js/main.js'); ?>"></script>
 </head>
 
 <body>
@@ -151,8 +152,6 @@ $safe_email = safe_output($user['email'] ?? '');
             </form>
         </div>
     </dialog>
-
-    <script src="../js/main.js"></script>
 </body>
 
 </html>

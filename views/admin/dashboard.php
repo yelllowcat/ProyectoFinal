@@ -10,7 +10,9 @@ namespace App\views\admin;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNIRED - Administrador</title>
-    <link rel="stylesheet" href="../assets/styles/dashboard.css">
+    <link rel="stylesheet" href="<?php echo asset('assets/styles/dashboard.css'); ?>">
+    <script src="<?php echo asset('js/main.js'); ?>"></script>
+    <script src="<?php echo asset('js/dashboard.js'); ?>"></script>
 </head>
 
 <body>
@@ -67,8 +69,6 @@ namespace App\views\admin;
             </form>
         </div>
     </dialog>
-    <script src="../../js/main.js"></script>
-    <script src="../../js/dashboard.js"></script>
 </body>
 
 </html>

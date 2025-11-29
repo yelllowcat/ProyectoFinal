@@ -22,7 +22,8 @@ $currentUserId = $_SESSION['user_id'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNIRED - Publicaciones</title>
-    <link rel="stylesheet" href="../assets/styles/styles.css">
+    <link rel="stylesheet" href="<?php echo asset('assets/styles/styles.css'); ?>">
+    <script src="<?php echo asset('js/main.js'); ?>"></script>
 </head>
 
 <body>
@@ -91,8 +92,6 @@ $currentUserId = $_SESSION['user_id'];
             </form>
         </div>
     </dialog>
-
-    <script src="../js/main.js"></script>
 </body>
 
 </html>
