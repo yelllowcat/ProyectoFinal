@@ -70,6 +70,14 @@ $currentUserId = $_SESSION['user_id'];
         </div>
     </div>
 
+    <dialog id="image-modal" class="image-modal">
+        <div class="image-modal-content">
+            <button class="image-modal-close" id="closeImageModal"><img src="../assets/images/plus.png"
+                    alt="Cerrar"></button>
+            <img id="modalImage" src="" alt="Post image">
+        </div>
+    </dialog>
+
     <dialog id="confirm-delete-modal" class="confirm-dialog" aria-labelledby="confirm-delete-title">
         <div class="confirm-box">
             <div class="confirm-head">

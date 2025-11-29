@@ -31,9 +31,9 @@ class Post
         $this->userId = $data['user_id'] ?? null;
         $this->currentUserId = $data['current_user_id'] ?? null;
         $this->data = $data;
-        
+
         $this->userAvatar = $data['user_avatar'] ?? '/assets/imagesProfile/default_avatar.png';
-        
+
         if ($this->userAvatar && !str_starts_with($this->userAvatar, '/assets/')) {
             $this->userAvatar = '/assets/imagesProfile/' . $this->userAvatar;
         }
@@ -84,7 +84,7 @@ class Post
         return $this->comments;
     }
 
-     public function render(): string
+    public function render(): string
     {
         $menuId = 'menu' . $this->id;
         $commentsSection = $this->renderCommentsSection();
@@ -126,7 +126,7 @@ class Post
         </div>
 
         " . ($this->image ? "<div class='feed-post-image'><img src='{$this->image}' 
-        alt='{$this->imageAlt}'></div>" : "") . "
+        class='post-image-clickable' data-image-url='{$this->image}' alt='{$this->imageAlt}' style='cursor: pointer;'></div>" : "") . "
         <p class='feed-post-text'>
             {$this->text}
         </p>
@@ -169,16 +169,16 @@ class Post
         </div>
         ";
         }
-$loadMoreBtn = '';
-    if ($totalComments > 3) {
-        $loadMoreBtn = "
+        $loadMoreBtn = '';
+        if ($totalComments > 3) {
+            $loadMoreBtn = "
         <div class='load-more-container'>
             <button class='load-more-btn' onclick='loadMoreComments(this)'>
                Ver más comentarios
             </button>
         </div>
         ";
-    }
+        }
         return "
     <div class='comments-section hidden'>
         <div class='comments-container'>

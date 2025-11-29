@@ -570,5 +570,43 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+document.addEventListener("click", function (event) {
+  if (event.target.classList.contains("post-image-clickable")) {
+    const imageUrl = event.target.dataset.imageUrl;
+    openImageModal(imageUrl);
+  }
+});
+
+function openImageModal(imageUrl) {
+  const modal = document.getElementById("image-modal");
+  const modalImage = document.getElementById("modalImage");
+
+  if (modal && modalImage) {
+    modalImage.src = imageUrl;
+    modal.showModal();
+  }
+}
+
+const imageModal = document.getElementById("image-modal");
+const closeImageModalBtn = document.getElementById("closeImageModal");
+
+if (imageModal && closeImageModalBtn) {
+  closeImageModalBtn.addEventListener("click", function () {
+    imageModal.close();
+  });
+
+  imageModal.addEventListener("click", function (event) {
+    if (event.target === imageModal) {
+      imageModal.close();
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && imageModal.open) {
+      imageModal.close();
+    }
+  });
+}
+
 console.log("Main.js loaded");
 
