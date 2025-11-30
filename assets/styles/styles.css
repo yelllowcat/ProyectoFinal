@@ -1461,10 +1461,15 @@ a {
     width: 280px;
     height: 100vh;
     position: fixed;
+    transform: translateX(-100%);
   }
 
   .sidebar.sidebar-hidden {
     transform: translateX(-100%);
+  }
+
+  .sidebar:not(.sidebar-hidden) {
+    transform: translateX(0);
   }
 
   .sidebar-overlay {
@@ -1472,7 +1477,7 @@ a {
   }
 
   .main-content {
-    margin-left: 280px;
+    margin-left: 0;
     padding: 20px;
   }
 

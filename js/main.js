@@ -435,6 +435,32 @@ document.addEventListener("DOMContentLoaded", function () {
   const mainContent = document.querySelector(".main-content");
   const overlay = document.getElementById("sidebarOverlay");
 
+  function initSidebar() {
+    if (window.innerWidth <= 768) {
+      if (sidebar) sidebar.classList.add("sidebar-hidden");
+      if (mainContent) mainContent.classList.add("sidebar-hidden");
+      if (overlay) overlay.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  }
+
+  initSidebar();
+
+  let resizeTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      if (window.innerWidth > 768) {
+        if (sidebar) sidebar.classList.remove("sidebar-hidden");
+        if (mainContent) mainContent.classList.remove("sidebar-hidden");
+        if (overlay) overlay.classList.remove("active");
+        document.body.style.overflow = "";
+      } else {
+        initSidebar();
+      }
+    }, 250);
+  });
+
   if (btnSidebar && sidebar && mainContent) {
     btnSidebar.addEventListener("click", function () {
       const isHidden = sidebar.classList.toggle("sidebar-hidden");
@@ -443,10 +469,12 @@ document.addEventListener("DOMContentLoaded", function () {
       if (overlay) {
         overlay.classList.toggle("active");
         
-        if (!isHidden) {
-          document.body.style.overflow = "hidden";
-        } else {
-          document.body.style.overflow = "";
+        if (window.innerWidth <= 768) {
+          if (!isHidden) {
+            document.body.style.overflow = "hidden";
+          } else {
+            document.body.style.overflow = "";
+          }
         }
       }
     });
