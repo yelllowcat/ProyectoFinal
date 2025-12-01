@@ -73,8 +73,9 @@ $currentUserId = $_SESSION['user_id'];
 
     <dialog id="image-modal" class="image-modal">
         <div class="image-modal-content">
-            <button class="image-modal-close" id="closeImageModal"><img src="../assets/images/plus.png"
-                    alt="Cerrar"></button>
+            <button class="image-modal-close" id="closeImageModal">
+                <img src="../assets/images/x.png" alt="Cerrar">
+            </button>
             <img id="modalImage" src="" alt="Post image">
         </div>
     </dialog>

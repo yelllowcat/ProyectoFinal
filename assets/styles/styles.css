@@ -1099,7 +1099,6 @@ a {
   max-height: 95vh;
   object-fit: contain;
   border-radius: 8px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   animation: zoomIn 0.3s ease;
 }
 

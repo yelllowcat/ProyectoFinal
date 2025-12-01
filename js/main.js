@@ -637,26 +637,28 @@ function openImageModal(imageUrl) {
   }
 }
 
-const imageModal = document.getElementById("image-modal");
-const closeImageModalBtn = document.getElementById("closeImageModal");
+document.addEventListener("DOMContentLoaded", function () {
+  const imageModal = document.getElementById("image-modal");
+  const closeImageModalBtn = document.getElementById("closeImageModal");
 
-if (imageModal && closeImageModalBtn) {
-  closeImageModalBtn.addEventListener("click", function () {
-    imageModal.close();
-  });
-
-  imageModal.addEventListener("click", function (event) {
-    if (event.target === imageModal) {
+  if (imageModal && closeImageModalBtn) {
+    closeImageModalBtn.addEventListener("click", function () {
       imageModal.close();
-    }
-  });
+    });
 
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && imageModal.open) {
-      imageModal.close();
-    }
-  });
-}
+    imageModal.addEventListener("click", function (event) {
+      if (event.target === imageModal) {
+        imageModal.close();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && imageModal.open) {
+        imageModal.close();
+      }
+    });
+  }
+});
 
 console.log("Main.js loaded");
 
