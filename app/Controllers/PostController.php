@@ -84,32 +84,38 @@ class PostController
 
         $userId = $_SESSION['user_id'];
 
-        if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-            $input = json_decode(file_get_contents('php://input'), true);
-            $content = clean_input($input['content'] ?? '');
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $content = clean_input($_POST['content'] ?? '');
 
-            if (empty($content) || strlen(trim($content)) < 2) {
-                return jsonError('El contenido del post debe tener al menos 2 caracteres');
+            if (empty($content) || strlen(trim($content)) < 1) {
+                flash('error', 'El contenido del post debe tener al menos 1 caracteres');
+                redirect('/editPost/' . $id);
+                return;
             }
 
             $postModel = new PostModel();
             $post = $postModel->getPostById($id);
 
             if (!$post || $post['user_id'] != $userId) {
-                return jsonError('No tienes permisos para editar este post', 403);
+                flash('error', 'No tienes permisos para editar este post');
+                redirect('/posts');
+                return;
             }
 
             $safeContent = safe_output($content);
             $result = $postModel->updatePost($id, $safeContent, $post['image']);
 
             if ($result) {
-                return jsonSuccess(null, 'Post actualizado correctamente');
+                flash('success', 'Post actualizado correctamente');
+                redirect('/posts');
             } else {
-                return jsonError('Error al actualizar el post');
+                flash('error', 'Error al actualizar el post');
+                redirect('/editPost/' . $id);
             }
+        } else {
+            flash('error', 'Método no permitido');
+            redirect('/posts');
         }
-
-        return jsonError('Método no permitido');
     }
 
     public function destroy($id)

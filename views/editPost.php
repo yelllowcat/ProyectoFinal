@@ -2,6 +2,7 @@
 namespace App\views;
 
 use App\Models\PostModel;
+use App\Models\UserModel;
 
 requireAuth();
 
@@ -20,6 +21,11 @@ if (!$post || $post['user_id'] != $currentUserId) {
   flash('error', 'No tienes permisos para editar esta publicación');
   redirect('/posts');
 }
+
+$userId = getCurrentUserId();
+$userModel = new UserModel();
+$user = $userModel->getUserById($userId);
+$profilePicture = getProfilePicture($user['profile_picture']);
 
 ?>
 <!DOCTYPE html>
@@ -42,10 +48,10 @@ if (!$post || $post['user_id'] != $currentUserId) {
 
   <div class="main-content">
     <div class="edit-container">
-      <form id="editPostForm" method="POST">
+      <form id="editPostForm" method="POST" action="/editPost/<?= $postId ?>">
         <div class="post-preview">
           <div class="post-header-section">
-            <div class="post-avatar"></div>
+            <img src="<?= $profilePicture ?>" alt="User Avatar" class="post-avatar">
             <div class="post-user-info">
               <h3><?= safe_output($_SESSION['user_name'] ?? 'Usuario') ?></h3>
               <div class="post-date-info">Publicado el: <?= date('d/m/Y', strtotime($post['created_at'])) ?></div>

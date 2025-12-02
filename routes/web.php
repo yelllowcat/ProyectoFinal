@@ -115,9 +115,6 @@ $router->get('/posts', function () {
     require __DIR__ . '/../views/posts.php';
 });
 
-$router->put('/posts/:id', [PostController::class, 'update']);
-$router->delete('/posts/:id', [PostController::class, 'destroy']);
-
 $router->get('/editPost/:id', function ($id) {
     requireUser();
     requireAuth();
@@ -125,7 +122,7 @@ $router->get('/editPost/:id', function ($id) {
     require __DIR__ . '/../views/editPost.php';
 });
 
-
+$router->post('/editPost/:id', [PostController::class, 'update']);
 
 $router->put('/posts/:id', [PostController::class, 'update']);
 $router->delete('/posts/:id', [PostController::class, 'destroy']);
