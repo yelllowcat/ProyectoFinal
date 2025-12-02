@@ -50,7 +50,7 @@ $currentUserId = $_SESSION['user_id'];
 
                     $postComponent = new Post([
                         'id' => $postData['post_id'],
-                        'author' => $postData['full_name'],
+                        'author' => $author['full_name'],
                         'date' => date('d/m/Y', strtotime($postData['created_at'])),
                         'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : '',
                         'image_alt' => 'Imagen del post',
