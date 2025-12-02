@@ -67,6 +67,20 @@
       </form>
     </div>
   </div>
+
+  <dialog id="confirm-delete-account-modal" class="confirm-dialog">
+    <div class="confirm-box">
+      <div class="confirm-head">
+        <h3>Eliminar cuenta</h3>
+        <p>¿Estás seguro de que deseas eliminar tu cuenta?</p>
+      </div>
+      <div class="confirm-sep"></div>
+      <div class="confirm-actions">
+        <button type="button" class="confirm-delete" onclick="deleteAccount()">Eliminar</button>
+        <button type="button" class="confirm-cancel" onclick="document.getElementById('confirm-delete-account-modal').close()">Cancelar</button>
+      </div>
+    </div>
+  </dialog>
 </body>
 
 </html>

@@ -3,6 +3,8 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
+use Exception;
+
 
 class UserController
 {
@@ -116,6 +118,39 @@ class UserController
         } else {
             flash('error', 'Error al subir la imagen');
             return null;
+        }
+    }
+
+    public function deleteAccount()
+    {
+        requireAuth();
+
+        try {
+
+            if (!isset($_SESSION['user_id'])) {
+                exit;
+            }
+
+            $userId = $_SESSION['user_id'];
+            $userModel = new UserModel();
+
+            $user = $userModel->getUserById($userId);
+
+            if (!$user) {
+                exit;
+            }
+            
+            $result = $userModel->deleteUser($userId);
+
+            if ($result) {
+                session_destroy();
+                exit; 
+            } else {
+                exit;
+            }
+
+        } catch (Exception $e) {
+            exit;
         }
     }
 }

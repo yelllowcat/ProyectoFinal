@@ -375,7 +375,7 @@ function handleProfileImageSelect(event) {
   console.log(preview);
   console.log(previewImage);
   console.log(currentImage);
-  
+
   if (file) {
     if (file.size > 5 * 1024 * 1024) {
       alert("La imagen no puede ser mayor a 5MB");
@@ -465,10 +465,10 @@ document.addEventListener("DOMContentLoaded", function () {
     btnSidebar.addEventListener("click", function () {
       const isHidden = sidebar.classList.toggle("sidebar-hidden");
       mainContent.classList.toggle("sidebar-hidden");
-      
+
       if (overlay) {
         overlay.classList.toggle("active");
-        
+
         if (window.innerWidth <= 768) {
           if (!isHidden) {
             document.body.style.overflow = "hidden";
@@ -660,5 +660,51 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
-console.log("Main.js loaded");
+function showDeleteConfirmation() {
+  const modal = document.getElementById('confirm-delete-account-modal');
+  if (modal) {
+    modal.showModal();
+  }
+}
 
+async function deleteAccount() {
+  const modal = document.getElementById('confirm-delete-account-modal');
+
+  try {
+
+    const response = await fetch('/profile/delete', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    const textResponse = await response.text();
+    console.log('Response text:', textResponse);
+
+    let data = {};
+    if (textResponse) {
+      try {
+        data = JSON.parse(textResponse);
+        console.log('Parsed data:', data);
+      } catch (parseError) {
+        console.error('Error parseando JSON:', parseError);
+        console.log('Texto recibido:', textResponse);
+      }
+    } else {
+      console.log('Response vacío');
+    }
+
+    if (response.ok) {
+      window.location.href = '/logout';
+    } else {
+      alert(data.message || 'Error al eliminar la cuenta');
+      if (modal) modal.close();
+    }
+  } catch (error) {
+    console.error('Error completo:', error);
+    console.error('Error stack:', error.stack);
+    alert('Error al eliminar la cuenta');
+    if (modal) modal.close();
+  }
+}

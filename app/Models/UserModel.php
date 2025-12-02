@@ -187,4 +187,15 @@ class UserModel
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    public function deleteUser($userId)
+    {
+        try {
+            $stmt = $this->pdo->prepare("DELETE FROM users WHERE user_id = ?");
+            return $stmt->execute([$userId]);
+        } catch (PDOException $e) {
+            error_log("Error deleting user: " . $e->getMessage());
+            return false;
+        }
+    }
+
 }
