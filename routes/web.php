@@ -6,6 +6,7 @@ use App\Controllers\PostController;
 use App\Controllers\FriendController;
 use App\Controllers\ProfileController;
 use App\Controllers\AdminController;
+use App\Controllers\PdfController;
 
 
 $router->get('/', function () {
@@ -145,3 +146,5 @@ $router->get('/dashboard', function () {
     requireAdmin();
     require __DIR__ . '/../views/admin/dashboard.php';
 });
+
+$router->get('/admin/stats/pdf', [PdfController::class, 'downloadStatsPdf']);

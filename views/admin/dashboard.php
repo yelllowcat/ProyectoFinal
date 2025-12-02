@@ -33,7 +33,9 @@ namespace App\views\admin;
             <div class="stat-tab" onclick="fetchPostsWithMostComments(event)">Publicaciones con mas comentarios</div>
             <div class="stat-tab" onclick="fetchPostsWithMostLikes(event)">Publicaciones con mas "Me gusta"</div>
         </div>
-        <button class="btn-download">Estadísticas en PDF</button>
+        <a href="/admin/stats/pdf" target="_blank" style="text-decoration: none;">
+            <button class="btn-download">Descargar Estadísticas en PDF</button>
+        </a>
 
         <div class="users-table-container">
             <table class="users-table">
