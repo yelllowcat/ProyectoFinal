@@ -61,7 +61,7 @@ if (!$user) {
     redirect('/posts');
 }
 
-$safe_full_name = safe_output($user['full_name']);
+$safe_full_name = safe_output($user['full_name'] ?? '');
 $safe_biography = safe_output($user['biography'] ?? '');
 $safe_email = safe_output($user['email'] ?? '');
 
@@ -72,7 +72,7 @@ $safe_email = safe_output($user['email'] ?? '');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNIRED - Perfil de <?php echo htmlspecialchars($user['full_name']); ?></title>
+    <title>UNIRED - Perfil de <?php echo $safe_full_name; ?></title>
     <link rel="stylesheet" href="<?php echo asset('assets/styles/styles.css'); ?>">
     <script src="<?php echo asset('js/main.js'); ?>"></script>
 </head>
@@ -110,15 +110,14 @@ $safe_email = safe_output($user['email'] ?? '');
                     $comments = $commentModel->getCommentsByPost($postData['post_id']);
                     $commentsCount = $commentModel->getCommentCount($postData['post_id']);
 
-                    $author = $userModel->getUserById($postData['user_id']);
-                    $authorPicture = getProfilePicture($author['profile_picture']);
+                    $authorName = $postData['author_name'] ?? $safe_full_name;
+                    $authorPicture = $profilePicture; 
 
-                    $safe_author_name = safe_output($postData['full_name']);
-                    $safe_post_content = safe_output($postData['content']);
+                    $safe_post_content = safe_output($postData['content'] ?? '');
 
                     $postComponent = new Post([
                         'id' => $postData['post_id'],
-                        'author' => $safe_author_name,
+                        'author' => $authorName,
                         'date' => date('d/m/Y', strtotime($postData['created_at'])),
                         'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : '',
                         'image_alt' => 'Imagen del post',
