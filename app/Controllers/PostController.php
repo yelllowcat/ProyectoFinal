@@ -218,10 +218,24 @@ class PostController
         $userId = $_SESSION['user_id'];
         $commentModel = new CommentModel();
 
+        $comment = $commentModel->getCommentById($id);
+
+        if (!$comment) {
+            return jsonError('Comentario no encontrado');
+        }
+
+        $postId = $comment['post_id'];
+
         $result = $commentModel->deleteComment($id, $userId);
 
         if ($result) {
-            return jsonSuccess(null, 'Comentario eliminado');
+            $postModel = new PostModel();
+            $post = $postModel->getPostById($postId);
+
+            return jsonSuccess([
+                'comment_count' => $post['comment_count'] ?? 0,
+                'post_id' => $postId
+            ], 'Comentario eliminado');
         } else {
             return jsonError('Error al eliminar el comentario o no tienes permisos');
         }

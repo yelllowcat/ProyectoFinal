@@ -93,6 +93,19 @@ $currentUserId = $_SESSION['user_id'];
             </form>
         </div>
     </dialog>
+    <dialog id="confirm-delete-comment-modal" class="confirm-dialog" aria-labelledby="confirm-delete-title">
+        <div class="confirm-box">
+            <div class="confirm-head">
+                <h3 id="confirm-delete-title">Confirmar eliminación</h3>
+                <p class="confirm-subtitle">¿Estás seguro/a de que deseas eliminar este comentario?</p>
+            </div>
+            <div class="confirm-sep"></div>
+            <form method="dialog" class="confirm-actions">
+                <button value="confirm" class="confirm-delete">Eliminar</button>
+                <button value="cancel" class="confirm-cancel">Cancelar</button>
+            </form>
+        </div>
+    </dialog>
 </body>
 
 </html>

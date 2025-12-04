@@ -158,10 +158,23 @@ class Post
             $time = htmlspecialchars($comment['time'] ?? '');
             $date = htmlspecialchars($comment['date'] ?? date('d/m/Y', strtotime($comment['created_at'])));
 
+            $commentId = $comment['comment_id'] ?? $comment['id'] ?? $index;
+            $commentMenuId = 'comment-menu-' . $this->id . '-' . $commentId;
+
             $commentsHtml .= "
-        <div class='comment{$isHidden}'>
+        <div class='comment{$isHidden}' data-comment-id='{$commentId}'>
             <div class='comment-header'>
-                {$author}: {$text}
+                <div class='comment-text-content'>
+                    {$author}: {$text}
+                </div>
+                <div class='comment-menu-wrapper'>
+                    <img src='/assets/images/vertical-dots.png' alt='Opciones de comentario' width='20' 
+                         class='comment-menu-trigger' data-menu-id='{$commentMenuId}' style='cursor: pointer;'>
+                    <div class='comment-menu-modal' id='{$commentMenuId}'>
+                        <div class='menu-option delete comment-delete-btn'>Eliminar</div>
+                        <div class='menu-option'>Cancelar</div>
+                    </div>
+                </div>
             </div>
             <div class='comment-date'>
                 {$time} • {$date}

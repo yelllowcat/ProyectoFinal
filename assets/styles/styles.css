@@ -457,10 +457,41 @@ a {
 }
 
 .comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
   font-weight: 600;
   font-size: 14px;
   color: #333;
   margin-bottom: 5px;
+}
+
+.comment-text-content {
+  flex: 1;
+}
+
+.comment-menu-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.comment-menu-modal {
+  display: none;
+  position: absolute;
+  top: 25px;
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 100;
+  min-width: 150px;
+}
+
+.comment-menu-modal.active {
+  display: block;
 }
 
 .comment-text {

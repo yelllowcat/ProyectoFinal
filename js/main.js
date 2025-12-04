@@ -46,20 +46,132 @@ function loadMoreComments(button) {
   }
 }
 
+function toggleCommentMenu(event, menuId) {
+  event.stopPropagation();
+
+  const menu = document.getElementById(menuId);
+  const allCommentMenus = document.querySelectorAll(".comment-menu-modal");
+
+  const wasActive = menu.classList.contains("active");
+
+  allCommentMenus.forEach((m) => {
+    m.classList.remove("active");
+  });
+
+  if (!wasActive) {
+    menu.classList.add("active");
+  }
+}
+
+function openDeleteCommentModal(deleteButton) {
+  commentToDelete = deleteButton.closest(".comment");
+  postToDelete = null;
+
+  if (confirmModal) {
+    try {
+      const modalSubtitle = confirmModal.querySelector(".confirm-subtitle");
+      if (modalSubtitle) {
+        modalSubtitle.textContent = "¿Estás seguro/a de que deseas eliminar este comentario?";
+      }
+    } catch (e) { }
+
+    confirmModal.showModal();
+  }
+}
+
 document.addEventListener("click", function () {
   const allMenus = document.querySelectorAll(".post-menu-modal");
   allMenus.forEach((m) => m.classList.remove("active"));
+
+  const allCommentMenus = document.querySelectorAll(".comment-menu-modal");
+  allCommentMenus.forEach((m) => m.classList.remove("active"));
 });
 
-const confirmModal = document.getElementById("confirm-delete-modal");
+let confirmModal = null;
 let postToDelete = null;
+let commentToDelete = null;
+
+document.addEventListener("DOMContentLoaded", function () {
+  confirmModal = document.getElementById("confirm-delete-modal");
+
+  if (confirmModal) {
+    confirmModal.addEventListener("close", async function () {
+      if (confirmModal.returnValue === "confirm") {
+        if (postToDelete) {
+          const postId = postToDelete.dataset.postId;
+          console.log("Eliminando post:", postId);
+
+          try {
+            const response = await fetch(`/posts/${postId}`, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              postToDelete.remove();
+            } else {
+              alert("Error al eliminar la publicación: " + result.message);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Error de conexión al eliminar la publicación");
+          }
+        }
+
+        if (commentToDelete) {
+          const commentId = commentToDelete.dataset.commentId;
+          const postContainer = commentToDelete.closest(".post-container");
+
+          try {
+            const response = await fetch(`/comments/${commentId}`, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              commentToDelete.remove();
+
+              if (postContainer && result.data?.comment_count !== undefined) {
+                const commentsButton = postContainer.querySelector(".action-btn.comments");
+                if (commentsButton) {
+                  commentsButton.innerHTML = `
+                    <img src='/assets/images/comments.png' alt='comments icon' width='25'>
+                    ${result.data.comment_count} Comentarios
+                  `;
+                }
+              }
+            } else {
+              alert("Error al eliminar el comentario: " + result.message);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Error de conexión al eliminar el comentario");
+          }
+        }
+      }
+
+      postToDelete = null;
+      commentToDelete = null;
+    });
+  }
+});
 
 function openConfirmModal(deleteButton) {
   console.log(deleteButton);
   postToDelete = deleteButton.closest(".post-container");
+  commentToDelete = null;
 
   if (confirmModal) {
     try {
+      const modalSubtitle = confirmModal.querySelector(".confirm-subtitle");
+      if (modalSubtitle) {
+        modalSubtitle.textContent = "¿Estás seguro/a de que deseas eliminar esta publicación?";
+      }
+
       const modalName = confirmModal.querySelector(".friend-name");
       let name = null;
       const friendCard = deleteButton.closest(".friend-card");
@@ -79,21 +191,6 @@ function openConfirmModal(deleteButton) {
 
     confirmModal.showModal();
   }
-}
-
-if (confirmModal) {
-  confirmModal.addEventListener("close", function () {
-    if (confirmModal.returnValue === "confirm") {
-      if (postToDelete) {
-        const postId = postToDelete.dataset.postId;
-        console.log("Eliminando post:", postId);
-
-        postToDelete.remove();
-      }
-    }
-
-    postToDelete = null;
-  });
 }
 
 async function toggleComments(button) {
@@ -242,12 +339,25 @@ function updateCommentsSection(postContainer, comments, commentCount) {
       year: "numeric",
     });
     const timeAgo = getTimeAgo(comment.created_at);
+    const postId = postContainer.dataset.postId;
+    const commentId = comment.comment_id || comment.id;
+    const commentMenuId = `comment-menu-${postId}-${commentId}`;
 
     const commentHTML = `
-      <div class="comment${isHidden}">
-        <div class="comment-header">${comment.full_name}: ${escapeHtml(
-      comment.content
-    )}</div>
+      <div class="comment${isHidden}" data-comment-id="${commentId}">
+        <div class="comment-header">
+          <div class="comment-text-content">
+            ${comment.full_name}: ${escapeHtml(comment.content)}
+          </div>
+          <div class="comment-menu-wrapper">
+            <img src="/assets/images/vertical-dots.png" alt="Opciones de comentario" width="20" 
+                 class="comment-menu-trigger" data-menu-id="${commentMenuId}" style="cursor: pointer;">
+            <div class="comment-menu-modal" id="${commentMenuId}">
+              <div class="menu-option delete comment-delete-btn">Eliminar</div>
+              <div class="menu-option">Cancelar</div>
+            </div>
+          </div>
+        </div>
         <div class="comment-date">${timeAgo} • ${dateString}</div>
       </div>
     `;
@@ -617,6 +727,17 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "/logout";
       }
     });
+  }
+});
+
+document.addEventListener("click", function (event) {
+  if (event.target.classList.contains("comment-menu-trigger")) {
+    const menuId = event.target.dataset.menuId;
+    toggleCommentMenu(event, menuId);
+  }
+
+  if (event.target.classList.contains("comment-delete-btn")) {
+    openDeleteCommentModal(event.target);
   }
 });
 
