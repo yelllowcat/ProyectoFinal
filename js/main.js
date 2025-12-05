@@ -266,7 +266,6 @@ async function addComment(button) {
   const commentText = commentInput.value.trim();
 
   if (!commentText) {
-    alert("Por favor escribe un comentario");
     return;
   }
 
@@ -339,7 +338,6 @@ function updateCommentsSection(postContainer, comments, commentCount, isAddingCo
     const currentUserId = postContainer.dataset.currentUserId;
     const commentUserId = comment.user_id;
 
-    // Only show menu for comment owner
     let commentMenuHTML = '';
     if (currentUserId && commentUserId && currentUserId == commentUserId) {
       commentMenuHTML = `
@@ -369,7 +367,6 @@ function updateCommentsSection(postContainer, comments, commentCount, isAddingCo
     commentsContainer.insertAdjacentHTML("beforeend", commentHTML);
   });
 
-  // Don't show the "load more" button when adding a new comment
   if (!isAddingComment && comments.length > 3) {
     const loadMoreContainer = document.createElement("div");
     loadMoreContainer.className = "load-more-container";
