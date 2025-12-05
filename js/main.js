@@ -355,9 +355,11 @@ function updateCommentsSection(postContainer, comments, commentCount, isAddingCo
     const commentHTML = `
       <div class="comment${isHidden}" data-comment-id="${commentId}">
         <div class="comment-header">
-          <div class="comment-text-content">
-            ${comment.full_name}: ${escapeHtml(comment.content)}
-          </div>
+          <a href='/profile/${commentUserId}' class='comment-user'>
+            <div class="comment-text-content">
+              ${comment.full_name}: ${escapeHtml(comment.content)}
+            </div>
+          </a>
           ${commentMenuHTML}
         </div>
         <div class="comment-date">${timeAgo} • ${dateString}</div>

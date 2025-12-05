@@ -179,9 +179,12 @@ class Post
             $commentsHtml .= "
         <div class='comment{$isHidden}' data-comment-id='{$commentId}'>
             <div class='comment-header'>
+            <a href='/profile/{$commentUserId}' class='comment-user'>
                 <div class='comment-text-content'>
                     {$author}: {$text}
                 </div>
+            </a>
+
                 {$commentMenu}
             </div>
             <div class='comment-date'>
