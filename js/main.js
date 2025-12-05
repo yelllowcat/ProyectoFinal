@@ -17,14 +17,6 @@ async function toggleMenu(event, menuId) {
   }
 }
 
-async function openConfirmModal(deleteButton) {
-  postToDelete = deleteButton.closest(".post-container");
-
-  if (confirmModal) {
-    confirmModal.showModal();
-  }
-}
-
 function loadMoreComments(button) {
   const commentsSection = button.closest(".comments-section");
   const commentsContainer = commentsSection.querySelector(
@@ -295,7 +287,8 @@ async function addComment(button) {
       updateCommentsSection(
         postContainer,
         result.data.comments,
-        result.data.comment_count
+        result.data.comment_count,
+        true
       );
 
       updateCommentCount(postContainer, result.data.comment_count);
@@ -308,7 +301,7 @@ async function addComment(button) {
   }
 }
 
-function updateCommentsSection(postContainer, comments, commentCount) {
+function updateCommentsSection(postContainer, comments, commentCount, isAddingComment = false) {
   const commentsSection = postContainer.querySelector(".comments-section");
 
   let commentsContainer = commentsSection.querySelector(".comments-container");
@@ -331,7 +324,8 @@ function updateCommentsSection(postContainer, comments, commentCount) {
   commentsContainer.appendChild(title);
 
   comments.forEach((comment, index) => {
-    const isHidden = index >= 3 ? " hidden" : "";
+
+    const isHidden = !isAddingComment && index >= 3 ? " hidden" : "";
     const date = new Date(comment.created_at);
     const dateString = date.toLocaleDateString("es-MX", {
       day: "numeric",
@@ -342,6 +336,23 @@ function updateCommentsSection(postContainer, comments, commentCount) {
     const postId = postContainer.dataset.postId;
     const commentId = comment.comment_id || comment.id;
     const commentMenuId = `comment-menu-${postId}-${commentId}`;
+    const currentUserId = postContainer.dataset.currentUserId;
+    const commentUserId = comment.user_id;
+
+    // Only show menu for comment owner
+    let commentMenuHTML = '';
+    if (currentUserId && commentUserId && currentUserId == commentUserId) {
+      commentMenuHTML = `
+        <div class="comment-menu-wrapper">
+          <img src="/assets/images/vertical-dots.png" alt="Opciones de comentario" width="20" 
+               class="comment-menu-trigger" data-menu-id="${commentMenuId}" style="cursor: pointer;">
+          <div class="comment-menu-modal" id="${commentMenuId}">
+            <div class="menu-option delete comment-delete-btn">Eliminar</div>
+            <div class="menu-option">Cancelar</div>
+          </div>
+        </div>
+      `;
+    }
 
     const commentHTML = `
       <div class="comment${isHidden}" data-comment-id="${commentId}">
@@ -349,14 +360,7 @@ function updateCommentsSection(postContainer, comments, commentCount) {
           <div class="comment-text-content">
             ${comment.full_name}: ${escapeHtml(comment.content)}
           </div>
-          <div class="comment-menu-wrapper">
-            <img src="/assets/images/vertical-dots.png" alt="Opciones de comentario" width="20" 
-                 class="comment-menu-trigger" data-menu-id="${commentMenuId}" style="cursor: pointer;">
-            <div class="comment-menu-modal" id="${commentMenuId}">
-              <div class="menu-option delete comment-delete-btn">Eliminar</div>
-              <div class="menu-option">Cancelar</div>
-            </div>
-          </div>
+          ${commentMenuHTML}
         </div>
         <div class="comment-date">${timeAgo} • ${dateString}</div>
       </div>
@@ -365,7 +369,8 @@ function updateCommentsSection(postContainer, comments, commentCount) {
     commentsContainer.insertAdjacentHTML("beforeend", commentHTML);
   });
 
-  if (comments.length > 3) {
+  // Don't show the "load more" button when adding a new comment
+  if (!isAddingComment && comments.length > 3) {
     const loadMoreContainer = document.createElement("div");
     loadMoreContainer.className = "load-more-container";
     loadMoreContainer.innerHTML = `

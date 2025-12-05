@@ -111,7 +111,7 @@ class Post
         }
 
         return "
-    <div class='feed-post-card post-container' data-post-id='{$this->id}'>
+    <div class='feed-post-card post-container' data-post-id='{$this->id}' data-current-user-id='{$this->currentUserId}'>
         <div class='feed-post-header'>
             <a href='/profile/{$this->userId}' class='feed-post-user'>
                 <div class='feed-post-avatar'>
@@ -160,6 +160,21 @@ class Post
 
             $commentId = $comment['comment_id'] ?? $comment['id'] ?? $index;
             $commentMenuId = 'comment-menu-' . $this->id . '-' . $commentId;
+            $commentUserId = $comment['user_id'] ?? null;
+
+            // Menú solo para propietario
+            $commentMenu = '';
+            if ($commentUserId == $this->currentUserId) {
+                $commentMenu = "
+                    <div class='comment-menu-wrapper'>
+                        <img src='/assets/images/vertical-dots.png' alt='Opciones de comentario' width='20' 
+                             class='comment-menu-trigger' data-menu-id='{$commentMenuId}' style='cursor: pointer;'>
+                        <div class='comment-menu-modal' id='{$commentMenuId}'>
+                            <div class='menu-option delete comment-delete-btn'>Eliminar</div>
+                            <div class='menu-option'>Cancelar</div>
+                        </div>
+                    </div>";
+            }
 
             $commentsHtml .= "
         <div class='comment{$isHidden}' data-comment-id='{$commentId}'>
@@ -167,14 +182,7 @@ class Post
                 <div class='comment-text-content'>
                     {$author}: {$text}
                 </div>
-                <div class='comment-menu-wrapper'>
-                    <img src='/assets/images/vertical-dots.png' alt='Opciones de comentario' width='20' 
-                         class='comment-menu-trigger' data-menu-id='{$commentMenuId}' style='cursor: pointer;'>
-                    <div class='comment-menu-modal' id='{$commentMenuId}'>
-                        <div class='menu-option delete comment-delete-btn'>Eliminar</div>
-                        <div class='menu-option'>Cancelar</div>
-                    </div>
-                </div>
+                {$commentMenu}
             </div>
             <div class='comment-date'>
                 {$time} • {$date}
