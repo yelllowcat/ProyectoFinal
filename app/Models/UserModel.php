@@ -188,14 +188,40 @@ class UserModel
     }
 
     public function deleteUser($userId)
-    {
-        try {
-            $stmt = $this->pdo->prepare("DELETE FROM users WHERE user_id = ?");
-            return $stmt->execute([$userId]);
-        } catch (PDOException $e) {
-            error_log("Error deleting user: " . $e->getMessage());
-            return false;
-        }
+{
+    try {
+        
+        $stmt1 = $this->pdo->prepare("DELETE FROM hidden_comments WHERE user_id = ?");
+        $stmt1->execute([$userId]);
+        
+        $stmt6 = $this->pdo->prepare("DELETE FROM user_update_log WHERE user_id = ?");
+        $stmt6->execute([$userId]);
+        
+        $stmt4 = $this->pdo->prepare("DELETE FROM friend_requests WHERE sender_id = ? OR receiver_id = ?");
+        $stmt4->execute([$userId, $userId]);
+        
+        $stmt5 = $this->pdo->prepare("DELETE FROM friends WHERE user_id1 = ? OR user_id2 = ?");
+        $stmt5->execute([$userId, $userId]);
+        
+        $stmt7 = $this->pdo->prepare("DELETE FROM posts WHERE user_id = ?");
+        $stmt7->execute([$userId]);
+        
+        $stmt2 = $this->pdo->prepare("DELETE FROM likes WHERE user_id = ?");
+        $stmt2->execute([$userId]);
+        
+        $stmt3 = $this->pdo->prepare("DELETE FROM comments WHERE user_id = ?");
+        $stmt3->execute([$userId]);
+        
+        $stmt8 = $this->pdo->prepare("DELETE FROM users WHERE user_id = ?");
+        $stmt8->execute([$userId]);
+        $rowCount = $stmt8->rowCount();
+        
+        return $rowCount > 0;
+        
+    } catch (PDOException $e) {
+        error_log("PDOException in deleteUser: " . $e->getMessage());
+        error_log("Error Info: " . print_r($this->pdo->errorInfo(), true));
+        return false;
     }
-
+}
 }
