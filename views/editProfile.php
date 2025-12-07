@@ -51,7 +51,7 @@
           <label for="full_name">Nombre completo</label>
           <input type="text" id="full_name" name="full_name" value="<?= safe_output($user['full_name'] ?? '') ?>"
             placeholder="Ingresa tu nombre completo" required minlength="2" maxlength="50" onpaste="return false;"
-            pattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s\.\-']{2,50}$">
+            pattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s']{2,50}$">
         </div>
 
         <div class="form-group">
