@@ -211,7 +211,7 @@ class Post
             {$loadMoreBtn}
         </div>
         <div class='comment-input-container'>
-            <input type='text' class='comment-input' placeholder='Comentar' onkeypress='handleCommentKeyPress(event, this)'>
+            <input type='text' class='comment-input' placeholder='Comentar' maxlength='500' minlength='1' onkeypress='handleCommentKeyPress(event, this)'>
             <button class='comment-submit' onclick='addComment(this)'>Publicar</button>
         </div>
     </div>
