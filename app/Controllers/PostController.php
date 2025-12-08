@@ -229,11 +229,10 @@ class PostController
         $result = $commentModel->deleteComment($id, $userId);
 
         if ($result) {
-            $postModel = new PostModel();
-            $post = $postModel->getPostById($postId);
+            $updatedCommentCount = $commentModel->getCommentCount($postId);
 
             return jsonSuccess([
-                'comment_count' => $post['comment_count'] ?? 0,
+                'comment_count' => $updatedCommentCount,
                 'post_id' => $postId
             ], 'Comentario eliminado');
         } else {
