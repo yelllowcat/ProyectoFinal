@@ -13,6 +13,7 @@ $friendController = new FriendController();
 
 $friends = $friendModel->getFriends($userId);
 $requests = $friendModel->getPendingRequests($userId);
+$sentRequests = $friendModel->getSentRequests($userId);
 $suggestions = $friendController->getSuggestions()['data'];
 ?>
 <!DOCTYPE html>
@@ -47,6 +48,7 @@ $suggestions = $friendController->getSuggestions()['data'];
                     <div class="tab active" data-filter="friend" onclick="filterFriends(event, 'friend')">Todos los
                         amigos</div>
                     <div class="tab" data-filter="request" onclick="filterFriends(event, 'request')">Solicitudes</div>
+                    <div class="tab" data-filter="pending" onclick="filterFriends(event, 'pending')">Pendientes</div>
                     <div class="tab" data-filter="suggestion" onclick="filterFriends(event, 'suggestion')">Sugerencias
                     </div>
                 </div>
@@ -75,6 +77,18 @@ $suggestions = $friendController->getSuggestions()['data'];
                         'request',
                         getProfilePicture($userModel->getUserById($request['sender_id'])['profile_picture']),
                         $request['request_id'],
+                        null
+                    );
+                    echo $friendCard->render();
+                }
+                foreach ($sentRequests as $sentRequest) {
+                    $friendCard = new FriendCard(
+                        $sentRequest['receiver_id'],
+                        $userModel->getUserById($sentRequest['receiver_id'])['full_name'],
+                        date('d/m/Y', strtotime($userModel->getUserById($sentRequest['receiver_id'])['registration_date'])),
+                        'pending',
+                        getProfilePicture($userModel->getUserById($sentRequest['receiver_id'])['profile_picture']),
+                        $sentRequest['receiver_id'],
                         null
                     );
                     echo $friendCard->render();

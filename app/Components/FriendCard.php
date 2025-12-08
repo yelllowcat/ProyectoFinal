@@ -65,6 +65,10 @@ class FriendCard
                     <button data-request-id='{$this->requestId}' data-action='accept' class='btn btn-primary btn-accept btn-action'>Aceptar</button>
                     <button data-request-id='{$this->requestId}' data-action='deny' class='btn btn-deny btn-action'>Eliminar</button>
                 ";
+            case 'pending':
+                return "
+                    <button data-user-id='{$this->requestId}' data-action='cancel' class='btn btn-deny btn-cancel btn-action'>Cancelar solicitud</button>
+                ";
             case 'suggestion':
                 return "
                     <button data-suggestion-id='{$this->id}' data-action='add' class='btn btn-primary btn-add btn-action'>Agregar</button>

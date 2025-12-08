@@ -67,9 +67,8 @@ function filterAndSearch() {
 
   if (currentSearchTerm.length > 0) {
     searchResults.style.display = "block";
-    searchResults.textContent = `Se encontraron ${visibleCount} resultado${
-      visibleCount !== 1 ? "s" : ""
-    } para "${currentSearchTerm}"`;
+    searchResults.textContent = `Se encontraron ${visibleCount} resultado${visibleCount !== 1 ? "s" : ""
+      } para "${currentSearchTerm}"`;
   }
 }
 document.addEventListener("DOMContentLoaded", () => {
@@ -77,6 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
   friendCards.forEach((card) => {
     if (card.querySelector(".btn-accept")) {
       card.dataset.status = "request";
+    } else if (card.querySelector(".btn-cancel")) {
+      card.dataset.status = "pending";
     } else if (card.querySelector(".btn-add")) {
       card.dataset.status = "suggestion";
     } else {
@@ -86,11 +87,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   filterAndSearch();
 
-  document.addEventListener('click', function(event) {
+  document.addEventListener('click', function (event) {
     if (event.target && event.target.classList.contains('btn-action')) {
       const button = event.target;
       const action = button.dataset.action;
-      const id = button.dataset.requestId || button.dataset.suggestionId;
+      const id = button.dataset.requestId || button.dataset.suggestionId || button.dataset.userId;
       if (!id) return;
       console.log("ID: ", id);
       console.log("Action: ", action);
@@ -101,6 +102,8 @@ document.addEventListener("DOMContentLoaded", () => {
         handleFriendAction(id, button, '/friend/reject/');
       } else if (action === 'add') {
         handleFriendAction(id, button, '/friend/request/');
+      } else if (action === 'cancel') {
+        handleFriendAction(id, button, '/friend/cancelUser/');
       }
     }
   });
@@ -113,6 +116,7 @@ function handleFriendAction(id, button, endpoint) {
   button.disabled = true;
   const originalText = button.textContent;
   button.textContent = 'Procesando...';
+  const action = button.dataset.action;
 
   fetch(`${endpoint}${id}`, {
     method: 'POST',
@@ -121,30 +125,65 @@ function handleFriendAction(id, button, endpoint) {
     },
     body: JSON.stringify({})
   })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      const card = button.closest('.friend-card');
-      if (card) {
-        card.style.transition = 'opacity 0.5s';
-        card.style.opacity = '0';
-        setTimeout(() => {
-            card.remove();
-            filterAndSearch();
-        }, 500);
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const card = button.closest('.friend-card');
+        if (card) {
+          updateCardAfterAction(card, action);
+        }
+      } else {
+        alert('Error: ' + (data.message || 'Acción fallida'));
+        button.disabled = false;
+        button.textContent = originalText;
       }
-    } else {
-      alert('Error: ' + (data.message || 'Acción fallida'));
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Ocurrió un error');
       button.disabled = false;
       button.textContent = originalText;
+    });
+}
+
+function updateCardAfterAction(card, action) {
+  const actionsContainer = card.querySelector('.friend-actions');
+
+  card.style.transition = 'opacity 0.3s';
+  card.style.opacity = '0';
+
+  setTimeout(() => {
+    switch (action) {
+      case 'accept':
+        card.dataset.status = 'friend';
+        const userId = card.querySelector('[data-request-id]').dataset.requestId;
+        actionsContainer.innerHTML = `<a href='/profile/${userId}'><button data-user-id='${userId}' data-action='view' class='btn btn-view-profile btn-action'>Ver perfil</button></a>`;
+        break;
+
+      case 'deny':
+        card.remove();
+        filterAndSearch();
+        return;
+
+      case 'add':
+        card.dataset.status = 'pending';
+        const suggestionId = card.querySelector('[data-suggestion-id]').dataset.suggestionId;
+        actionsContainer.innerHTML = `<button data-user-id='${suggestionId}' data-action='cancel' class='btn btn-deny btn-cancel btn-action'>Cancelar solicitud</button>`;
+        break;
+
+      case 'cancel':
+        card.dataset.status = 'suggestion';
+        const cancelUserId = card.querySelector('[data-user-id]').dataset.userId;
+        actionsContainer.innerHTML = `
+          <button data-suggestion-id='${cancelUserId}' data-action='add' class='btn btn-primary btn-add btn-action'>Agregar</button>
+          <button data-suggestion-id='${cancelUserId}' data-action='deny' class='btn btn-deny btn-action'>Eliminar</button>
+        `;
+        break;
     }
-  })
-  .catch(error => {
-    console.error('Error:', error);
-    alert('Ocurrió un error');
-    button.disabled = false;
-    button.textContent = originalText;
-  });
+
+    card.style.opacity = '1';
+    filterAndSearch();
+  }, 300);
 }
 
 console.log("Friends.js loaded");
