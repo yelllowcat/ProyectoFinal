@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\PostModel;
 use App\Models\LikeModel;
 use App\Models\CommentModel;
+use App\Models\ReplyModel;
 
 class PostController
 {
@@ -251,6 +252,85 @@ class PostController
         return jsonSuccess([
             'comments' => $comments,
             'comment_count' => $commentCount
+        ]);
+    }
+
+    public function addReply($commentId)
+    {
+        requireAuth();
+
+        $userId = $_SESSION['user_id'];
+        $replyModel = new ReplyModel();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $input = json_decode(file_get_contents('php://input'), true);
+            $reply = clean_input($input['reply'] ?? '');
+
+            if (empty($reply)) {
+                return jsonError('La respuesta no puede estar vacía');
+            }
+
+            $safeReply = safe_output($reply);
+            $replyId = $replyModel->createReply($commentId, $userId, $safeReply);
+
+            if ($replyId) {
+                $newReply = $replyModel->getReplyById($replyId);
+                $replies = $replyModel->getRepliesByComment($commentId);
+                $replyCount = $replyModel->getReplyCount($commentId);
+
+                return jsonSuccess([
+                    'reply' => $newReply,
+                    'replies' => $replies,
+                    'reply_count' => $replyCount
+                ], 'Respuesta agregada');
+            } else {
+                return jsonError('Error al agregar la respuesta');
+            }
+        }
+
+        return jsonError('Método no permitido');
+    }
+
+    public function deleteReply($id)
+    {
+        requireAuth();
+
+        $userId = $_SESSION['user_id'];
+        $replyModel = new ReplyModel();
+
+        $reply = $replyModel->getReplyById($id);
+
+        if (!$reply) {
+            return jsonError('Respuesta no encontrada');
+        }
+
+        $commentId = $reply['comment_id'];
+
+        $result = $replyModel->deleteReply($id, $userId);
+
+        if ($result) {
+            $updatedReplyCount = $replyModel->getReplyCount($commentId);
+
+            return jsonSuccess([
+                'reply_count' => $updatedReplyCount,
+                'comment_id' => $commentId
+            ], 'Respuesta eliminada');
+        } else {
+            return jsonError('Error al eliminar la respuesta o no tienes permisos');
+        }
+    }
+
+    public function getReplies($commentId)
+    {
+        requireAuth();
+
+        $replyModel = new ReplyModel();
+        $replies = $replyModel->getRepliesByComment($commentId);
+        $replyCount = $replyModel->getReplyCount($commentId);
+
+        return jsonSuccess([
+            'replies' => $replies,
+            'reply_count' => $replyCount
         ]);
     }
 }

@@ -55,9 +55,27 @@ function toggleCommentMenu(event, menuId) {
   }
 }
 
+function toggleReplyMenu(event, menuId) {
+  event.stopPropagation();
+
+  const menu = document.getElementById(menuId);
+  const allReplyMenus = document.querySelectorAll(".reply-menu-modal");
+
+  const wasActive = menu.classList.contains("active");
+
+  allReplyMenus.forEach((m) => {
+    m.classList.remove("active");
+  });
+
+  if (!wasActive) {
+    menu.classList.add("active");
+  }
+}
+
 function openDeleteCommentModal(deleteButton) {
   commentToDelete = deleteButton.closest(".comment");
   postToDelete = null;
+  replyToDelete = null;
 
   if (confirmModal) {
     try {
@@ -71,17 +89,38 @@ function openDeleteCommentModal(deleteButton) {
   }
 }
 
+function openDeleteReplyModal(deleteButton) {
+  replyToDelete = deleteButton.closest(".reply");
+  postToDelete = null;
+  commentToDelete = null;
+
+  if (confirmModal) {
+    try {
+      const modalSubtitle = confirmModal.querySelector(".confirm-subtitle");
+      if (modalSubtitle) {
+        modalSubtitle.textContent = "¿Estás seguro/a de que deseas eliminar esta respuesta?";
+      }
+    } catch (e) { }
+
+    confirmModal.showModal();
+  }
+}
+
 document.addEventListener("click", function () {
   const allMenus = document.querySelectorAll(".post-menu-modal");
   allMenus.forEach((m) => m.classList.remove("active"));
 
   const allCommentMenus = document.querySelectorAll(".comment-menu-modal");
   allCommentMenus.forEach((m) => m.classList.remove("active"));
+
+  const allReplyMenus = document.querySelectorAll(".reply-menu-modal");
+  allReplyMenus.forEach((m) => m.classList.remove("active"));
 });
 
 let confirmModal = null;
 let postToDelete = null;
 let commentToDelete = null;
+let replyToDelete = null;
 
 document.addEventListener("DOMContentLoaded", function () {
   confirmModal = document.getElementById("confirm-delete-modal");
@@ -144,10 +183,42 @@ document.addEventListener("DOMContentLoaded", function () {
             alert("Error de conexión al eliminar el comentario");
           }
         }
+
+        if (replyToDelete) {
+          const replyId = replyToDelete.dataset.replyId;
+          const commentEl = replyToDelete.closest(".comment");
+
+          try {
+            const response = await fetch(`/replies/${replyId}`, {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+              replyToDelete.remove();
+
+              if (commentEl && result.data?.reply_count !== undefined) {
+                const toggleBtn = commentEl.querySelector(".reply-toggle-btn");
+                if (toggleBtn) {
+                  const count = result.data.reply_count;
+                  toggleBtn.textContent = count > 0 ? `Ver respuestas (${count})` : 'Responder';
+                }
+              }
+            } else {
+              alert("Error al eliminar la respuesta: " + result.message);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("Error de conexión al eliminar la respuesta");
+          }
+        }
       }
 
       postToDelete = null;
       commentToDelete = null;
+      replyToDelete = null;
     });
   }
 });
@@ -363,6 +434,18 @@ function updateCommentsSection(postContainer, comments, commentCount, isAddingCo
           ${commentMenuHTML}
         </div>
         <div class="comment-date">${timeAgo} • ${dateString}</div>
+        <div class="reply-toggle-container" data-comment-id="${commentId}">
+          <button class="reply-toggle-btn" onclick="toggleReplies(this)">
+            Responder
+          </button>
+        </div>
+        <div class="reply-section hidden" data-comment-id="${commentId}">
+          <div class="replies-container"></div>
+          <div class="reply-input-container">
+            <input type="text" class="reply-input" placeholder="Escribir respuesta..." maxlength="500" minlength="1" onkeypress="handleReplyKeyPress(event, this)">
+            <button class="reply-submit" onclick="addReply(this)">Publicar</button>
+          </div>
+        </div>
       </div>
     `;
 
@@ -428,6 +511,133 @@ function handleCommentKeyPress(event, button) {
   if (event.key === "Enter" && !event.shiftKey) {
     event.preventDefault();
     addComment(button);
+  }
+}
+
+function handleReplyKeyPress(event, input) {
+  if (event.key === "Enter" && !event.shiftKey) {
+    event.preventDefault();
+    addReply(input);
+  }
+}
+
+async function toggleReplies(button) {
+  const commentEl = button.closest(".comment");
+  const commentId = commentEl.dataset.commentId;
+  const replySection = commentEl.querySelector(".reply-section");
+
+  if (replySection.classList.contains("hidden")) {
+    try {
+      const response = await fetch(`/comments/${commentId}/replies`);
+      const result = await response.json();
+
+      if (result.success) {
+        const replies = result.data.replies;
+        const replyCount = result.data.reply_count;
+
+        renderRepliesSection(commentEl, replies, replyCount);
+
+        if (replyCount > 0) {
+          button.textContent = `Ver respuestas (${replyCount})`;
+        } else {
+          button.textContent = 'Responder';
+        }
+      }
+    } catch (error) {
+      console.error("Error al cargar respuestas:", error);
+    }
+  }
+
+  replySection.classList.toggle("hidden");
+}
+
+function renderRepliesSection(commentEl, replies, replyCount) {
+  const repliesContainer = commentEl.querySelector(".replies-container");
+  const postContainer = commentEl.closest(".post-container");
+  const currentUserId = postContainer ? postContainer.dataset.currentUserId : null;
+
+  repliesContainer.innerHTML = "";
+
+  replies.forEach(reply => {
+    const replyId = reply.reply_id || reply.id;
+    const replyUserId = reply.user_id;
+    const date = new Date(reply.created_at);
+    const dateString = date.toLocaleDateString("es-MX", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const timeAgo = getTimeAgo(reply.created_at);
+
+    let replyMenuHTML = '';
+    if (currentUserId && replyUserId && currentUserId == replyUserId) {
+      const replyMenuId = `reply-menu-${replyId}`;
+      replyMenuHTML = `
+        <div class="reply-menu-wrapper">
+          <img src="/assets/images/vertical-dots.png" alt="Opciones de respuesta" width="16"
+               class="reply-menu-trigger" data-menu-id="${replyMenuId}" style="cursor: pointer;">
+          <div class="reply-menu-modal" id="${replyMenuId}">
+            <div class="menu-option delete reply-delete-btn">Eliminar</div>
+            <div class="menu-option">Cancelar</div>
+          </div>
+        </div>
+      `;
+    }
+
+    const replyHTML = `
+      <div class="reply" data-reply-id="${replyId}">
+        <div class="reply-header">
+          <a href="/profile/${replyUserId}" class="reply-user">
+            <div class="reply-text-content">
+              ${reply.full_name}: ${escapeHtml(reply.content)}
+            </div>
+          </a>
+          ${replyMenuHTML}
+        </div>
+        <div class="reply-date">${timeAgo} • ${dateString}</div>
+      </div>
+    `;
+
+    repliesContainer.insertAdjacentHTML("beforeend", replyHTML);
+  });
+}
+
+async function addReply(button) {
+  const commentEl = button.closest(".comment");
+  const commentId = commentEl.dataset.commentId;
+  const replyInput = commentEl.querySelector(".reply-input");
+  const replyText = replyInput.value.trim();
+
+  if (!replyText) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/comments/${commentId}/replies`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ reply: replyText }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      replyInput.value = "";
+
+      renderRepliesSection(commentEl, result.data.replies, result.data.reply_count);
+
+      const toggleBtn = commentEl.querySelector(".reply-toggle-btn");
+      if (toggleBtn && result.data.reply_count > 0) {
+        toggleBtn.textContent = `Ver respuestas (${result.data.reply_count})`;
+      }
+    } else {
+      alert("Error al agregar respuesta: " + result.message);
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error de conexión");
   }
 }
 
@@ -742,6 +952,15 @@ document.addEventListener("click", function (event) {
 
   if (event.target.classList.contains("comment-delete-btn")) {
     openDeleteCommentModal(event.target);
+  }
+
+  if (event.target.classList.contains("reply-menu-trigger")) {
+    const menuId = event.target.dataset.menuId;
+    toggleReplyMenu(event, menuId);
+  }
+
+  if (event.target.classList.contains("reply-delete-btn")) {
+    openDeleteReplyModal(event.target);
   }
 });
 

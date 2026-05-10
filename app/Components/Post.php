@@ -190,6 +190,18 @@ class Post
             <div class='comment-date'>
                 {$time} • {$date}
             </div>
+            <div class='reply-toggle-container' data-comment-id='{$commentId}'>
+                <button class='reply-toggle-btn' onclick='toggleReplies(this)'>
+                    Responder
+                </button>
+            </div>
+            <div class='reply-section hidden' data-comment-id='{$commentId}'>
+                <div class='replies-container'></div>
+                <div class='reply-input-container'>
+                    <input type='text' class='reply-input' placeholder='Escribir respuesta...' maxlength='500' minlength='1' onkeypress='handleReplyKeyPress(event, this)'>
+                    <button class='reply-submit' onclick='addReply(this)'>Publicar</button>
+                </div>
+            </div>
         </div>
         ";
         }

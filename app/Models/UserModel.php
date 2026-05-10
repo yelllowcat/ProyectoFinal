@@ -208,7 +208,10 @@ class UserModel
         
         $stmt2 = $this->pdo->prepare("DELETE FROM likes WHERE user_id = ?");
         $stmt2->execute([$userId]);
-        
+
+        $stmtReplies = $this->pdo->prepare("DELETE FROM replies WHERE user_id = ?");
+        $stmtReplies->execute([$userId]);
+
         $stmt3 = $this->pdo->prepare("DELETE FROM comments WHERE user_id = ?");
         $stmt3->execute([$userId]);
         

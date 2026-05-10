@@ -606,6 +606,136 @@ a {
   display: none;
 }
 
+.reply-toggle-container {
+  margin-top: 8px;
+}
+
+.reply-toggle-btn {
+  background: none;
+  border: none;
+  color: #4db8c4;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.reply-toggle-btn:hover {
+  text-decoration: underline;
+  color: #3da3af;
+}
+
+.reply-section {
+  margin-top: 10px;
+  padding-left: 16px;
+  border-left: 2px solid #e0e0e0;
+}
+
+.reply-section.hidden {
+  display: none;
+}
+
+.reply {
+  padding: 8px 10px;
+  background-color: #f0f0f0;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.reply-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  color: #444;
+  margin-bottom: 3px;
+}
+
+.reply-user {
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+}
+
+.reply-user:hover {
+  text-decoration: underline;
+}
+
+.reply-text-content {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.reply-date {
+  font-size: 10px;
+  color: #999;
+  margin-top: 2px;
+}
+
+.reply-input-container {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.reply-input {
+  flex: 1;
+  padding: 6px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 15px;
+  outline: none;
+  font-size: 12px;
+}
+
+.reply-input:focus {
+  border-color: #4db8c4;
+}
+
+.reply-submit {
+  padding: 6px 14px;
+  background-color: #4db8c4;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.reply-submit:hover {
+  background-color: #3da3af;
+}
+
+.reply-submit:active {
+  transform: scale(0.98);
+}
+
+.reply-menu-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.reply-menu-modal {
+  display: none;
+  position: absolute;
+  top: 20px;
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 100;
+  min-width: 130px;
+}
+
+.reply-menu-modal.active {
+  display: block;
+}
+
 .edit-section {
   background-color: white;
   border-radius: 12px;
