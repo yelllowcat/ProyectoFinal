@@ -423,12 +423,15 @@ function updateCommentsSection(postContainer, comments, commentCount, isAddingCo
       `;
     }
 
+    const replyCount = comment.reply_count || 0;
+    const replyBtnText = replyCount > 0 ? `Ver respuestas (${replyCount})` : 'Responder';
+
     const commentHTML = `
       <div class="comment${isHidden}" data-comment-id="${commentId}">
         <div class="comment-header">
           <a href='/profile/${commentUserId}' class='comment-user'>
             <div class="comment-text-content">
-              ${comment.full_name}: ${escapeHtml(comment.content)}
+              <span class="comment-author-name">${escapeHtml(comment.full_name)}</span> <span class="comment-text-body">${escapeHtml(comment.content)}</span>
             </div>
           </a>
           ${commentMenuHTML}
@@ -436,7 +439,10 @@ function updateCommentsSection(postContainer, comments, commentCount, isAddingCo
         <div class="comment-date">${timeAgo} • ${dateString}</div>
         <div class="reply-toggle-container" data-comment-id="${commentId}">
           <button class="reply-toggle-btn" onclick="toggleReplies(this)">
-            Responder
+            ${replyBtnText}
+          </button>
+          <button class="comment-like-btn" onclick="handleCommentLike(this)" data-comment-id="${commentId}">
+            <img src="/assets/images/heartOutline.png" alt="Like" width="14"> 0
           </button>
         </div>
         <div class="reply-section hidden" data-comment-id="${commentId}">
@@ -521,6 +527,86 @@ function handleReplyKeyPress(event, input) {
   }
 }
 
+async function handleCommentLike(button) {
+  const commentId = button.dataset.commentId;
+  const isCurrentlyLiked = button.classList.contains("liked");
+
+  try {
+    const response = await fetch(`/comments/${commentId}/like`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      let action = result.data.action;
+      if (action === undefined) {
+        action = isCurrentlyLiked ? "removed" : "added";
+      }
+
+      const img = button.querySelector("img");
+
+      if (action === "added") {
+        button.classList.add("liked");
+        img.src = "/assets/images/heartFilled.png";
+        img.alt = "Liked";
+      } else {
+        button.classList.remove("liked");
+        img.src = "/assets/images/heartOutline.png";
+        img.alt = "Like";
+      }
+
+      button.innerHTML = `
+        <img src="${img.src}" alt="${img.alt}" width="14">
+        ${result.data.likes}
+      `;
+    }
+  } catch (error) {
+    console.error("Error en like de comentario:", error);
+  }
+}
+
+async function handleReplyLike(button) {
+  const replyId = button.dataset.replyId;
+  const isCurrentlyLiked = button.classList.contains("liked");
+
+  try {
+    const response = await fetch(`/replies/${replyId}/like`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      let action = result.data.action;
+      if (action === undefined) {
+        action = isCurrentlyLiked ? "removed" : "added";
+      }
+
+      const img = button.querySelector("img");
+
+      if (action === "added") {
+        button.classList.add("liked");
+        img.src = "/assets/images/heartFilled.png";
+        img.alt = "Liked";
+      } else {
+        button.classList.remove("liked");
+        img.src = "/assets/images/heartOutline.png";
+        img.alt = "Like";
+      }
+
+      button.innerHTML = `
+        <img src="${img.src}" alt="${img.alt}" width="12">
+        ${result.data.likes}
+      `;
+    }
+  } catch (error) {
+    console.error("Error en like de respuesta:", error);
+  }
+}
+
 async function toggleReplies(button) {
   const commentEl = button.closest(".comment");
   const commentId = commentEl.dataset.commentId;
@@ -589,12 +675,17 @@ function renderRepliesSection(commentEl, replies, replyCount) {
         <div class="reply-header">
           <a href="/profile/${replyUserId}" class="reply-user">
             <div class="reply-text-content">
-              ${reply.full_name}: ${escapeHtml(reply.content)}
+              <span class="reply-author-name">${escapeHtml(reply.full_name)}</span> <span class="reply-text-body">${escapeHtml(reply.content)}</span>
             </div>
           </a>
           ${replyMenuHTML}
         </div>
         <div class="reply-date">${timeAgo} • ${dateString}</div>
+        <div class="reply-like-container">
+          <button class="reply-like-btn" onclick="handleReplyLike(this)" data-reply-id="${replyId}">
+            <img src="/assets/images/heartOutline.png" alt="Like" width="12"> 0
+          </button>
+        </div>
       </div>
     `;
 

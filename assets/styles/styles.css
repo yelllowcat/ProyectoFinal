@@ -486,6 +486,33 @@ a {
   word-break: break-word; 
 }
 
+.comment-author-name {
+  font-weight: 700;
+  color: #333;
+  margin-right: 4px;
+}
+
+.comment-text-body {
+  font-weight: 400;
+  color: #333;
+}
+
+.reply-author-name {
+  font-weight: 700;
+  color: #333;
+  margin-right: 4px;
+}
+
+.reply-text-body {
+  font-weight: 400;
+  color: #333;
+}
+
+.comment-text-body {
+  font-weight: 400;
+  color: #555;
+}
+
 .comment-menu-wrapper {
   position: relative;
   display: flex;
@@ -608,6 +635,61 @@ a {
 
 .reply-toggle-container {
   margin-top: 8px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.comment-like-btn {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-size: 11px;
+  color: #999;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.2s ease;
+}
+
+.comment-like-btn:hover {
+  border-color: #e57373;
+  color: #e57373;
+}
+
+.comment-like-btn.liked {
+  border-color: #e57373;
+  color: #e57373;
+}
+
+.reply-like-container {
+  margin-top: 4px;
+}
+
+.reply-like-btn {
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 1px 6px;
+  cursor: pointer;
+  font-size: 10px;
+  color: #bbb;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.2s ease;
+}
+
+.reply-like-btn:hover {
+  border-color: #e57373;
+  color: #e57373;
+}
+
+.reply-like-btn.liked {
+  border-color: #e57373;
+  color: #e57373;
 }
 
 .reply-toggle-btn {
@@ -667,6 +749,16 @@ a {
   min-width: 0;
   overflow-wrap: break-word;
   word-break: break-word;
+}
+
+.reply-author-name {
+  font-weight: 700;
+  color: #555;
+}
+
+.reply-text-body {
+  font-weight: 300;
+  color: #888;
 }
 
 .reply-date {

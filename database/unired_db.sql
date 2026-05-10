@@ -84,6 +84,17 @@ CREATE TABLE replies (
     FOREIGN KEY (user_id)    REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
+-- Tabla reply_likes
+CREATE TABLE reply_likes (
+    like_id     INT AUTO_INCREMENT PRIMARY KEY,
+    reply_id    INT NOT NULL,
+    user_id     INT NOT NULL,
+    liked_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (reply_id) REFERENCES replies(reply_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id)  REFERENCES users(user_id) ON DELETE CASCADE,
+    UNIQUE (reply_id, user_id)
+) ENGINE=InnoDB;
+
 -- TABLA friend_requests
 CREATE TABLE IF NOT EXISTS friend_requests (
     request_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -247,6 +258,106 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- ---------------------------store procedure of comment likes-------------------------------
+
+DELIMITER $$
+CREATE PROCEDURE sp_add_comment_like(
+    IN p_comment_id INT,
+    IN p_user_id INT
+)
+BEGIN
+    INSERT IGNORE INTO comment_likes (comment_id, user_id, liked_at)
+    VALUES (p_comment_id, p_user_id, NOW());
+    SELECT ROW_COUNT() AS affected_rows;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_remove_comment_like(
+    IN p_comment_id INT,
+    IN p_user_id INT
+)
+BEGIN
+    DELETE FROM comment_likes
+    WHERE comment_id = p_comment_id AND user_id = p_user_id;
+    SELECT ROW_COUNT() AS affected_rows;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_get_comment_like_count(
+    IN p_comment_id INT
+)
+BEGIN
+    SELECT COUNT(*) as like_count
+    FROM comment_likes
+    WHERE comment_id = p_comment_id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_has_comment_liked(
+    IN p_comment_id INT,
+    IN p_user_id INT
+)
+BEGIN
+    SELECT EXISTS(
+        SELECT 1 FROM comment_likes
+        WHERE comment_id = p_comment_id AND user_id = p_user_id
+    ) as has_liked;
+END$$
+DELIMITER ;
+
+-- ---------------------------store procedure of reply likes-------------------------------
+
+DELIMITER $$
+CREATE PROCEDURE sp_add_reply_like(
+    IN p_reply_id INT,
+    IN p_user_id INT
+)
+BEGIN
+    INSERT IGNORE INTO reply_likes (reply_id, user_id, liked_at)
+    VALUES (p_reply_id, p_user_id, NOW());
+    SELECT ROW_COUNT() AS affected_rows;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_remove_reply_like(
+    IN p_reply_id INT,
+    IN p_user_id INT
+)
+BEGIN
+    DELETE FROM reply_likes
+    WHERE reply_id = p_reply_id AND user_id = p_user_id;
+    SELECT ROW_COUNT() AS affected_rows;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_get_reply_like_count(
+    IN p_reply_id INT
+)
+BEGIN
+    SELECT COUNT(*) as like_count
+    FROM reply_likes
+    WHERE reply_id = p_reply_id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_has_reply_liked(
+    IN p_reply_id INT,
+    IN p_user_id INT
+)
+BEGIN
+    SELECT EXISTS(
+        SELECT 1 FROM reply_likes
+        WHERE reply_id = p_reply_id AND user_id = p_user_id
+    ) as has_liked;
+END$$
+DELIMITER ;
+
 -- ---------------------------store procedure of comments-------------------------------
 
 -- Procedimiento para crear un comentario
@@ -270,7 +381,8 @@ CREATE PROCEDURE sp_get_comments_by_post(
     IN p_post_id INT
 )
 BEGIN
-    SELECT c.*, u.full_name, u.profile_picture 
+    SELECT c.*, u.full_name, u.profile_picture,
+        (SELECT COUNT(*) FROM replies r WHERE r.comment_id = c.comment_id AND r.active = 1) as reply_count
     FROM comments c 
     JOIN users u ON c.user_id = u.user_id 
     WHERE c.post_id = p_post_id AND c.active = 1 

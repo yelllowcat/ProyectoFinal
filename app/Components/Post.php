@@ -176,12 +176,15 @@ class Post
                     </div>";
             }
 
+            $replyCount = $comment['reply_count'] ?? 0;
+            $replyBtnText = $replyCount > 0 ? "Ver respuestas ({$replyCount})" : 'Responder';
+
             $commentsHtml .= "
         <div class='comment{$isHidden}' data-comment-id='{$commentId}'>
             <div class='comment-header'>
             <a href='/profile/{$commentUserId}' class='comment-user'>
                 <div class='comment-text-content'>
-                    {$author}: {$text}
+                    <span class='comment-author-name'>{$author}</span> <span class='comment-text-body'>{$text}</span>
                 </div>
             </a>
 
@@ -192,7 +195,10 @@ class Post
             </div>
             <div class='reply-toggle-container' data-comment-id='{$commentId}'>
                 <button class='reply-toggle-btn' onclick='toggleReplies(this)'>
-                    Responder
+                    {$replyBtnText}
+                </button>
+                <button class='comment-like-btn' onclick='handleCommentLike(this)' data-comment-id='{$commentId}'>
+                    <img src='/assets/images/heartOutline.png' alt='Like' width='14'> 0
                 </button>
             </div>
             <div class='reply-section hidden' data-comment-id='{$commentId}'>

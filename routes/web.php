@@ -140,6 +140,9 @@ $router->post('/comments/:id/replies', [PostController::class, 'addReply']);
 $router->get('/comments/:id/replies', [PostController::class, 'getReplies']);
 $router->delete('/replies/:id', [PostController::class, 'deleteReply']);
 
+$router->post('/comments/:id/like', [PostController::class, 'likeComment']);
+$router->post('/replies/:id/like', [PostController::class, 'likeReply']);
+
 $router->get('/admin/stats/users-posts', [AdminController::class, 'getUsersWithMostPosts']);
 $router->get('/admin/stats/users-friends', [AdminController::class, 'getUsersWithMostFriends']);
 $router->get('/admin/stats/posts-comments', [AdminController::class, 'getPostsWithMostComments']);

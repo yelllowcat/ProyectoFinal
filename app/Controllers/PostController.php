@@ -6,6 +6,8 @@ use App\Models\PostModel;
 use App\Models\LikeModel;
 use App\Models\CommentModel;
 use App\Models\ReplyModel;
+use App\Models\CommentLikeModel;
+use App\Models\ReplyLikeModel;
 
 class PostController
 {
@@ -147,6 +149,64 @@ class PostController
 
         $userId = $_SESSION['user_id'];
         $likeModel = new LikeModel();
+
+        $hasLiked = $likeModel->hasLiked($id, $userId);
+
+        if ($hasLiked) {
+            $result = $likeModel->removeLike($id, $userId);
+            $action = 'removed';
+        } else {
+            $result = $likeModel->addLike($id, $userId);
+            $action = 'added';
+        }
+
+        if ($result) {
+            $likeCount = $likeModel->getLikeCount($id);
+
+            return jsonSuccess([
+                'likes' => $likeCount,
+                'action' => $action
+            ], $action === 'added' ? 'Like agregado' : 'Like removido');
+        } else {
+            return jsonError('Error al procesar el like');
+        }
+    }
+
+    public function likeComment($id)
+    {
+        requireAuth();
+
+        $userId = $_SESSION['user_id'];
+        $likeModel = new CommentLikeModel();
+
+        $hasLiked = $likeModel->hasLiked($id, $userId);
+
+        if ($hasLiked) {
+            $result = $likeModel->removeLike($id, $userId);
+            $action = 'removed';
+        } else {
+            $result = $likeModel->addLike($id, $userId);
+            $action = 'added';
+        }
+
+        if ($result) {
+            $likeCount = $likeModel->getLikeCount($id);
+
+            return jsonSuccess([
+                'likes' => $likeCount,
+                'action' => $action
+            ], $action === 'added' ? 'Like agregado' : 'Like removido');
+        } else {
+            return jsonError('Error al procesar el like');
+        }
+    }
+
+    public function likeReply($id)
+    {
+        requireAuth();
+
+        $userId = $_SESSION['user_id'];
+        $likeModel = new ReplyLikeModel();
 
         $hasLiked = $likeModel->hasLiked($id, $userId);
 
