@@ -148,6 +148,15 @@ $router->get('/admin/stats/users-friends', [AdminController::class, 'getUsersWit
 $router->get('/admin/stats/posts-comments', [AdminController::class, 'getPostsWithMostComments']);
 $router->get('/admin/stats/posts-likes', [AdminController::class, 'getPostsWithMostLikes']);
 
+$router->get('/admin/stats/summary', [AdminController::class, 'getSummaryStats']);
+$router->get('/admin/stats/activity-timeline', [AdminController::class, 'getActivityTimeline']);
+$router->get('/admin/stats/engagement-breakdown', [AdminController::class, 'getEngagementBreakdown']);
+$router->get('/admin/stats/user-growth', [AdminController::class, 'getUserGrowth']);
+$router->get('/admin/stats/user-activity-split', [AdminController::class, 'getUserActivitySplit']);
+$router->get('/admin/stats/posts-by-day', [AdminController::class, 'getPostsByDayOfWeek']);
+$router->get('/admin/stats/post-image-ratio', [AdminController::class, 'getPostImageRatio']);
+$router->get('/admin/stats/top-engaged-users', [AdminController::class, 'getTopEngagedUsers']);
+
 $router->get('/dashboard', function () {
     requireAuth();
     requireAdmin();

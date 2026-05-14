@@ -44,4 +44,60 @@ class AdminController
         $posts = $this->adminModel->getPostsWithMostLikes();
         jsonSuccess($posts);
     }
+
+    public function getSummaryStats()
+    {
+        requireAdmin();
+        $stats = $this->adminModel->getSummaryStats();
+        jsonSuccess($stats);
+    }
+
+    public function getActivityTimeline()
+    {
+        requireAdmin();
+        $data = $this->adminModel->getActivityTimeline();
+        jsonSuccess($data);
+    }
+
+    public function getEngagementBreakdown()
+    {
+        requireAdmin();
+        $data = $this->adminModel->getEngagementBreakdown();
+        jsonSuccess($data);
+    }
+
+    public function getUserGrowth()
+    {
+        requireAdmin();
+        $data = $this->adminModel->getUserGrowth();
+        jsonSuccess($data);
+    }
+
+    public function getUserActivitySplit()
+    {
+        requireAdmin();
+        $data = $this->adminModel->getUserActivitySplit();
+        jsonSuccess($data);
+    }
+
+    public function getPostsByDayOfWeek()
+    {
+        requireAdmin();
+        $data = $this->adminModel->getPostsByDayOfWeek();
+        jsonSuccess($data);
+    }
+
+    public function getPostImageRatio()
+    {
+        requireAdmin();
+        $data = $this->adminModel->getPostImageRatio();
+        jsonSuccess($data);
+    }
+
+    public function getTopEngagedUsers()
+    {
+        requireAdmin();
+        $data = $this->adminModel->getTopEngagedUsers();
+        jsonSuccess($data);
+    }
 }
