@@ -342,6 +342,74 @@ class AdminModel
         }
     }
 
+    public function getPeakUsageHeatmap($range = '30')
+    {
+        try {
+            $sql = "
+                SELECT DAYOFWEEK(ts) AS dow, HOUR(ts) AS hr, COUNT(*) AS cnt
+                FROM (
+                    SELECT created_at AS ts FROM posts WHERE active = 1
+                    UNION ALL SELECT created_at FROM comments WHERE active = 1
+                    UNION ALL SELECT created_at FROM replies WHERE active = 1
+                    UNION ALL SELECT liked_at FROM likes
+                    UNION ALL SELECT liked_at FROM comment_likes
+                    UNION ALL SELECT liked_at FROM reply_likes
+                    UNION ALL SELECT friendship_date FROM friends
+                    UNION ALL SELECT registration_date FROM users WHERE active = 1
+                ) AS all_activity
+            ";
+
+            if ($range !== 'all') {
+                $sql .= " WHERE ts >= DATE_SUB(NOW(), INTERVAL ? DAY)";
+                $days = (int)$range;
+            }
+
+            $sql .= " GROUP BY dow, hr";
+
+            $stmt = $this->pdo->prepare($sql);
+            if ($range !== 'all') {
+                $stmt->execute([$days]);
+            } else {
+                $stmt->execute();
+            }
+
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $data = [];
+            for ($r = 0; $r < 7; $r++) {
+                $data[$r] = array_fill(0, 24, 0);
+            }
+
+            $max = 0;
+            foreach ($rows as $row) {
+                $dow = (int)$row['dow'];
+                $hr = (int)$row['hr'];
+                $cnt = (int)$row['cnt'];
+                $rowIdx = ($dow + 5) % 7;
+                $data[$rowIdx][$hr] = $cnt;
+                if ($cnt > $max) {
+                    $max = $cnt;
+                }
+            }
+
+            $labelDays = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+            $labelHours = [];
+            for ($h = 0; $h < 24; $h++) {
+                $labelHours[] = sprintf('%02d:00', $h);
+            }
+
+            return [
+                'max' => $max,
+                'days' => $labelDays,
+                'hours' => $labelHours,
+                'data' => $data
+            ];
+        } catch (PDOException $e) {
+            error_log("getPeakUsageHeatmap error: " . $e->getMessage());
+            return ['max' => 0, 'days' => [], 'hours' => [], 'data' => []];
+        }
+    }
+
     public function getTopEngagedUsers($limit = 10)
     {
         try {

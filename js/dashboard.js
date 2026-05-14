@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fetch new endpoints
     fetchSummaryStats();
     fetchActivityTimeline();
+    fetchPeakUsageHeatmap('30');
     switchChartTab('actividad');
 
     // Load initial table data
@@ -475,3 +476,71 @@ function renderPostTable(data, countLabel) {
         tbody.appendChild(tr);
     });
 }
+
+// Peak Usage Heatmap
+function fetchPeakUsageHeatmap(range) {
+    fetch('/admin/stats/peak-usage?range=' + range)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                buildHeatmap(data.data);
+            }
+        })
+        .catch(error => console.error('Error fetching peak usage:', error));
+}
+
+function switchHeatmapRange(range, btn) {
+    document.querySelectorAll('.heatmap-toggle').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    fetchPeakUsageHeatmap(range);
+}
+
+function buildHeatmap(data) {
+    const grid = document.getElementById('heatmapGrid');
+    const yLabels = document.getElementById('heatmapYLabels');
+    const xLabels = document.getElementById('heatmapXLabels');
+    if (!grid || !yLabels || !xLabels) return;
+
+    yLabels.innerHTML = '';
+    xLabels.innerHTML = '';
+    grid.innerHTML = '';
+
+    var dayNames = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    var max = data.max || 1;
+    var thresholds = [0, max * 0.2, max * 0.4, max * 0.6, max * 0.8];
+    var palette = ['#e8f4f7', '#b3dfe5', '#6bc5d2', '#2d9dad', '#0d737d'];
+
+    function getColor(val) {
+        if (val <= 0) return '#fafafa';
+        for (var i = palette.length - 1; i >= 0; i--) {
+            if (val >= thresholds[i]) return palette[i];
+        }
+        return palette[0];
+    }
+
+    for (var r = 0; r < 7; r++) {
+        var yLabel = document.createElement('div');
+        yLabel.className = 'heatmap-y-label';
+        yLabel.textContent = dayNames[r];
+        yLabels.appendChild(yLabel);
+
+        for (var c = 0; c < 24; c++) {
+            var val = data.data[r] ? (data.data[r][c] || 0) : 0;
+            var cell = document.createElement('div');
+            cell.className = 'heatmap-cell';
+            if (val === 0) cell.classList.add('heatmap-cell-zero');
+            cell.style.backgroundColor = getColor(val);
+            cell.setAttribute('title', dayNames[r] + ' ' + data.hours[c] + ' — ' + val + ' actividades');
+            grid.appendChild(cell);
+        }
+    }
+
+    for (var h = 0; h < 24; h++) {
+        var xLabel = document.createElement('div');
+        xLabel.className = 'heatmap-x-label';
+        xLabel.textContent = h % 3 === 0 ? h + 'h' : '';
+        xLabels.appendChild(xLabel);
+    }
+}
+
+window.renderPostTable = renderPostTable;

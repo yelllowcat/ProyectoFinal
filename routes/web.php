@@ -156,6 +156,7 @@ $router->get('/admin/stats/user-activity-split', [AdminController::class, 'getUs
 $router->get('/admin/stats/posts-by-day', [AdminController::class, 'getPostsByDayOfWeek']);
 $router->get('/admin/stats/post-image-ratio', [AdminController::class, 'getPostImageRatio']);
 $router->get('/admin/stats/top-engaged-users', [AdminController::class, 'getTopEngagedUsers']);
+$router->get('/admin/stats/peak-usage', [AdminController::class, 'getPeakUsageHeatmap']);
 
 $router->get('/dashboard', function () {
     requireAuth();

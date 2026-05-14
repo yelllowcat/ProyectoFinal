@@ -96,6 +96,33 @@ namespace App\views\admin;
             </div>
         </div>
 
+        <!-- Peak Usage Heatmap -->
+        <div class="chart-panel full-width">
+            <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <h3>Pico de uso de la plataforma</h3>
+                <div class="heatmap-toggles">
+                    <button class="heatmap-toggle active" onclick="switchHeatmapRange('30', this)">Últimos 30 días</button>
+                    <button class="heatmap-toggle" onclick="switchHeatmapRange('all', this)">Todo el tiempo</button>
+                </div>
+            </div>
+            <div class="heatmap-wrapper">
+                <div class="heatmap-y-labels" id="heatmapYLabels"></div>
+                <div>
+                    <div class="heatmap-grid" id="heatmapGrid"></div>
+                    <div class="heatmap-x-labels" id="heatmapXLabels"></div>
+                </div>
+            </div>
+            <div class="heatmap-legend">
+                <span>Bajo</span>
+                <span class="heatmap-legend-swatch" style="background:#e8f4f7;"></span>
+                <span class="heatmap-legend-swatch" style="background:#b3dfe5;"></span>
+                <span class="heatmap-legend-swatch" style="background:#6bc5d2;"></span>
+                <span class="heatmap-legend-swatch" style="background:#2d9dad;"></span>
+                <span class="heatmap-legend-swatch" style="background:#0d737d;"></span>
+                <span>Alto</span>
+            </div>
+        </div>
+
         <!-- Chart Section Tabs -->
         <div class="chart-tabs">
             <button class="chart-tab active" onclick="switchChartTab('actividad')">Actividad</button>

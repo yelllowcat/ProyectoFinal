@@ -94,6 +94,17 @@ class AdminController
         jsonSuccess($data);
     }
 
+    public function getPeakUsageHeatmap()
+    {
+        requireAdmin();
+        $range = $_GET['range'] ?? '30';
+        if (!in_array($range, ['30', '90', 'all'])) {
+            $range = '30';
+        }
+        $data = $this->adminModel->getPeakUsageHeatmap($range);
+        jsonSuccess($data);
+    }
+
     public function getTopEngagedUsers()
     {
         requireAdmin();
