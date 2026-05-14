@@ -169,7 +169,7 @@ BEGIN
     IF user_exists = 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Correo no encontrado';
     ELSE
-        SELECT user_id, full_name, email, role, registration_date, active FROM users WHERE email = p_email;
+        SELECT user_id, full_name, email, password, role, registration_date, active FROM users WHERE email = p_email;
     END IF;
 END$$
 DELIMITER ;
