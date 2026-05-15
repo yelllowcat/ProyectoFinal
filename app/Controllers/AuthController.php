@@ -25,8 +25,18 @@ class AuthController
                 redirect('/register');
             }
 
+            $email_lower = strtolower($email);
+            if (str_ends_with($email_lower, '@uabcs.mx')) {
+                $role = 'teacher';
+            } elseif (str_ends_with($email_lower, '@alu.uabcs.mx')) {
+                $role = 'student';
+            } else {
+                $_SESSION['error'] = 'Solo se permiten correos de @uabcs.mx o @alu.uabcs.mx.';
+                redirect('/register');
+            }
+
             $userModel = new UserModel();
-            $result = $userModel->registerUser($full_name, $email, $password);
+            $result = $userModel->registerUser($full_name, $email, $password, $role);
 
             if ($result === true) {
                 $_SESSION['success'] = 'Registro exitoso. Inicia sesión.';

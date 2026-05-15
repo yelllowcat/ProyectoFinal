@@ -31,8 +31,9 @@ use App\Components\Alert;
 
       <div class="form-group">
         <input type="email" id="email" placeholder="Correo electrónico" name="email" required
+          pattern="^.*@(uabcs\.mx|alu\.uabcs\.mx)$" title="Debe ser un correo @uabcs.mx o @alu.uabcs.mx"
           value="<?= safe_output($_POST['email'] ?? '') ?>" onpaste="return false;" maxlength="200" />
-        <label for="email" class="form-label" data-help="Formato: correo@ejemplo.com">Correo electrónico</label>
+        <label for="email" class="form-label" data-help="Formato: usuario@uabcs.mx o @alu.uabcs.mx">Correo electrónico</label>
       </div>
 
       <div class="form-group password-field">
