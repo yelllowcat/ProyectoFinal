@@ -13,23 +13,6 @@ const colors = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Sidebar toggle for mobile
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-    if (sidebarToggle && sidebar && sidebarOverlay) {
-        sidebarToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-            sidebarOverlay.classList.toggle('active');
-        });
-
-        sidebarOverlay.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            sidebarOverlay.classList.remove('active');
-        });
-    }
-
     // Modal logic for logout
     const logoutBtn = document.getElementById('admin-logout');
     const confirmLogoutModal = document.getElementById('confirm-logout-modal');
@@ -62,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     switchChartTab('actividad');
 
     // Load initial table data
-    fetchUsersWithMostPosts({ target: document.querySelector('.stat-tab.active') });
+    fetchUsersWithMostPosts({ target: document.querySelector('.stat-btn.active') });
 });
 
 // Animate numbers counting up
@@ -352,16 +335,8 @@ function renderChartB(type, labels, dataArray, titleText, bgColors, horizontal) 
 
 function updateActiveTab(event) {
     if (event && event.target) {
-        document.querySelectorAll('.stat-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.stat-btn').forEach(tab => tab.classList.remove('active'));
         event.target.classList.add('active');
-        
-        // Close sidebar on mobile after clicking
-        const sidebar = document.getElementById('sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        if (sidebar && sidebar.classList.contains('active')) {
-            sidebar.classList.remove('active');
-            sidebarOverlay.classList.remove('active');
-        }
     }
 }
 
