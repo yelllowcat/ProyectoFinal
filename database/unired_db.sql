@@ -130,6 +130,25 @@ CREATE TABLE IF NOT EXISTS user_update_log (
     FOREIGN KEY (user_id) REFERENCES users(user_id)
 ) ENGINE=InnoDB;
 
+-- TABLA reports
+CREATE TABLE IF NOT EXISTS reports (
+    report_id INT AUTO_INCREMENT PRIMARY KEY,
+    reporter_id INT NOT NULL,
+    reported_user_id INT,
+    post_id INT,
+    comment_id INT,
+    reply_id INT,
+    reason TEXT NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    resolved_at DATETIME,
+    FOREIGN KEY (reporter_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (reported_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE,
+    FOREIGN KEY (reply_id) REFERENCES replies(reply_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
 -- Comprobaciones básicas (puedes descomentar si deseas ver resultados)
 -- SELECT * FROM users;
 -- SELECT * FROM posts;
@@ -518,7 +537,67 @@ BEGIN
 END$$
 DELIMITER ;
 
+-- --------------------------------store procedure of reports-----------------------------------------------
 
+DELIMITER $$
+CREATE PROCEDURE sp_create_report(
+    IN p_reporter_id INT,
+    IN p_reported_user_id INT,
+    IN p_post_id INT,
+    IN p_comment_id INT,
+    IN p_reply_id INT,
+    IN p_reason TEXT
+)
+BEGIN
+    INSERT INTO reports (reporter_id, reported_user_id, post_id, comment_id, reply_id, reason, created_at)
+    VALUES (p_reporter_id, p_reported_user_id, p_post_id, p_comment_id, p_reply_id, p_reason, NOW());
+    
+    SELECT LAST_INSERT_ID() as report_id;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_get_reports()
+BEGIN
+    SELECT r.*, 
+           u.full_name AS reporter_name, 
+           ru.full_name AS reported_user_name,
+           p.content AS post_content,
+           c.content AS comment_content,
+           re.content AS reply_content
+    FROM reports r
+    JOIN users u ON r.reporter_id = u.user_id
+    LEFT JOIN users ru ON r.reported_user_id = ru.user_id
+    LEFT JOIN posts p ON r.post_id = p.post_id
+    LEFT JOIN comments c ON r.comment_id = c.comment_id
+    LEFT JOIN replies re ON r.reply_id = re.reply_id
+    ORDER BY r.created_at DESC;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_resolve_report(
+    IN p_report_id INT,
+    IN p_status VARCHAR(20)
+)
+BEGIN
+    UPDATE reports 
+    SET status = p_status, resolved_at = NOW()
+    WHERE report_id = p_report_id;
+    
+    SELECT ROW_COUNT() as affected_rows;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_delete_report(
+    IN p_report_id INT
+)
+BEGIN
+    DELETE FROM reports WHERE report_id = p_report_id;
+    SELECT ROW_COUNT() as affected_rows;
+END$$
+DELIMITER ;
 
 -- ---------------------------------------------------
 -- Trigger: registrar historial antes de update en users

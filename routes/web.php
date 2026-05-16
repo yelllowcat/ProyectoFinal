@@ -7,6 +7,7 @@ use App\Controllers\FriendController;
 use App\Controllers\ProfileController;
 use App\Controllers\AdminController;
 use App\Controllers\PdfController;
+use App\Controllers\ReportController;
 
 
 $router->get('/', function () {
@@ -165,3 +166,9 @@ $router->get('/dashboard', function () {
 });
 
 $router->get('/admin/stats/pdf', [PdfController::class, 'downloadStatsPdf']);
+
+// Report routes
+$router->post('/report', [ReportController::class, 'store']);
+$router->get('/admin/reports', [ReportController::class, 'index']);
+$router->post('/admin/reports/:id/resolve', [ReportController::class, 'resolve']);
+$router->delete('/admin/reports/:id', [ReportController::class, 'destroy']);

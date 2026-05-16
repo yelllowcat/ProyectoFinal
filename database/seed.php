@@ -26,12 +26,24 @@ function seedId(): int {
 }
 
 // ── 1. Users ─────────────────────────────────────────────────────────
-$existingCount = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-echo "  Existing users: $existingCount\n";
+echo "  Cleaning old seed users (role = 'user')…\n";
+$pdo->exec("DELETE FROM reply_likes WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
+$pdo->exec("DELETE FROM comment_likes WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
+$pdo->exec("DELETE FROM likes WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
+$pdo->exec("DELETE FROM replies WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
+$pdo->exec("DELETE FROM comments WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
+$pdo->exec("DELETE FROM posts WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
+$pdo->exec("DELETE FROM friend_requests WHERE sender_id IN (SELECT user_id FROM users WHERE role = 'user') OR receiver_id IN (SELECT user_id FROM users WHERE role = 'user')");
+$pdo->exec("DELETE FROM friends WHERE user_id1 IN (SELECT user_id FROM users WHERE role = 'user') OR user_id2 IN (SELECT user_id FROM users WHERE role = 'user')");
+$pdo->exec("DELETE FROM user_update_log WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
+$pdo->exec("DELETE FROM users WHERE role = 'user'");
+
+$existingCount = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role != 'admin'")->fetchColumn();
+echo "  Existing non-admin users: $existingCount\n";
 
 $needed = 25 - $existingCount;
 $userIds = [];
-$stmtU = $pdo->query("SELECT user_id FROM users");
+$stmtU = $pdo->query("SELECT user_id FROM users WHERE role != 'admin'");
 while ($row = $stmtU->fetch(PDO::FETCH_ASSOC)) {
     $userIds[] = (int)$row['user_id'];
 }
@@ -66,10 +78,18 @@ if ($needed > 0) {
     $insU = $pdo->prepare("INSERT INTO users (full_name, email, password, role, biography, profile_picture, registration_date) VALUES (?, ?, ?, ?, ?, ?, ?)");
 
     for ($i = 0; $i < $needed; $i++) {
-        $fn = $firstNames[$i % count($firstNames)] . ' ' . $lastNames[array_rand($lastNames)];
-        $email = 'seed' . seedId() . '@unired.com';
+        $firstName = $firstNames[$i % count($firstNames)];
+        $lastName  = $lastNames[array_rand($lastNames)];
+        $fn = $firstName . ' ' . $lastName;
+        $username = strtolower($firstName) . '.' . strtolower($lastName);
+
+        $isTeacher = $i % 2 === 0;
+        $role    = $isTeacher ? 'teacher' : 'student';
+        $domain  = $isTeacher ? '@uabcs.mx' : '@alu.uabcs.mx';
+        $email   = $username . $domain;
+
         $pass = password_hash('user123', PASSWORD_DEFAULT);
-        $insU->execute([$fn, $email, $pass, 'user', $biographies[$i % count($biographies)], pick($avatars), randDate(random_int(1, 28))]);
+        $insU->execute([$fn, $email, $pass, $role, $biographies[$i % count($biographies)], pick($avatars), randDate(random_int(1, 28))]);
         $userIds[] = (int)$pdo->lastInsertId();
     }
     echo "  +$needed new users created. Total: " . count($userIds) . "\n";

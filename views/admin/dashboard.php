@@ -137,6 +137,9 @@ namespace App\views\admin;
                 <button class="stat-btn" onclick="fetchPostsWithMostLikes(event)">
                     Posts con más likes
                 </button>
+                <button class="stat-btn" onclick="fetchReports(event)">
+                    Reportes
+                </button>
             </div>
 
             <!-- Data Table -->

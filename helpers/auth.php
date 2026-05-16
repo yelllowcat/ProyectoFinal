@@ -27,8 +27,7 @@ function requireUser()
 {
     requireAuth();
 
-    $user = getCurrentUser();
-    if (!$user || !isset($user['user_role']) || $user['user_role'] !== 'user') {
+    if (!isRegularUser()) {
         http_response_code(403);
         die('Access denied. User privileges required.');
     }
@@ -53,10 +52,17 @@ function isAdmin()
     $user = getCurrentUser();
     return $user && isset($user['user_role']) && $user['user_role'] === 'admin';
 }
-function isUser()
+
+function isRegularUser()
 {
     $user = getCurrentUser();
-    return $user && isset($user['user_role']) && $user['user_role'] === 'user';
+    $nonAdminRoles = ['user', 'teacher', 'student'];
+    return $user && isset($user['user_role']) && in_array($user['user_role'], $nonAdminRoles, true);
+}
+
+function isUser()
+{
+    return isRegularUser();
 }
 function isOwner($resourceUserId)
 {

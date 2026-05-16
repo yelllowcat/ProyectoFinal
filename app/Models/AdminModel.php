@@ -129,7 +129,7 @@ class AdminModel
         try {
             $stats = [];
             
-            $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM users WHERE active = 1 AND role = 'user'");
+            $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM users WHERE active = 1 AND role != 'admin'");
             $stats['total_users'] = (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
             
             $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM posts WHERE active = 1");
@@ -250,7 +250,7 @@ class AdminModel
                   MIN(DATE(registration_date)) as week_start,
                   COUNT(*) as count
                 FROM users 
-                WHERE active = 1 AND role = 'user'
+                WHERE active = 1 AND role != 'admin'
                   AND registration_date >= DATE_SUB(NOW(), INTERVAL 8 WEEK)
                 GROUP BY YEARWEEK(registration_date, 1)
                 ORDER BY week
@@ -280,9 +280,9 @@ class AdminModel
         try {
             $stmt = $this->pdo->query("
                 SELECT 
-                  (SELECT COUNT(*) FROM users WHERE active = 1 AND role = 'user' 
+                  (SELECT COUNT(*) FROM users WHERE active = 1 AND role != 'admin' 
                    AND user_id IN (SELECT DISTINCT user_id FROM posts WHERE active = 1)) as active,
-                  (SELECT COUNT(*) FROM users WHERE active = 1 AND role = 'user' 
+                  (SELECT COUNT(*) FROM users WHERE active = 1 AND role != 'admin' 
                    AND user_id NOT IN (SELECT DISTINCT user_id FROM posts WHERE active = 1)) as inactive
             ");
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -425,7 +425,7 @@ class AdminModel
                 LEFT JOIN comments c ON u.user_id = c.user_id AND c.active = 1
                 LEFT JOIN replies r ON u.user_id = r.user_id AND r.active = 1
                 LEFT JOIN likes l ON u.user_id = l.user_id
-                WHERE u.active = 1 AND u.role = 'user'
+                WHERE u.active = 1 AND u.role != 'admin'
                 GROUP BY u.user_id, u.full_name, u.email, u.profile_picture
                 ORDER BY total_engagement DESC
                 LIMIT ?

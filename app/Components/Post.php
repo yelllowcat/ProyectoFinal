@@ -16,6 +16,7 @@ class Post
     private $currentUserId;
     private $data;
     private $userAvatar;
+    private $authorRole;
 
     public function __construct($data)
     {
@@ -37,6 +38,8 @@ class Post
         if ($this->userAvatar && !str_starts_with($this->userAvatar, '/assets/')) {
             $this->userAvatar = '/assets/imagesProfile/' . $this->userAvatar;
         }
+
+        $this->authorRole = $data['author_role'] ?? 'user';
     }
 
     public function getId()
@@ -95,7 +98,7 @@ class Post
         $heartAlt = $hasLiked ? 'Liked' : 'Like';
         $likeButtonClass = $hasLiked ? 'action-btn liked' : 'action-btn';
 
-        // Menú solo para propietario
+        // Menú del post
         $menuOptions = '';
         if ($this->userId == $this->currentUserId) {
             $menuOptions = "
@@ -108,6 +111,23 @@ class Post
             </div>
         </div>
         ";
+        } else {
+            $menuOptions = "
+        <div class='feed-post-menu' onclick=\"toggleMenu(event, '{$menuId}')\">
+            <img src='/assets/images/more.png' alt='more options' width='25'>
+            <div class='post-menu-modal' id='{$menuId}'>
+                <div class='menu-option' style='color: #f44336;' onclick=\"openReportModal('post', {$this->id})\">Reportar publicación</div>
+                <div class='menu-option'>Cancelar</div>
+            </div>
+        </div>
+        ";
+        }
+
+        $roleBadge = "";
+        if ($this->authorRole === 'teacher') {
+            $roleBadge = "<span class='role-badge role-teacher'>Profesor</span>";
+        } elseif ($this->authorRole === 'student') {
+            $roleBadge = "<span class='role-badge role-student'>Estudiante</span>";
         }
 
         return "
@@ -118,7 +138,7 @@ class Post
                     <img src='{$this->userAvatar}' alt='Avatar de {$this->author}' class='post-user-avatar'>
                 </div>
                 <div class='feed-post-user-info'>
-                    <h3>{$this->author}</h3>
+                    <h3 style='display:flex; align-items:center; gap:5px;'>{$this->author} {$roleBadge}</h3>
                     <div class='feed-post-date'>Publicado el: {$this->date}</div>
                 </div>
             </a>
@@ -162,7 +182,7 @@ class Post
             $commentMenuId = 'comment-menu-' . $this->id . '-' . $commentId;
             $commentUserId = $comment['user_id'] ?? null;
 
-            // Menú solo para propietario
+            // Menú del comentario
             $commentMenu = '';
             if ($commentUserId == $this->currentUserId) {
                 $commentMenu = "
@@ -171,6 +191,16 @@ class Post
                              class='comment-menu-trigger' data-menu-id='{$commentMenuId}' style='cursor: pointer;'>
                         <div class='comment-menu-modal' id='{$commentMenuId}'>
                             <div class='menu-option delete comment-delete-btn'>Eliminar</div>
+                            <div class='menu-option'>Cancelar</div>
+                        </div>
+                    </div>";
+            } else {
+                $commentMenu = "
+                    <div class='comment-menu-wrapper'>
+                        <img src='/assets/images/vertical-dots.png' alt='Opciones de comentario' width='20' 
+                             class='comment-menu-trigger' data-menu-id='{$commentMenuId}' style='cursor: pointer;'>
+                        <div class='comment-menu-modal' id='{$commentMenuId}'>
+                            <div class='menu-option' style='color: #f44336;' onclick=\"openReportModal('comment', {$commentId})\">Reportar comentario</div>
                             <div class='menu-option'>Cancelar</div>
                         </div>
                     </div>";

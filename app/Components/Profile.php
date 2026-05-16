@@ -12,8 +12,9 @@ class Profile
     private $friendsCount;
     private $userId;
     private $profilePicture;
+    private $userRole;
 
-    public function __construct($viewState = 'own', $userName = 'Usuario', $userBio = '', $postCount = 0, $likesCount = 0, $friendsCount = 0, $userId = null, $profilePicture = null)
+    public function __construct($viewState = 'own', $userName = 'Usuario', $userBio = '', $postCount = 0, $likesCount = 0, $friendsCount = 0, $userId = null, $profilePicture = null, $userRole = 'user')
     {
         $this->viewState = $viewState;
         $this->userName = htmlspecialchars($userName);
@@ -23,6 +24,7 @@ class Profile
         $this->friendsCount = $friendsCount;
         $this->userId = $userId;
         $this->profilePicture = $profilePicture;
+        $this->userRole = $userRole;
     }
 
     private function getDefaultBio()
@@ -49,6 +51,9 @@ class Profile
                     <button class='btn btn-remove profile-action-btn' data-action='remove' data-user-id='{$this->userId}'>
                         Eliminar amistad
                     </button>
+                    <button class='btn btn-remove profile-action-btn' style='margin-left: 10px;' onclick=\"openReportModal('user', {$this->userId})\">
+                        Reportar usuario
+                    </button>
                 </div>";
         } else if ($this->viewState === 'request') {
             return "
@@ -66,6 +71,9 @@ class Profile
                     <button class='btn btn-primary profile-action-btn' data-action='reject' data-user-id='{$this->userId}'>
                         Cancelar solicitud
                     </button>
+                    <button class='btn btn-remove profile-action-btn' style='margin-left: 10px;' onclick=\"openReportModal('user', {$this->userId})\">
+                        Reportar usuario
+                    </button>
                 </div>";
         } else if ($this->viewState === 'stranger') {
             return "
@@ -73,20 +81,34 @@ class Profile
                     <button class='btn btn-primary profile-action-btn' data-action='add' data-user-id='{$this->userId}'>
                         Agregar amigo
                     </button>
+                    <button class='btn btn-remove profile-action-btn' style='margin-left: 10px;' onclick=\"openReportModal('user', {$this->userId})\">
+                        Reportar usuario
+                    </button>
                 </div>";
         }
+        
+        // Agregar botón de reportar si no es el perfil propio y no es 'stranger' (donde ya se agregó)
+        // Pero para los otros estados, tenemos que insertarlo en el return
+
     }
 
     public function render()
     {
         $actionButtons = $this->getActionButtons();
 
+        $roleBadge = "";
+        if ($this->userRole === 'teacher') {
+            $roleBadge = "<span class='role-badge role-teacher'>Profesor</span>";
+        } elseif ($this->userRole === 'student') {
+            $roleBadge = "<span class='role-badge role-student'>Estudiante</span>";
+        }
+
         return "
 <div class='profile-section'>
     <div class='profile-photo'>
         <img src='{$this->profilePicture}' alt='Foto de perfil de {$this->userName}' class='profile-avatar'>
     </div>
-    <h2 class='profile-name'>{$this->userName}</h2>
+    <h2 class='profile-name' style='display:flex; justify-content:center; align-items:center;'>{$this->userName} {$roleBadge}</h2>
     <p class='profile-bio'>{$this->userBio}</p>
 
     <div class='stats-container'>

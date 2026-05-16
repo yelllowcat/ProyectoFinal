@@ -370,6 +370,11 @@ function fetchDataAndRenderTable(url, type, countField, countLabel) {
         .then(response => response.json())
         .then(data => {
             if (data.success && data.data) {
+                if (type === 'report') {
+                    renderReportTable(data.data);
+                    return;
+                }
+                
                 const normalized = data.data.map(item => {
                     item.count = item[countField];
                     return item;
@@ -451,6 +456,96 @@ function renderPostTable(data, countLabel) {
         tbody.appendChild(tr);
     });
 }
+
+window.fetchReports = function (event) {
+    updateActiveTab(event);
+    document.getElementById('tableTitle').innerText = 'Reportes Pendientes';
+    fetchDataAndRenderTable('/admin/reports', 'report', null, null);
+};
+
+function renderReportTable(data) {
+    const thead = document.getElementById('statsTableHeader');
+    thead.innerHTML = `
+        <tr>
+            <th>Id</th>
+            <th>Reportado Por</th>
+            <th>Razón</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    `;
+
+    const tbody = document.getElementById('statsTableBody');
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay reportes.</td></tr>';
+        return;
+    }
+
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        
+        let targetText = '';
+        if (item.reported_user_id) targetText = 'Usuario: ' + item.reported_user_name;
+        else if (item.post_id) targetText = 'Post: ' + (item.post_content ? item.post_content.substring(0, 20) + '...' : '');
+        else if (item.comment_id) targetText = 'Comentario';
+        else if (item.reply_id) targetText = 'Respuesta';
+        
+        let statusBadge = item.status === 'pending' 
+            ? '<span style="background: #ff9800; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px;">Pendiente</span>'
+            : '<span style="background: #4caf50; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px;">Resuelto</span>';
+
+        tr.innerHTML = `
+            <td>${item.report_id}</td>
+            <td>${item.reporter_name}</td>
+            <td>
+                <strong>${item.reason}</strong><br>
+                <small style="color: #666;">${targetText}</small>
+            </td>
+            <td>${new Date(item.created_at).toLocaleDateString()}</td>
+            <td>${statusBadge}</td>
+            <td>
+                <div style="display:flex; gap: 5px;">
+                    ${item.status === 'pending' ? `<button class="btn-view-profile-table" style="background:#4caf50;" onclick="resolveReport(${item.report_id})">Resolver</button>` : ''}
+                    <button class="btn-view-profile-table" style="background:#f44336;" onclick="deleteReport(${item.report_id})">Eliminar</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+window.resolveReport = async function(id) {
+    if (!confirm('¿Marcar este reporte como resuelto?')) return;
+    try {
+        const res = await fetch(`/admin/reports/${id}/resolve`, { method: 'POST' });
+        const json = await res.json();
+        if (json.success) {
+            fetchReports();
+        } else {
+            alert(json.message);
+        }
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+window.deleteReport = async function(id) {
+    if (!confirm('¿Eliminar este reporte permanentemente?')) return;
+    try {
+        const res = await fetch(`/admin/reports/${id}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+            fetchReports();
+        } else {
+            alert(json.message);
+        }
+    } catch (e) {
+        console.error(e);
+    }
+};
 
 // Peak Usage Heatmap
 function fetchPeakUsageHeatmap(range) {

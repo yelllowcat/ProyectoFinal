@@ -1143,3 +1143,67 @@ async function deleteAccount() {
     if (modal) modal.close();
   }
 }
+
+// ---------------------------------------------------
+// Reportes
+// ---------------------------------------------------
+
+function openReportModal(entityType, entityId) {
+  const modal = document.getElementById("report-modal");
+  if (!modal) return;
+  
+  document.getElementById("report-entity-type").value = entityType;
+  document.getElementById("report-entity-id").value = entityId;
+  
+  document.getElementById("report-form").reset();
+  
+  modal.showModal();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const reportForm = document.getElementById("report-form");
+  if (reportForm) {
+    reportForm.addEventListener("submit", async function (e) {
+      e.preventDefault();
+      
+      const entityType = document.getElementById("report-entity-type").value;
+      const entityId = document.getElementById("report-entity-id").value;
+      
+      const reasonRadio = document.querySelector('input[name="reason"]:checked');
+      if (!reasonRadio) {
+        alert("Por favor selecciona una razón.");
+        return;
+      }
+      const reason = reasonRadio.value;
+      const details = document.getElementById("report-reason-details").value;
+      
+      const fullReason = details ? `${reason}: ${details}` : reason;
+      
+      const formData = new FormData();
+      formData.append("reason", fullReason);
+      
+      if (entityType === "user") formData.append("reported_user_id", entityId);
+      if (entityType === "post") formData.append("post_id", entityId);
+      if (entityType === "comment") formData.append("comment_id", entityId);
+      if (entityType === "reply") formData.append("reply_id", entityId);
+      
+      try {
+        const response = await fetch("/report", {
+          method: "POST",
+          body: formData
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+          alert(result.data.message || "Reporte enviado correctamente.");
+          document.getElementById("report-modal").close();
+        } else {
+          alert("Error: " + result.message);
+        }
+      } catch (error) {
+        console.error("Error al enviar reporte:", error);
+        alert("Ocurrió un error al enviar el reporte.");
+      }
+    });
+  }
+});
