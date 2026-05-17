@@ -99,10 +99,9 @@ function validateEmail() {
 
 function validatePassword() {
   const password = this.value;
-  const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$/;
   
-  if (password && !pattern.test(password)) {
-    this.setCustomValidity('La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo');
+  if (password && password.length < 8) {
+    this.setCustomValidity('La contraseña debe tener al menos 8 caracteres');
     shakeElement(this);
     return false;
   } else {

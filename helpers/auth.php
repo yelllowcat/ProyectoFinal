@@ -27,7 +27,7 @@ function requireUser()
 {
     requireAuth();
 
-    if (!isRegularUser()) {
+    if (!isRegularUser() && !isAdmin()) {
         http_response_code(403);
         die('Access denied. User privileges required.');
     }

@@ -172,3 +172,10 @@ $router->post('/report', [ReportController::class, 'store']);
 $router->get('/admin/reports', [ReportController::class, 'index']);
 $router->post('/admin/reports/:id/resolve', [ReportController::class, 'resolve']);
 $router->delete('/admin/reports/:id', [ReportController::class, 'destroy']);
+
+$router->get('/report/view/:id', function ($id) {
+    requireAuth();
+    requireAdmin();
+    $_GET['report_id'] = $id;
+    require __DIR__ . '/../views/admin/reportView.php';
+});

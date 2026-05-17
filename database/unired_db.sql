@@ -563,14 +563,18 @@ BEGIN
            u.full_name AS reporter_name, 
            ru.full_name AS reported_user_name,
            p.content AS post_content,
+           p.user_id AS post_user_id,
            c.content AS comment_content,
-           re.content AS reply_content
+           c.post_id AS comment_post_id,
+           re.content AS reply_content,
+           rc.post_id AS reply_post_id
     FROM reports r
     JOIN users u ON r.reporter_id = u.user_id
     LEFT JOIN users ru ON r.reported_user_id = ru.user_id
     LEFT JOIN posts p ON r.post_id = p.post_id
     LEFT JOIN comments c ON r.comment_id = c.comment_id
     LEFT JOIN replies re ON r.reply_id = re.reply_id
+    LEFT JOIN comments rc ON re.comment_id = rc.comment_id
     ORDER BY r.created_at DESC;
 END$$
 DELIMITER ;

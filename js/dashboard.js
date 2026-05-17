@@ -505,14 +505,33 @@ function renderReportTable(data) {
 
     data.forEach(item => {
         const tr = document.createElement('tr');
-        
+
         let targetText = '';
-        if (item.reported_user_id) targetText = 'Usuario: ' + item.reported_user_name;
-        else if (item.post_id) targetText = 'Post: ' + (item.post_content ? item.post_content.substring(0, 20) + '...' : '');
-        else if (item.comment_id) targetText = 'Comentario';
-        else if (item.reply_id) targetText = 'Respuesta';
-        
-        let statusBadge = item.status === 'pending' 
+        let targetUrl = '/report/view/' + item.report_id;
+        let targetLabel = 'Ver contenido reportado';
+
+        if (item.reported_user_id) {
+            targetText = 'Usuario: ' + item.reported_user_name;
+        } else if (item.post_id) {
+            const snippet = item.post_content ? item.post_content.substring(0, 20) + '...' : '';
+            targetText = 'Post: ' + snippet;
+        } else if (item.comment_id) {
+            targetText = 'Comentario';
+        } else if (item.reply_id) {
+            targetText = 'Respuesta';
+        }
+
+        const externalLinkIcon = targetUrl ? `
+            <a href="${targetUrl}" target="_blank" title="${targetLabel}" style="text-decoration: none; display: inline-flex; align-items: center; margin-left: 4px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #4db8c4; vertical-align: middle;">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+            </a>
+        ` : '';
+
+        let statusBadge = item.status === 'pending'
             ? '<span style="background: #ff9800; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px;">Pendiente</span>'
             : '<span style="background: #4caf50; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px;">Resuelto</span>';
 
@@ -521,7 +540,7 @@ function renderReportTable(data) {
             <td>${item.reporter_name}</td>
             <td>
                 <strong>${item.reason}</strong><br>
-                <small style="color: #666;">${targetText}</small>
+                <small style="color: #666;">${targetText}${externalLinkIcon}</small>
             </td>
             <td>${new Date(item.created_at).toLocaleDateString()}</td>
             <td>${statusBadge}</td>

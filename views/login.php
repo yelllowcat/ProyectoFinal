@@ -31,10 +31,10 @@ use App\Components\Alert;
 
       <div class="form-group password-field">
         <input type="password" id="password" name="password" placeholder="Contraseña" required
-          pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$" minlength="8"
+          minlength="8"
           onpaste="return false;" maxlength="64" />
         <label for="password" class="form-label"
-          data-help="8+ caracteres, mayúscula, minúscula, número y símbolo">Contraseña</label>
+          data-help="Mínimo 8 caracteres">Contraseña</label>
         <img class="eye-icon" onclick="togglePassword()" src="../assets/images/eye-off.png" alt="Ocultar contraseña" />
       </div>
 

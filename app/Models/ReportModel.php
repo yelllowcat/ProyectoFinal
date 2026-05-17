@@ -49,6 +49,18 @@ class ReportModel
         }
     }
 
+    public function getReportById($reportId)
+    {
+        try {
+            $stmt = $this->pdo->prepare("CALL sp_get_report_by_id(?)");
+            $stmt->execute([$reportId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("getReportById error: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function resolveReport($reportId, $status)
     {
         try {
