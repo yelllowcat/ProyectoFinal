@@ -18,7 +18,7 @@ class ReportController
         requireUser();
         requireAuth();
 
-        $reporterId = $_SESSION['user']['id'];
+        $reporterId = $_SESSION['user_id'];
         $reportedUserId = $_POST['reported_user_id'] ?? null;
         $postId = $_POST['post_id'] ?? null;
         $commentId = $_POST['comment_id'] ?? null;
@@ -61,13 +61,13 @@ class ReportController
     public function resolve($id)
     {
         requireAdmin();
-        $status = $_POST['status'] ?? 'resolved';
+        $action = $_POST['action'] ?? 'dismiss';
         
-        $success = $this->reportModel->resolveReport($id, $status);
+        $success = $this->reportModel->takeModerationAction($id, $action);
         if ($success) {
-            jsonSuccess(['message' => 'Estado del reporte actualizado.']);
+            jsonSuccess(['message' => 'Reporte resuelto exitosamente con la acción seleccionada.']);
         } else {
-            jsonError('Error al actualizar el reporte.');
+            jsonError('Error al resolver el reporte o aplicar la acción.');
         }
     }
 

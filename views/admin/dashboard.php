@@ -59,6 +59,80 @@ namespace App\views\admin;
                     </div>
                 </div>
             </div>
+            </div>
+
+            <!-- Stats Nav and Tables (Moved to Top) -->
+            <div class="stat-nav">
+                <button class="stat-btn active" onclick="fetchUsersWithMostPosts(event)">
+                    Usuarios con más publicaciones
+                </button>
+                <button class="stat-btn" onclick="fetchUsersWithMostFriends(event)">
+                    Usuarios con más amigos
+                </button>
+                <button class="stat-btn" onclick="fetchPostsWithMostComments(event)">
+                    Posts con más comentarios
+                </button>
+                <button class="stat-btn" onclick="fetchPostsWithMostLikes(event)">
+                    Posts con más likes
+                </button>
+            </div>
+
+            <!-- Data Table -->
+            <div class="table-panel">
+                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="tableTitle">Usuarios con más publicaciones</h3>
+                    <a href="/admin/stats/pdf" target="_blank" style="text-decoration: none;">
+                        <button class="btn-download">Descargar PDF</button>
+                    </a>
+                </div>
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead id="statsTableHeader">
+                            <tr>
+                                <th>Id</th>
+                                <th>Nombre</th>
+                                <th>Correo electrónico</th>
+                                <th>Cantidad</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="statsTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 40px;">
+                                    Cargando estadísticas...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Reports Table -->
+            <div class="table-panel" style="margin-top: 20px; margin-bottom: 20px;">
+                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="reportsTableTitle">Reportes Pendientes</h3>
+                </div>
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead id="reportsTableHeader">
+                            <tr>
+                                <th>Id</th>
+                                <th>Reportado Por</th>
+                                <th>Razón</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportsTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align:center;">Cargando reportes...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
 
             <!-- Main Chart Area -->
             <div class="chart-panel full-width">
@@ -124,53 +198,6 @@ namespace App\views\admin;
                 </div>
             </div>
 
-            <div class="stat-nav">
-                <button class="stat-btn active" onclick="fetchUsersWithMostPosts(event)">
-                    Usuarios con más publicaciones
-                </button>
-                <button class="stat-btn" onclick="fetchUsersWithMostFriends(event)">
-                    Usuarios con más amigos
-                </button>
-                <button class="stat-btn" onclick="fetchPostsWithMostComments(event)">
-                    Posts con más comentarios
-                </button>
-                <button class="stat-btn" onclick="fetchPostsWithMostLikes(event)">
-                    Posts con más likes
-                </button>
-                <button class="stat-btn" onclick="fetchReports(event)">
-                    Reportes
-                </button>
-            </div>
-
-            <!-- Data Table -->
-            <div class="table-panel">
-                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3 id="tableTitle">Usuarios con más publicaciones</h3>
-                    <a href="/admin/stats/pdf" target="_blank" style="text-decoration: none;">
-                        <button class="btn-download">Descargar PDF</button>
-                    </a>
-                </div>
-                <div class="users-table-container">
-                    <table class="users-table">
-                        <thead id="statsTableHeader">
-                            <tr>
-                                <th>Id</th>
-                                <th>Nombre</th>
-                                <th>Correo electrónico</th>
-                                <th>Cantidad</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="statsTableBody">
-                            <tr>
-                                <td colspan="5" style="text-align: center; padding: 40px;">
-                                    Cargando estadísticas...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -187,7 +214,36 @@ namespace App\views\admin;
                 <button value="cancel" class="confirm-cancel">Cancelar</button>
             </form>
         </div>
+        </div>
     </dialog>
+
+    <dialog id="resolve-report-modal" class="confirm-dialog">
+        <div class="confirm-box" style="max-width: 400px; padding: 20px;">
+            <div class="confirm-head">
+                <h3>Resolver Reporte</h3>
+                <p class="confirm-subtitle">Selecciona la acción de moderación a tomar.</p>
+            </div>
+            <div class="confirm-sep"></div>
+            <form id="resolve-report-form">
+                <input type="hidden" id="resolve-report-id" name="report_id">
+                
+                <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+                    <label for="resolve-action" style="display:block; margin-bottom: 5px; font-weight: 500;">Acción</label>
+                    <select id="resolve-action" name="action" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                        <option value="dismiss">Solo desestimar (falsa alarma)</option>
+                        <option value="delete">Eliminar contenido reportado</option>
+                        <option value="suspend">Suspender usuario y eliminar contenido</option>
+                    </select>
+                </div>
+
+                <div class="confirm-actions" style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn-primary" style="flex: 1; padding: 10px; border-radius: 8px; background: #e74c3c; color: white; border: none; cursor: pointer; font-weight: 600;">Aplicar Acción</button>
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('resolve-report-modal').close()" style="flex: 1; padding: 10px; border-radius: 8px; background: #eee; border: none; cursor: pointer; font-weight: 600;">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
 </body>
 
 </html>

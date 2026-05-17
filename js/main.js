@@ -1171,7 +1171,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const reasonRadio = document.querySelector('input[name="reason"]:checked');
       if (!reasonRadio) {
-        alert("Por favor selecciona una razón.");
+        showDialogMessage("Atención", "Por favor selecciona una razón.");
         return;
       }
       const reason = reasonRadio.value;
@@ -1195,15 +1195,37 @@ document.addEventListener("DOMContentLoaded", () => {
         const result = await response.json();
         
         if (result.success) {
-          alert(result.data.message || "Reporte enviado correctamente.");
           document.getElementById("report-modal").close();
+          showDialogMessage("Éxito", result.data.message || "Reporte enviado correctamente.");
         } else {
-          alert("Error: " + result.message);
+          showDialogMessage("Error", result.message);
         }
       } catch (error) {
         console.error("Error al enviar reporte:", error);
-        alert("Ocurrió un error al enviar el reporte.");
+        showDialogMessage("Error", "Ocurrió un error al enviar el reporte.");
       }
     });
   }
 });
+
+function showDialogMessage(title, message) {
+    const dialog = document.createElement('dialog');
+    dialog.className = 'confirm-dialog';
+    dialog.innerHTML = `
+        <div class="confirm-box" style="max-width: 350px;">
+            <div class="confirm-head">
+                <h3>${title}</h3>
+                <p class="confirm-subtitle">${message}</p>
+            </div>
+            <div class="confirm-sep"></div>
+            <div class="confirm-actions" style="display:flex; justify-content:center;">
+                <button class="confirm-cancel" style="width:100%;" onclick="this.closest('dialog').close()">Aceptar</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(dialog);
+    dialog.showModal();
+    dialog.addEventListener('close', () => {
+        dialog.remove();
+    });
+}

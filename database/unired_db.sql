@@ -648,3 +648,55 @@ LEFT JOIN (
 ) c ON p.post_id = c.post_id
 WHERE p.active = 1
 ORDER BY p.created_at DESC;
+
+DELIMITER $$
+CREATE PROCEDURE sp_admin_delete_post(
+    IN p_post_id INT
+)
+BEGIN
+    UPDATE posts 
+    SET active = 0 
+    WHERE post_id = p_post_id;
+    
+    SELECT ROW_COUNT() AS affected_rows;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_admin_delete_comment(
+    IN p_comment_id INT
+)
+BEGIN
+    UPDATE comments 
+    SET active = 0 
+    WHERE comment_id = p_comment_id;
+    
+    SELECT ROW_COUNT() AS affected_rows;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_admin_delete_reply(
+    IN p_reply_id INT
+)
+BEGIN
+    UPDATE replies 
+    SET active = 0 
+    WHERE reply_id = p_reply_id;
+    
+    SELECT ROW_COUNT() AS affected_rows;
+END$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE PROCEDURE sp_admin_suspend_user(
+    IN p_user_id INT
+)
+BEGIN
+    UPDATE users 
+    SET active = 0 
+    WHERE user_id = p_user_id;
+    
+    SELECT ROW_COUNT() AS affected_rows;
+END$$
+DELIMITER ;

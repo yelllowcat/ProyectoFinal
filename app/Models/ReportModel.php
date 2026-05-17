@@ -72,4 +72,69 @@ class ReportModel
             return false;
         }
     }
+
+    public function takeModerationAction($reportId, $action)
+    {
+        try {
+            // First, fetch the report to know what to act on
+            $stmt = $this->pdo->prepare("SELECT * FROM reports WHERE report_id = ?");
+            $stmt->execute([$reportId]);
+            $report = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$report) {
+                return false;
+            }
+
+            // Execute action based on type
+            if ($action === 'delete') {
+                if ($report['post_id']) {
+                    $this->pdo->prepare("CALL sp_admin_delete_post(?)")->execute([$report['post_id']]);
+                } elseif ($report['comment_id']) {
+                    $this->pdo->prepare("CALL sp_admin_delete_comment(?)")->execute([$report['comment_id']]);
+                } elseif ($report['reply_id']) {
+                    $this->pdo->prepare("CALL sp_admin_delete_reply(?)")->execute([$report['reply_id']]);
+                }
+            } elseif ($action === 'suspend') {
+                // First delete the content as well
+                if ($report['post_id']) {
+                    $this->pdo->prepare("CALL sp_admin_delete_post(?)")->execute([$report['post_id']]);
+                } elseif ($report['comment_id']) {
+                    $this->pdo->prepare("CALL sp_admin_delete_comment(?)")->execute([$report['comment_id']]);
+                } elseif ($report['reply_id']) {
+                    $this->pdo->prepare("CALL sp_admin_delete_reply(?)")->execute([$report['reply_id']]);
+                }
+
+                // Then suspend the user (either the specifically reported user or the content author)
+                $userIdToSuspend = $report['reported_user_id'];
+                
+                // If it wasn't a direct user report, we need to find the author's ID
+                if (!$userIdToSuspend) {
+                    if ($report['post_id']) {
+                        $stmt = $this->pdo->prepare("SELECT user_id FROM posts WHERE post_id = ?");
+                        $stmt->execute([$report['post_id']]);
+                        $userIdToSuspend = $stmt->fetchColumn();
+                    } elseif ($report['comment_id']) {
+                        $stmt = $this->pdo->prepare("SELECT user_id FROM comments WHERE comment_id = ?");
+                        $stmt->execute([$report['comment_id']]);
+                        $userIdToSuspend = $stmt->fetchColumn();
+                    } elseif ($report['reply_id']) {
+                        $stmt = $this->pdo->prepare("SELECT user_id FROM replies WHERE reply_id = ?");
+                        $stmt->execute([$report['reply_id']]);
+                        $userIdToSuspend = $stmt->fetchColumn();
+                    }
+                }
+
+                if ($userIdToSuspend) {
+                    $this->pdo->prepare("CALL sp_admin_suspend_user(?)")->execute([$userIdToSuspend]);
+                }
+            }
+
+            // Always resolve the report at the end
+            return $this->resolveReport($reportId, 'resolved');
+
+        } catch (PDOException $e) {
+            error_log("takeModerationAction error: " . $e->getMessage());
+            return false;
+        }
+    }
 }

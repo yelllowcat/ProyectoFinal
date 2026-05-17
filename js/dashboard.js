@@ -46,6 +46,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load initial table data
     fetchUsersWithMostPosts({ target: document.querySelector('.stat-btn.active') });
+    fetchReports();
+
+    const resolveForm = document.getElementById('resolve-report-form');
+    if (resolveForm) {
+        resolveForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const id = document.getElementById('resolve-report-id').value;
+            const action = document.getElementById('resolve-action').value;
+            
+            try {
+                const fd = new FormData();
+                fd.append('action', action);
+
+                const res = await fetch(`/admin/reports/${id}/resolve`, { 
+                    method: 'POST',
+                    body: fd
+                });
+                const json = await res.json();
+                if (json.success) {
+                    document.getElementById('resolve-report-modal').close();
+                    fetchReports();
+                } else {
+                    alert(json.message);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        });
+    }
 });
 
 // Animate numbers counting up
@@ -370,11 +399,6 @@ function fetchDataAndRenderTable(url, type, countField, countLabel) {
         .then(response => response.json())
         .then(data => {
             if (data.success && data.data) {
-                if (type === 'report') {
-                    renderReportTable(data.data);
-                    return;
-                }
-                
                 const normalized = data.data.map(item => {
                     item.count = item[countField];
                     return item;
@@ -457,30 +481,25 @@ function renderPostTable(data, countLabel) {
     });
 }
 
-window.fetchReports = function (event) {
-    updateActiveTab(event);
-    document.getElementById('tableTitle').innerText = 'Reportes Pendientes';
-    fetchDataAndRenderTable('/admin/reports', 'report', null, null);
+window.fetchReports = function () {
+    fetch('/admin/reports')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                renderReportTable(data.data);
+            }
+        })
+        .catch(error => console.error('Error fetching reports:', error));
 };
 
 function renderReportTable(data) {
-    const thead = document.getElementById('statsTableHeader');
-    thead.innerHTML = `
-        <tr>
-            <th>Id</th>
-            <th>Reportado Por</th>
-            <th>Razón</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    `;
-
-    const tbody = document.getElementById('statsTableBody');
+    const tbody = document.getElementById('reportsTableBody');
+    if (!tbody) return;
+    
     tbody.innerHTML = '';
 
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay reportes.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay reportes pendientes.</td></tr>';
         return;
     }
 
@@ -517,19 +536,10 @@ function renderReportTable(data) {
     });
 }
 
-window.resolveReport = async function(id) {
-    if (!confirm('¿Marcar este reporte como resuelto?')) return;
-    try {
-        const res = await fetch(`/admin/reports/${id}/resolve`, { method: 'POST' });
-        const json = await res.json();
-        if (json.success) {
-            fetchReports();
-        } else {
-            alert(json.message);
-        }
-    } catch (e) {
-        console.error(e);
-    }
+window.resolveReport = function(id) {
+    const modal = document.getElementById('resolve-report-modal');
+    document.getElementById('resolve-report-id').value = id;
+    modal.showModal();
 };
 
 window.deleteReport = async function(id) {
