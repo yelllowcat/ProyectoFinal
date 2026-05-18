@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
+
+
 -- TABLA posts
 CREATE TABLE IF NOT EXISTS posts (
     post_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -722,6 +724,23 @@ CREATE TABLE IF NOT EXISTS post_hashtags (
     FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
     FOREIGN KEY (hashtag_id) REFERENCES hashtags(hashtag_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+-- =====================================================
+-- PERFORMANCE INDEXES
+-- =====================================================
+
+-- Composite indexes for feed, profile, and comment queries
+CREATE INDEX idx_posts_active_created ON posts(active, created_at DESC);
+CREATE INDEX idx_posts_user_active_created ON posts(user_id, active, created_at DESC);
+CREATE INDEX idx_comments_post_active_created ON comments(post_id, active, created_at);
+
+-- Friend request lookups (hot path)
+CREATE INDEX idx_friend_requests_receiver ON friend_requests(receiver_id, status);
+CREATE INDEX idx_friend_requests_sender ON friend_requests(sender_id, status);
+
+-- FULLTEXT indexes for search (replace LIKE '%term%' full table scans)
+CREATE FULLTEXT INDEX idx_posts_content ON posts(content);
+CREATE FULLTEXT INDEX idx_users_search ON users(full_name, email);
 
 -- Procedimiento: obtener o crear hashtag
 DELIMITER $$

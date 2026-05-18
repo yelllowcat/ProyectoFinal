@@ -20,15 +20,22 @@ $likeModel = new LikeModel();
 $commentModel = new CommentModel();
 $friendModel = new FriendModel();
 
-$userPosts = $postModel->getPostsByUserId($userId);
 $currentUserId = getCurrentUserId();
 
-$totalLikes = 0;
-$postCount = count($userPosts);
+// Pagination for profile posts
+$page = max(1, (int) ($_GET['page'] ?? 1));
+$perPage = 20;
+$userPosts = $postModel->getPostsByUserIdPaginated($userId, $page, $perPage);
+$postCount = $postModel->countPostsByUserId($userId);
+$totalPages = (int) ceil($postCount / $perPage);
 
-foreach ($userPosts as $post) {
-    $totalLikes += $likeModel->getLikeCount($post['post_id']);
-}
+// Total likes across ALL user's posts (single query instead of N)
+$totalLikes = $likeModel->getTotalLikesForUser($userId);
+
+// Bulk fetch data for displayed posts (eliminates N+1 queries)
+$postIds = array_column($userPosts, 'post_id');
+$likedMap = $likeModel->bulkHasLiked($postIds, $currentUserId);
+$commentsMap = $commentModel->getFirstCommentsForPosts($postIds, 3);
 
 $isOwnProfile = ($userId == $currentUserId);
 $friendsCount = count($friendModel->getFriends($userId));
@@ -107,13 +114,14 @@ $safe_email = safe_output($user['email'] ?? '');
                 }
             } else {
                 foreach ($userPosts as $postData) {
-                    $likesCount = $likeModel->getLikeCount($postData['post_id']);
-                    $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
-                    $comments = $commentModel->getCommentsByPost($postData['post_id']);
-                    $commentsCount = $commentModel->getCommentCount($postData['post_id']);
+                    // Use pre-fetched bulk data (eliminates N+1 queries)
+                    $hasLiked = $likedMap[$postData['post_id']] ?? false;
+                    $likesCount = $postData['likes_count'] ?? 0;
+                    $comments = $commentsMap[$postData['post_id']] ?? [];
+                    $commentsCount = $postData['comments_count'] ?? 0;
 
                     $authorName = $postData['author_name'] ?? $safe_full_name;
-                    $authorPicture = $profilePicture; 
+                    $authorPicture = $profilePicture;
 
                     $safe_post_content = safe_output($postData['content'] ?? '');
 
@@ -136,6 +144,25 @@ $safe_email = safe_output($user['email'] ?? '');
 
                     echo $postComponent->render();
                 }
+
+                // Pagination controls for profile posts
+                if ($totalPages > 1):
+                ?>
+                <div class="pagination" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin: 30px 0; padding: 15px;">
+                    <?php if ($page > 1): ?>
+                        <a href="/profile/<?php echo $userId; ?>?page=<?php echo $page - 1; ?>" class="btn btn-primary" style="padding: 8px 16px; text-decoration: none;">&larr; Anterior</a>
+                    <?php endif; ?>
+
+                    <span style="color: #666; font-size: 14px;">
+                        P&aacute;gina <?php echo $page; ?> de <?php echo $totalPages; ?> (<?php echo $postCount; ?> publicaciones)
+                    </span>
+
+                    <?php if ($page < $totalPages): ?>
+                        <a href="/profile/<?php echo $userId; ?>?page=<?php echo $page + 1; ?>" class="btn btn-primary" style="padding: 8px 16px; text-decoration: none;">Siguiente &rarr;</a>
+                    <?php endif; ?>
+                </div>
+                <?php
+                endif;
             }
             ?>
         </div>

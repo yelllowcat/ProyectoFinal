@@ -38,15 +38,25 @@ class SearchController
         $friendModel = new FriendModel();
         $currentUserId = getCurrentUserId();
 
+        $friendshipMap = [];
+        $likedMap = [];
+
         if (!empty($query) && strlen($query) >= 2) {
             $results = $searchModel->search($query, $type ?: null);
             $totalResults = $searchModel->getTotalResults($results);
 
-            // Enrich users with friendship status
+            // Bulk enrich users with friendship status (eliminates N+1)
+            $userIds = array_column($results['users'], 'user_id');
+            $friendshipMap = $friendModel->bulkFriendshipStatus($currentUserId, $userIds);
             foreach ($results['users'] as &$user) {
-                $user['friendship_status'] = $friendModel->getFriendshipStatus($currentUserId, $user['user_id']);
+                $user['friendship_status'] = $friendshipMap[$user['user_id']] ?? 'none';
             }
             unset($user);
+
+            // Bulk pre-fetch like status for posts (eliminates N+1)
+            $postIds = array_column($results['posts'], 'post_id');
+            $likeModel = new LikeModel();
+            $likedMap = $likeModel->bulkHasLiked($postIds, $currentUserId);
         }
 
         // Always fetch trending hashtags for the widget
@@ -93,31 +103,33 @@ class SearchController
         $total = $searchModel->getTotalCount($query, $type, $dateFilter);
         $hasMore = ($page * $perPage) < $total;
 
-        // Enrich user results with friendship status
+        // Bulk enrich user results with friendship status (eliminates N+1)
         if ($type === 'users') {
+            $userIds = array_column($results['users'], 'user_id');
+            $friendshipMap = $friendModel->bulkFriendshipStatus($currentUserId, $userIds);
             foreach ($results['users'] as &$user) {
-                $user['friendship_status'] = $friendModel->getFriendshipStatus($currentUserId, $user['user_id']);
+                $user['friendship_status'] = $friendshipMap[$user['user_id']] ?? 'none';
             }
             unset($user);
         }
 
-        // Render posts HTML for JSON
+        // Render posts HTML for JSON using pre-fetched bulk data
         if ($type === 'posts') {
             $likeModel = new LikeModel();
-            $commentModel = new CommentModel();
-            $userModel = new UserModel();
+            $postIds = array_column($results['posts'], 'post_id');
+            $likedMap = $likeModel->bulkHasLiked($postIds, $currentUserId);
+
             $postsHtml = [];
             foreach ($results['posts'] as $postData) {
-                $postUser = $userModel->getUserById($postData['user_id']);
-                $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
-                $likesCount = $likeModel->getLikeCount($postData['post_id']);
-                $commentsCount = $commentModel->getCommentCount($postData['post_id']);
-                $authorPicture = getProfilePicture($postUser['profile_picture'] ?? '');
+                $hasLiked = $likedMap[$postData['post_id']] ?? false;
+                $likesCount = $postData['likes_count'] ?? 0;
+                $commentsCount = $postData['comments_count'] ?? 0;
+                $authorPicture = getProfilePicture($postData['author_picture'] ?? '');
 
                 $postComponent = new Post([
                     'id' => $postData['post_id'],
-                    'author' => $postUser['full_name'] ?? 'Usuario',
-                    'author_role' => $postUser['role'] ?? 'user',
+                    'author' => $postData['author_name'] ?? 'Usuario',
+                    'author_role' => $postData['author_role'] ?? 'user',
                     'date' => date('d/m/Y', strtotime($postData['created_at'])),
                     'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : '',
                     'image_alt' => 'Imagen del post',

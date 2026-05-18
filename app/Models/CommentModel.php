@@ -84,4 +84,47 @@ class CommentModel
             return false;
         }
     }
+
+    /**
+     * Bulk fetch the first N comments for multiple posts in a single query.
+     * Reduces N+1 comment queries to 1.
+     */
+    public function getFirstCommentsForPosts(array $postIds, int $limitPerPost = 3): array
+    {
+        if (empty($postIds)) {
+            return [];
+        }
+
+        try {
+            $placeholders = implode(',', array_fill(0, count($postIds), '?'));
+            $stmt = $this->pdo->prepare("
+                SELECT c.*, u.full_name, u.profile_picture,
+                    (SELECT COUNT(*) FROM replies r WHERE r.comment_id = c.comment_id AND r.active = 1) as reply_count
+                FROM comments c
+                JOIN users u ON c.user_id = u.user_id
+                WHERE c.post_id IN ($placeholders) AND c.active = 1
+                ORDER BY c.post_id, c.created_at ASC
+            ");
+            $stmt->execute($postIds);
+            $allComments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Group by post_id and limit per post in PHP (MySQL 5.7 compatible)
+            $grouped = [];
+            $counts = [];
+            foreach ($allComments as $row) {
+                $pid = $row['post_id'];
+                if (!isset($counts[$pid])) {
+                    $counts[$pid] = 0;
+                }
+                if ($counts[$pid] < $limitPerPost) {
+                    $grouped[$pid][] = $row;
+                    $counts[$pid]++;
+                }
+            }
+            return $grouped;
+        } catch (PDOException $e) {
+            error_log("getFirstCommentsForPosts error: " . $e->getMessage());
+            return [];
+        }
+    }
 }

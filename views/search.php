@@ -2,14 +2,12 @@
 namespace App\views;
 
 use App\Components\Post;
-use App\Models\LikeModel;
-use App\Models\CommentModel;
-use App\Models\UserModel;
 
-$likeModel = new LikeModel();
-$commentModel = new CommentModel();
-$userModel = new UserModel();
 $currentUserId = getCurrentUserId();
+
+// These maps are pre-fetched by SearchController in bulk (eliminates N+1 queries)
+$likedMap = $likedMap ?? [];
+$friendshipMap = $friendshipMap ?? [];
 
 // Determine active tab
 $activeTab = $type ?: 'all';
@@ -217,17 +215,17 @@ function buildTabUrl(string $query, string $type, string $sort, string $date): s
                                 </h3>
                                 <div class="search-posts-list">
                                     <?php foreach ($shownPosts as $postData):
-                                        $postUser = $userModel->getUserById($postData['user_id']);
-                                        $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
-                                        $likesCount = $likeModel->getLikeCount($postData['post_id']);
-                                        $commentsCount = $commentModel->getCommentCount($postData['post_id']);
-                                        $authorPicture = getProfilePicture($postUser['profile_picture'] ?? '');
+                                        // Use pre-fetched bulk data (eliminates N+1 queries)
+                                        $hasLiked = $likedMap[$postData['post_id']] ?? false;
+                                        $likesCount = $postData['likes_count'] ?? 0;
+                                        $commentsCount = $postData['comments_count'] ?? 0;
+                                        $authorPicture = getProfilePicture($postData['author_picture'] ?? '');
                                     ?>
                                         <?php
                                         $postComponent = new Post([
                                             'id' => $postData['post_id'],
-                                            'author' => $postUser['full_name'] ?? 'Usuario',
-                                            'author_role' => $postUser['role'] ?? 'user',
+                                            'author' => $postData['author_name'] ?? 'Usuario',
+                                            'author_role' => $postData['author_role'] ?? 'user',
                                             'date' => date('d/m/Y', strtotime($postData['created_at'])),
                                             'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : '',
                                             'image_alt' => 'Imagen del post',
@@ -322,17 +320,17 @@ function buildTabUrl(string $query, string $type, string $sort, string $date): s
                         elseif ($activeTab === 'posts'):
                             if (!empty($results['posts'])):
                                 foreach ($results['posts'] as $postData):
-                                    $postUser = $userModel->getUserById($postData['user_id']);
-                                    $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
-                                    $likesCount = $likeModel->getLikeCount($postData['post_id']);
-                                    $commentsCount = $commentModel->getCommentCount($postData['post_id']);
-                                    $authorPicture = getProfilePicture($postUser['profile_picture'] ?? '');
+                                    // Use pre-fetched bulk data (eliminates N+1 queries)
+                                    $hasLiked = $likedMap[$postData['post_id']] ?? false;
+                                    $likesCount = $postData['likes_count'] ?? 0;
+                                    $commentsCount = $postData['comments_count'] ?? 0;
+                                    $authorPicture = getProfilePicture($postData['author_picture'] ?? '');
                         ?>
                             <?php
                             $postComponent = new Post([
                                 'id' => $postData['post_id'],
-                                'author' => $postUser['full_name'] ?? 'Usuario',
-                                'author_role' => $postUser['role'] ?? 'user',
+                                'author' => $postData['author_name'] ?? 'Usuario',
+                                'author_role' => $postData['author_role'] ?? 'user',
                                 'date' => date('d/m/Y', strtotime($postData['created_at'])),
                                 'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : '',
                                 'image_alt' => 'Imagen del post',

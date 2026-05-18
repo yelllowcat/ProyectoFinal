@@ -46,6 +46,35 @@ class PostModel
         }
     }
 
+    public function getAllPostsPaginated(int $page = 1, int $perPage = 20): array
+    {
+        try {
+            $offset = ($page - 1) * $perPage;
+            $stmt = $this->pdo->prepare("
+                SELECT * FROM v_posts_stats
+                ORDER BY created_at DESC
+                LIMIT ? OFFSET ?
+            ");
+            $stmt->execute([$perPage, $offset]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("getAllPostsPaginated error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getTotalPostsCount(): int
+    {
+        try {
+            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM posts WHERE active = 1");
+            $stmt->execute();
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("getTotalPostsCount error: " . $e->getMessage());
+            return 0;
+        }
+    }
+
 
     public function getPostById($postId)
     {
@@ -109,6 +138,36 @@ class PostModel
         } catch (PDOException $e) {
             error_log("getPostsByUserId error: " . $e->getMessage());
             return [];
+        }
+    }
+
+    public function getPostsByUserIdPaginated(int $userId, int $page = 1, int $perPage = 20): array
+    {
+        try {
+            $offset = ($page - 1) * $perPage;
+            $stmt = $this->pdo->prepare("
+                SELECT * FROM v_posts_stats
+                WHERE user_id = ?
+                ORDER BY created_at DESC
+                LIMIT ? OFFSET ?
+            ");
+            $stmt->execute([$userId, $perPage, $offset]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("getPostsByUserIdPaginated error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function countPostsByUserId(int $userId): int
+    {
+        try {
+            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM posts WHERE user_id = ? AND active = 1");
+            $stmt->execute([$userId]);
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("countPostsByUserId error: " . $e->getMessage());
+            return 0;
         }
     }
 

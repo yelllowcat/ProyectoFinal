@@ -99,4 +99,52 @@ class LikeModel
             return [];
         }
     }
+
+    /**
+     * Get total likes count across all active posts by a specific user.
+     */
+    public function getTotalLikesForUser(int $userId): int
+    {
+        try {
+            $stmt = $this->pdo->prepare("
+                SELECT COUNT(*) FROM likes l
+                JOIN posts p ON l.post_id = p.post_id
+                WHERE p.user_id = ? AND p.active = 1
+            ");
+            $stmt->execute([$userId]);
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("getTotalLikesForUser error: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Bulk check if user has liked multiple posts in a single query.
+     * Reduces N+1 queries to 1.
+     */
+    public function bulkHasLiked(array $postIds, int $userId): array
+    {
+        if (empty($postIds)) {
+            return [];
+        }
+
+        try {
+            $placeholders = implode(',', array_fill(0, count($postIds), '?'));
+            $stmt = $this->pdo->prepare("
+                SELECT post_id FROM likes
+                WHERE user_id = ? AND post_id IN ($placeholders)
+            ");
+            $stmt->execute(array_merge([$userId], $postIds));
+
+            $liked = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $liked[$row['post_id']] = true;
+            }
+            return $liked;
+        } catch (PDOException $e) {
+            error_log("bulkHasLiked error: " . $e->getMessage());
+            return [];
+        }
+    }
 }

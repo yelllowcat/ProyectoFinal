@@ -71,15 +71,33 @@ class SearchModel
         }
 
         try {
-            $stmt = $this->pdo->prepare("
-                SELECT user_id, full_name, profile_picture, biography, role, registration_date
-                FROM users
-                WHERE active = 1
-                AND (full_name LIKE ? OR email LIKE ?)
-                ORDER BY {$orderBy}
-                LIMIT ? OFFSET ?
-            ");
-            $stmt->execute([$searchTerm, $searchTerm, $limit, $offset]);
+            $rawTerm = trim(str_replace('%', '', $searchTerm));
+            $useFulltext = strlen($rawTerm) >= 4;
+
+            if ($useFulltext) {
+                $fulltextTerm = '*' . $rawTerm . '*';
+                $stmt = $this->pdo->prepare("
+                    SELECT user_id, full_name, profile_picture, biography, role, registration_date
+                    FROM users
+                    WHERE active = 1
+                    AND MATCH(full_name, email) AGAINST(? IN BOOLEAN MODE)
+                    ORDER BY {$orderBy}
+                    LIMIT ? OFFSET ?
+                ");
+                $stmt->execute([$fulltextTerm, $limit, $offset]);
+            } else {
+                // Fallback to LIKE for short terms
+                $likeTerm = '%' . $rawTerm . '%';
+                $stmt = $this->pdo->prepare("
+                    SELECT user_id, full_name, profile_picture, biography, role, registration_date
+                    FROM users
+                    WHERE active = 1
+                    AND (full_name LIKE ? OR email LIKE ?)
+                    ORDER BY {$orderBy}
+                    LIMIT ? OFFSET ?
+                ");
+                $stmt->execute([$likeTerm, $likeTerm, $limit, $offset]);
+            }
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("searchUsers error: " . $e->getMessage());
@@ -90,11 +108,24 @@ class SearchModel
     private function countUsers(string $searchTerm): int
     {
         try {
-            $stmt = $this->pdo->prepare("
-                SELECT COUNT(*) FROM users
-                WHERE active = 1 AND (full_name LIKE ? OR email LIKE ?)
-            ");
-            $stmt->execute([$searchTerm, $searchTerm]);
+            $rawTerm = trim(str_replace('%', '', $searchTerm));
+            $useFulltext = strlen($rawTerm) >= 4;
+
+            if ($useFulltext) {
+                $fulltextTerm = '*' . $rawTerm . '*';
+                $stmt = $this->pdo->prepare("
+                    SELECT COUNT(*) FROM users
+                    WHERE active = 1 AND MATCH(full_name, email) AGAINST(? IN BOOLEAN MODE)
+                ");
+                $stmt->execute([$fulltextTerm]);
+            } else {
+                $likeTerm = '%' . $rawTerm . '%';
+                $stmt = $this->pdo->prepare("
+                    SELECT COUNT(*) FROM users
+                    WHERE active = 1 AND (full_name LIKE ? OR email LIKE ?)
+                ");
+                $stmt->execute([$likeTerm, $likeTerm]);
+            }
             return (int) $stmt->fetchColumn();
         } catch (PDOException $e) {
             error_log("countUsers error: " . $e->getMessage());
@@ -110,24 +141,47 @@ class SearchModel
         } elseif ($sort === 'comments') {
             $orderBy = 'comment_count DESC, created_at DESC';
         } elseif ($sort === 'relevance') {
-            $orderBy = 'created_at DESC';
+            // Use FULLTEXT relevance score when available
+            $rawTerm = trim(str_replace('%', '', $searchTerm));
+            if (strlen($rawTerm) >= 4) {
+                $orderBy = 'MATCH(content) AGAINST(? IN BOOLEAN MODE) DESC, created_at DESC';
+            }
         }
 
         $dateWhere = $this->buildDateFilter($dateFilter, 'created_at');
 
         try {
-            $stmt = $this->pdo->prepare("
-                SELECT *
-                FROM v_posts_stats
-                WHERE content LIKE :term
-                {$dateWhere}
-                ORDER BY {$orderBy}
-                LIMIT :limit OFFSET :offset
-            ");
-            $stmt->bindValue(':term', $searchTerm, PDO::PARAM_STR);
-            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-            $stmt->execute();
+            $rawTerm = trim(str_replace('%', '', $searchTerm));
+            $useFulltext = strlen($rawTerm) >= 4;
+
+            if ($useFulltext) {
+                $fulltextTerm = '*' . $rawTerm . '*';
+                $stmt = $this->pdo->prepare("
+                    SELECT *
+                    FROM v_posts_stats
+                    WHERE MATCH(content) AGAINST(? IN BOOLEAN MODE)
+                    {$dateWhere}
+                    ORDER BY {$orderBy}
+                    LIMIT ? OFFSET ?
+                ");
+                $params = [$fulltextTerm, $limit, $offset];
+                if ($sort === 'relevance' && strpos($orderBy, 'MATCH') !== false) {
+                    // Re-bind the term for the ORDER BY clause
+                    $params = [$fulltextTerm, $fulltextTerm, $limit, $offset];
+                }
+                $stmt->execute($params);
+            } else {
+                $likeTerm = '%' . $rawTerm . '%';
+                $stmt = $this->pdo->prepare("
+                    SELECT *
+                    FROM v_posts_stats
+                    WHERE content LIKE ?
+                    {$dateWhere}
+                    ORDER BY {$orderBy}
+                    LIMIT ? OFFSET ?
+                ");
+                $stmt->execute([$likeTerm, $limit, $offset]);
+            }
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("searchPosts error: " . $e->getMessage());
@@ -139,11 +193,24 @@ class SearchModel
     {
         $dateWhere = $this->buildDateFilter($dateFilter, 'created_at');
         try {
-            $stmt = $this->pdo->prepare("
-                SELECT COUNT(*) FROM v_posts_stats
-                WHERE content LIKE :term {$dateWhere}
-            ");
-            $stmt->execute([':term' => $searchTerm]);
+            $rawTerm = trim(str_replace('%', '', $searchTerm));
+            $useFulltext = strlen($rawTerm) >= 4;
+
+            if ($useFulltext) {
+                $fulltextTerm = '*' . $rawTerm . '*';
+                $stmt = $this->pdo->prepare("
+                    SELECT COUNT(*) FROM v_posts_stats
+                    WHERE MATCH(content) AGAINST(? IN BOOLEAN MODE) {$dateWhere}
+                ");
+                $stmt->execute([$fulltextTerm]);
+            } else {
+                $likeTerm = '%' . $rawTerm . '%';
+                $stmt = $this->pdo->prepare("
+                    SELECT COUNT(*) FROM v_posts_stats
+                    WHERE content LIKE ? {$dateWhere}
+                ");
+                $stmt->execute([$likeTerm]);
+            }
             return (int) $stmt->fetchColumn();
         } catch (PDOException $e) {
             error_log("countPosts error: " . $e->getMessage());

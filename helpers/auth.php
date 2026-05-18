@@ -183,11 +183,12 @@ function safe_output($data)
 function getProfilePicture($filename)
 {
     $imagePath = $_SERVER['DOCUMENT_ROOT'] . "/assets/imagesProfile/{$filename}";
-    $defaultImage = "/assets/imagesProfile/default_avatar.png?v=" . time();
+    $defaultPath = $_SERVER['DOCUMENT_ROOT'] . "/assets/imagesProfile/default_avatar.png";
+    $defaultImage = "/assets/imagesProfile/default_avatar.png?v=" . (file_exists($defaultPath) ? filemtime($defaultPath) : time());
 
     if (empty($filename) || !file_exists($imagePath)) {
         return $defaultImage;
     }
 
-    return "/assets/imagesProfile/{$filename}?v=" . time();
+    return "/assets/imagesProfile/{$filename}?v=" . filemtime($imagePath);
 }

@@ -264,4 +264,58 @@ class FriendModel
 
         return 'none';
     }
+
+    /**
+     * Bulk fetch friendship status for multiple users in 3 queries instead of N*3.
+     * Returns an associative array: [user_id => 'friends'|'pending_sent'|'pending_received'|'none']
+     */
+    public function bulkFriendshipStatus(int $currentUserId, array $userIds): array
+    {
+        if (empty($userIds)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+        $statusMap = [];
+
+        // Initialize all as 'none'
+        foreach ($userIds as $uid) {
+            $statusMap[$uid] = 'none';
+        }
+
+        // 1. Check existing friendships
+        $stmt = $this->pdo->prepare("
+            SELECT user_id1, user_id2 FROM friends
+            WHERE (user_id1 = ? AND user_id2 IN ($placeholders))
+               OR (user_id2 = ? AND user_id1 IN ($placeholders))
+        ");
+        $params = array_merge([$currentUserId], $userIds, [$currentUserId], $userIds);
+        $stmt->execute($params);
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $otherId = ($row['user_id1'] == $currentUserId) ? $row['user_id2'] : $row['user_id1'];
+            $statusMap[$otherId] = 'friends';
+        }
+
+        // 2. Check pending sent (current user sent request)
+        $stmt = $this->pdo->prepare("
+            SELECT receiver_id FROM friend_requests
+            WHERE sender_id = ? AND receiver_id IN ($placeholders) AND status = 'pending'
+        ");
+        $stmt->execute(array_merge([$currentUserId], $userIds));
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $statusMap[$row['receiver_id']] = 'pending_sent';
+        }
+
+        // 3. Check pending received (other user sent request to current user)
+        $stmt = $this->pdo->prepare("
+            SELECT sender_id FROM friend_requests
+            WHERE receiver_id = ? AND sender_id IN ($placeholders) AND status = 'pending'
+        ");
+        $stmt->execute(array_merge([$currentUserId], $userIds));
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            $statusMap[$row['sender_id']] = 'pending_received';
+        }
+
+        return $statusMap;
+    }
 }

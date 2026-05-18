@@ -21,13 +21,21 @@ class HashtagController
         }
 
         $hashtagModel = new HashtagModel();
-        $postsData = $hashtagModel->getPostsByHashtag($tag);
-        $postCount = count($postsData);
+        $currentUserId = getCurrentUserId();
 
+        // Pagination for hashtag posts
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $perPage = 20;
+        $postsData = $hashtagModel->getPostsByHashtagPaginated($tag, $page, $perPage);
+        $postCount = $hashtagModel->countPostsByHashtag($tag);
+        $totalPages = (int) ceil($postCount / $perPage);
+
+        // Bulk fetch data for all posts (eliminates N+1 queries)
+        $postIds = array_column($postsData, 'post_id');
         $likeModel = new LikeModel();
         $commentModel = new CommentModel();
-        $userModel = new UserModel();
-        $currentUserId = getCurrentUserId();
+        $likedMap = $likeModel->bulkHasLiked($postIds, $currentUserId);
+        $commentsMap = $commentModel->getFirstCommentsForPosts($postIds, 3);
 
         require __DIR__ . '/../../views/hashtag.php';
     }

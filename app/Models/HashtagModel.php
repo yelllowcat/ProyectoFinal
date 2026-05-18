@@ -122,6 +122,58 @@ class HashtagModel
         }
     }
 
+    public function getPostsByHashtagPaginated(string $name, int $page = 1, int $perPage = 20): array
+    {
+        try {
+            $offset = ($page - 1) * $perPage;
+            $stmt = $this->pdo->prepare("
+                SELECT p.*, u.full_name AS author_name, u.profile_picture AS author_picture, u.email AS author_email,
+                       IFNULL(l.likes_count, 0) AS likes_count,
+                       IFNULL(c.comments_count, 0) AS comments_count
+                FROM posts p
+                INNER JOIN users u ON p.user_id = u.user_id
+                INNER JOIN post_hashtags ph ON p.post_id = ph.post_id
+                INNER JOIN hashtags h ON ph.hashtag_id = h.hashtag_id
+                LEFT JOIN (
+                    SELECT post_id, COUNT(*) AS likes_count FROM likes GROUP BY post_id
+                ) l ON p.post_id = l.post_id
+                LEFT JOIN (
+                    SELECT post_id, COUNT(*) AS comments_count FROM comments WHERE active = 1 GROUP BY post_id
+                ) c ON p.post_id = c.post_id
+                WHERE h.name = LOWER(:name)
+                  AND p.active = 1
+                ORDER BY p.created_at DESC
+                LIMIT :limit OFFSET :offset
+            ");
+            $stmt->bindValue(':name', strtolower(trim($name)), PDO::PARAM_STR);
+            $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("getPostsByHashtagPaginated error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function countPostsByHashtag(string $name): int
+    {
+        try {
+            $stmt = $this->pdo->prepare("
+                SELECT COUNT(DISTINCT p.post_id)
+                FROM posts p
+                INNER JOIN post_hashtags ph ON p.post_id = ph.post_id
+                INNER JOIN hashtags h ON ph.hashtag_id = h.hashtag_id
+                WHERE h.name = LOWER(:name) AND p.active = 1
+            ");
+            $stmt->execute([':name' => strtolower(trim($name))]);
+            return (int) $stmt->fetchColumn();
+        } catch (PDOException $e) {
+            error_log("countPostsByHashtag error: " . $e->getMessage());
+            return 0;
+        }
+    }
+
     public function getTrendingHashtags(int $limit = 10): array
     {
         try {
