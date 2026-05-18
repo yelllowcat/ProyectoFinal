@@ -65,6 +65,22 @@ $profilePicture = getProfilePicture($user['profile_picture']);
           <div class="action-buttons">
             <button type="submit" class="btn btn-primary btn-post">Publicar</button>
           </div>
+
+          <div class="predefined-hashtags-section">
+            <div class="predefined-hashtags-title">Etiquetas sugeridas</div>
+            <div class="predefined-hashtags-list" id="predefinedHashtagsList">
+              <button type="button" class="predefined-hashtag-pill" data-tag="noticia">#noticia</button>
+              <button type="button" class="predefined-hashtag-pill" data-tag="pregunta">#pregunta</button>
+              <button type="button" class="predefined-hashtag-pill" data-tag="evento">#evento</button>
+              <button type="button" class="predefined-hashtag-pill" data-tag="opinion">#opinion</button>
+              <button type="button" class="predefined-hashtag-pill" data-tag="tutorial">#tutorial</button>
+              <button type="button" class="predefined-hashtag-pill" data-tag="general">#general</button>
+            </div>
+            <div class="selected-hashtags-area" id="selectedHashtagsArea" style="display: none;">
+              <div class="selected-hashtags-title">Seleccionadas</div>
+              <div class="selected-hashtags-list" id="selectedHashtagsList"></div>
+            </div>
+          </div>
         </div>
       </form>
     </div>
@@ -103,6 +119,83 @@ $profilePicture = getProfilePicture($user['profile_picture']);
       background: rgba(220, 53, 69, 0.9);
     }
   </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const textarea = document.getElementById('postText');
+      const predefinedList = document.getElementById('predefinedHashtagsList');
+      const selectedArea = document.getElementById('selectedHashtagsArea');
+      const selectedList = document.getElementById('selectedHashtagsList');
+      const selectedHashtags = new Set();
+
+      if (!predefinedList || !textarea) return;
+
+      predefinedList.addEventListener('click', function(e) {
+        const pill = e.target.closest('.predefined-hashtag-pill');
+        if (!pill) return;
+
+        const tag = pill.dataset.tag;
+        if (selectedHashtags.has(tag)) return;
+
+        // Add to selected set
+        selectedHashtags.add(tag);
+        pill.classList.add('selected');
+
+        // Append to textarea if not already present
+        const tagText = '#' + tag;
+        const regex = new RegExp('(^|\\s)' + tagText + '(\\s|$)', 'i');
+        if (!regex.test(textarea.value)) {
+          const separator = textarea.value.length > 0 && !textarea.value.endsWith(' ') ? ' ' : '';
+          textarea.value += separator + tagText + ' ';
+        }
+
+        updateCounter();
+        renderSelectedHashtags();
+      });
+
+      selectedList.addEventListener('click', function(e) {
+        const removeBtn = e.target.closest('.remove-hashtag-btn');
+        if (!removeBtn) return;
+
+        const tag = removeBtn.dataset.tag;
+        if (!tag) return;
+
+        // Remove from selected set
+        selectedHashtags.delete(tag);
+
+        // Unmark predefined pill
+        const pill = predefinedList.querySelector('.predefined-hashtag-pill[data-tag="' + tag + '"]');
+        if (pill) pill.classList.remove('selected');
+
+        // Remove from textarea
+        const tagText = '#' + tag;
+        const regex = new RegExp('(^|\\s)' + tagText + '(\\s|$)', 'g');
+        textarea.value = textarea.value.replace(regex, ' ').replace(/\s+/g, ' ').trim();
+        if (textarea.value.length > 0) textarea.value += ' ';
+
+        updateCounter();
+        renderSelectedHashtags();
+      });
+
+      function renderSelectedHashtags() {
+        selectedList.innerHTML = '';
+
+        if (selectedHashtags.size === 0) {
+          selectedArea.style.display = 'none';
+          return;
+        }
+
+        selectedArea.style.display = 'block';
+        selectedHashtags.forEach(function(tag) {
+          const tagEl = document.createElement('div');
+          tagEl.className = 'selected-hashtag-tag';
+          tagEl.innerHTML = '<span>#' + tag + '</span>' +
+            '<button type="button" class="remove-hashtag-btn" data-tag="' + tag + '" title="Quitar etiqueta">&times;</button>';
+          selectedList.appendChild(tagEl);
+        });
+      }
+    });
+  </script>
 </body>
 
 </html>
