@@ -22,6 +22,7 @@ class PdfController
             'users_most_friends' => $this->adminModel->getUsersWithMostFriends(),
             'posts_most_comments' => $this->adminModel->getPostsWithMostComments(),
             'posts_most_likes' => $this->adminModel->getPostsWithMostLikes(),
+            'top_hashtags' => $this->adminModel->getTopHashtags(10, 'posts'),
             'generated_date' => date('d/m/Y H:i:s')
         ];
 
@@ -64,6 +65,8 @@ class PdfController
         $pdf->AddPage();
 
         $this->addPostsMostLikes($pdf, $stats['posts_most_likes']);
+
+        $this->addTopHashtags($pdf, $stats['top_hashtags']);
 
         $pdf->Output('estadisticas_unired_' . date('Y-m-d') . '.pdf', 'D');
     }
@@ -269,6 +272,47 @@ class PdfController
             $pdf->Cell(70, 7, $this->truncateText($post['content'], 40), 1, 0, 'L', $fill);
             $pdf->Cell(25, 7, $post['like_count'], 1, 0, 'C', $fill);
             $pdf->Cell(30, 7, date('d/m/Y', strtotime($post['created_at'])), 1, 1, 'C', $fill);
+            $fill = !$fill;
+        }
+
+        $pdf->Ln(5);
+    }
+
+    private function addTopHashtags($pdf, $hashtags)
+    {
+        $pdf->SetFont('helvetica', 'B', 14);
+        $pdf->Cell(0, 10, '5. Hashtags más Usados', 0, 1, 'L');
+        $pdf->SetLineWidth(0.3);
+        $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
+        $pdf->Ln(5);
+
+        if (empty($hashtags)) {
+            $pdf->SetFont('helvetica', '', 10);
+            $pdf->Cell(0, 6, 'No hay datos disponibles.', 0, 1, 'C');
+            return;
+        }
+
+        $pdf->SetFont('helvetica', 'B', 10);
+        $pdf->SetFillColor(0, 0, 0);
+        $pdf->SetTextColor(255, 255, 255);
+
+        $pdf->Cell(10, 8, '#', 1, 0, 'C', true);
+        $pdf->Cell(60, 8, 'Hashtag', 1, 0, 'C', true);
+        $pdf->Cell(35, 8, 'Publicaciones', 1, 0, 'C', true);
+        $pdf->Cell(35, 8, 'Likes', 1, 0, 'C', true);
+        $pdf->Cell(35, 8, 'Comentarios', 1, 1, 'C', true);
+
+        $pdf->SetFont('helvetica', '', 9);
+        $pdf->SetTextColor(0, 0, 0);
+
+        $fill = false;
+        foreach ($hashtags as $index => $tag) {
+            $pdf->SetFillColor($fill ? 245 : 255, $fill ? 245 : 255, $fill ? 245 : 255);
+            $pdf->Cell(10, 7, $index + 1, 1, 0, 'C', $fill);
+            $pdf->Cell(60, 7, '#' . $this->truncateText($tag['name'], 30), 1, 0, 'L', $fill);
+            $pdf->Cell(35, 7, $tag['post_count'], 1, 0, 'C', $fill);
+            $pdf->Cell(35, 7, $tag['total_likes'], 1, 0, 'C', $fill);
+            $pdf->Cell(35, 7, $tag['total_comments'], 1, 1, 'C', $fill);
             $fill = !$fill;
         }
 

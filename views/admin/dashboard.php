@@ -58,6 +58,12 @@ namespace App\views\admin;
                         <p class="summary-value" id="summary-friendships">0</p>
                     </div>
                 </div>
+                <div class="summary-card card-orange">
+                    <div class="summary-info">
+                        <h4 class="summary-title">Hashtags</h4>
+                        <p class="summary-value" id="summary-hashtags">0</p>
+                    </div>
+                </div>
             </div>
             </div>
 
@@ -74,6 +80,9 @@ namespace App\views\admin;
                 </button>
                 <button class="stat-btn" onclick="fetchPostsWithMostLikes(event)">
                     Posts con más likes
+                </button>
+                <button class="stat-btn" onclick="fetchTopHashtags(event)">
+                    Hashtags más usados
                 </button>
             </div>
 
@@ -176,13 +185,19 @@ namespace App\views\admin;
                 <button class="chart-tab active" onclick="switchChartTab('actividad')">Actividad</button>
                 <button class="chart-tab" onclick="switchChartTab('usuarios')">Usuarios</button>
                 <button class="chart-tab" onclick="switchChartTab('interacciones')">Interacciones</button>
+                <button class="chart-tab" onclick="switchChartTab('hashtags')">Hashtags</button>
             </div>
 
             <!-- Charts Grid -->
             <div class="charts-grid">
                 <div class="chart-panel">
-                    <div class="panel-header">
+                    <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <h3 id="chartATitle">Publicaciones por día</h3>
+                        <div class="hashtag-toggles" id="hashtagToggles" style="display:none;">
+                            <button class="heatmap-toggle" onclick="switchHashtagRange(7, this)">7 días</button>
+                            <button class="heatmap-toggle active" onclick="switchHashtagRange(30, this)">30 días</button>
+                            <button class="heatmap-toggle" onclick="switchHashtagRange(90, this)">90 días</button>
+                        </div>
                     </div>
                     <div class="chart-container" style="height: 300px;">
                         <canvas id="chartA"></canvas>

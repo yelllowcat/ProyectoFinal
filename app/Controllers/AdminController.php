@@ -111,4 +111,33 @@ class AdminController
         $data = $this->adminModel->getTopEngagedUsers();
         jsonSuccess($data);
     }
+
+    public function getHashtagSummary()
+    {
+        requireAdmin();
+        $total = $this->adminModel->getTotalHashtags();
+        jsonSuccess(['total_hashtags' => $total]);
+    }
+
+    public function getTopHashtags()
+    {
+        requireAdmin();
+        $sort = clean_input($_GET['sort'] ?? 'posts');
+        if (!in_array($sort, ['posts', 'likes', 'comments'])) {
+            $sort = 'posts';
+        }
+        $data = $this->adminModel->getTopHashtags(10, $sort);
+        jsonSuccess($data);
+    }
+
+    public function getHashtagTrend()
+    {
+        requireAdmin();
+        $range = (int) ($_GET['range'] ?? 30);
+        if (!in_array($range, [7, 30, 90])) {
+            $range = 30;
+        }
+        $data = $this->adminModel->getHashtagTrend(5, $range);
+        jsonSuccess($data);
+    }
 }

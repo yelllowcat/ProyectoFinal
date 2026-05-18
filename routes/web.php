@@ -167,6 +167,10 @@ $router->get('/admin/stats/post-image-ratio', [AdminController::class, 'getPostI
 $router->get('/admin/stats/top-engaged-users', [AdminController::class, 'getTopEngagedUsers']);
 $router->get('/admin/stats/peak-usage', [AdminController::class, 'getPeakUsageHeatmap']);
 
+$router->get('/admin/stats/hashtag-summary', [AdminController::class, 'getHashtagSummary']);
+$router->get('/admin/stats/top-hashtags', [AdminController::class, 'getTopHashtags']);
+$router->get('/admin/stats/hashtag-trend', [AdminController::class, 'getHashtagTrend']);
+
 $router->get('/dashboard', function () {
     requireAuth();
     requireAdmin();

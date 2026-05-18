@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Fetch new endpoints
     fetchSummaryStats();
+    fetchHashtagSummary();
     fetchActivityTimeline();
     fetchPeakUsageHeatmap('30');
     switchChartTab('actividad');
@@ -194,8 +195,14 @@ function switchChartTab(tab) {
     currentTab = tab;
     document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.chart-tab').forEach(t => {
-        if (t.textContent.trim().toLowerCase() === tab) t.classList.add('active');
+        const tabText = t.textContent.trim().toLowerCase();
+        if (tabText === tab || (tab === 'hashtags' && tabText === 'hashtags')) t.classList.add('active');
     });
+
+    const hashtagToggles = document.getElementById('hashtagToggles');
+    if (hashtagToggles) {
+        hashtagToggles.style.display = tab === 'hashtags' ? 'flex' : 'none';
+    }
 
     if (tab === 'actividad') {
         fetchPostsByDayOfWeek();
@@ -206,6 +213,9 @@ function switchChartTab(tab) {
     } else if (tab === 'interacciones') {
         fetchEngagementBreakdown();
         fetchTopEngagedUsers();
+    } else if (tab === 'hashtags') {
+        fetchHashtagTrend(30);
+        fetchTopHashtagsForChart();
     }
 }
 
@@ -300,6 +310,7 @@ function renderChartA(type, labels, dataArray, titleText, bgColors, horizontal) 
     if (chartAInstance) chartAInstance.destroy();
 
     const datasets = [{
+        label: '',
         data: dataArray,
         backgroundColor: Array.isArray(bgColors) ? bgColors.slice(0, dataArray.length) : (type === 'doughnut' || type === 'pie' ? [colors.teal, colors.green, colors.pink, colors.yellow, colors.purple, colors.orange].slice(0, dataArray.length) : bgColors),
         borderWidth: type === 'doughnut' || type === 'pie' ? 1 : 0,
@@ -314,7 +325,7 @@ function renderChartA(type, labels, dataArray, titleText, bgColors, horizontal) 
             maintainAspectRatio: false,
             indexAxis: horizontal ? 'y' : 'x',
             plugins: {
-                legend: { position: type === 'doughnut' || type === 'pie' ? 'right' : 'top' }
+                legend: { display: type === 'doughnut' || type === 'pie', position: 'right' }
             },
             scales: type === 'bar' && !horizontal ? {
                 x: { grid: { display: false } },
@@ -335,6 +346,7 @@ function renderChartB(type, labels, dataArray, titleText, bgColors, horizontal) 
     if (chartBInstance) chartBInstance.destroy();
 
     const datasets = [{
+        label: '',
         data: dataArray,
         backgroundColor: Array.isArray(bgColors) ? bgColors.slice(0, dataArray.length) : (type === 'doughnut' || type === 'pie' ? [colors.teal, colors.green, colors.pink, colors.yellow, colors.purple, colors.orange].slice(0, dataArray.length) : bgColors),
         borderWidth: type === 'doughnut' || type === 'pie' ? 1 : 0,
@@ -349,7 +361,7 @@ function renderChartB(type, labels, dataArray, titleText, bgColors, horizontal) 
             maintainAspectRatio: false,
             indexAxis: horizontal ? 'y' : 'x',
             plugins: {
-                legend: { position: type === 'doughnut' || type === 'pie' ? 'right' : 'top' }
+                legend: { display: type === 'doughnut' || type === 'pie', position: 'right' }
             },
             scales: type === 'bar' && !horizontal ? {
                 x: { grid: { display: false } },
@@ -643,3 +655,125 @@ function buildHeatmap(data) {
 }
 
 window.renderPostTable = renderPostTable;
+
+// Hashtag Analytics
+function fetchHashtagSummary() {
+    fetch('/admin/stats/hashtag-summary')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                const el = document.getElementById('summary-hashtags');
+                if (el) animateValue(el, 0, data.data.total_hashtags || 0, 1500);
+            }
+        })
+        .catch(error => console.error('Error fetching hashtag summary:', error));
+}
+
+window.fetchTopHashtags = function (event) {
+    updateActiveTab(event);
+    document.getElementById('tableTitle').innerText = 'Hashtags más usados';
+    fetch('/admin/stats/top-hashtags')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                renderHashtagTable(data.data);
+            }
+        })
+        .catch(error => console.error('Error fetching top hashtags:', error));
+};
+
+function renderHashtagTable(data) {
+    const thead = document.getElementById('statsTableHeader');
+    thead.innerHTML = `
+        <tr>
+            <th>Hashtag</th>
+            <th>Publicaciones</th>
+            <th>Likes</th>
+            <th>Comentarios</th>
+            <th>Acción</th>
+        </tr>
+    `;
+
+    const tbody = document.getElementById('statsTableBody');
+    tbody.innerHTML = '';
+
+    if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay datos disponibles.</td></tr>';
+        return;
+    }
+
+    data.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><strong>#${item.name}</strong></td>
+            <td style="font-weight:bold; color:${colors.teal}">${item.post_count}</td>
+            <td>${item.total_likes}</td>
+            <td>${item.total_comments}</td>
+            <td><button class="btn-view-profile-table" onclick="window.location.href='/hashtag/${encodeURIComponent(item.name)}'">Ver posts</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function fetchHashtagTrend(range = 30) {
+    fetch('/admin/stats/hashtag-trend?range=' + range)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                renderHashtagTrendChart(data.data);
+            }
+        })
+        .catch(error => console.error('Error fetching hashtag trend:', error));
+}
+
+function renderHashtagTrendChart(data) {
+    const ctx = document.getElementById('chartA');
+    if (!ctx) return;
+    document.getElementById('chartATitle').innerText = 'Tendencia de Hashtags';
+    if (chartAInstance) chartAInstance.destroy();
+
+    chartAInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.labels,
+            datasets: data.datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: { mode: 'index', intersect: false }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            },
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true, grid: { color: colors.gray } }
+            }
+        }
+    });
+}
+
+function fetchTopHashtagsForChart() {
+    fetch('/admin/stats/top-hashtags?sort=posts')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                const top5 = data.data.slice(0, 5);
+                const labels = top5.map(h => '#' + h.name);
+                const values = top5.map(h => parseInt(h.post_count));
+                renderChartB('bar', labels, values, 'Top Hashtags por Publicaciones', colors.teal, true);
+            }
+        })
+        .catch(error => console.error('Error fetching top hashtags for chart:', error));
+}
+
+window.switchHashtagRange = function(range, btn) {
+    document.querySelectorAll('.hashtag-toggles .heatmap-toggle').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    fetchHashtagTrend(range);
+};

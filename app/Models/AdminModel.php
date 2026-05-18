@@ -437,4 +437,120 @@ class AdminModel
             return [];
         }
     }
+
+    public function getTotalHashtags(): int
+    {
+        try {
+            $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM hashtags");
+            return (int) $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+        } catch (PDOException $e) {
+            error_log("getTotalHashtags error: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    public function getTopHashtags(int $limit = 10, string $sortBy = 'posts'): array
+    {
+        try {
+            $orderColumn = match ($sortBy) {
+                'likes' => 'total_likes',
+                'comments' => 'total_comments',
+                default => 'post_count',
+            };
+
+            $stmt = $this->pdo->prepare("
+                SELECT 
+                    h.hashtag_id,
+                    h.name,
+                    COUNT(DISTINCT p.post_id) as post_count,
+                    COUNT(DISTINCT l.like_id) as total_likes,
+                    COUNT(DISTINCT c.comment_id) as total_comments
+                FROM hashtags h
+                JOIN post_hashtags ph ON h.hashtag_id = ph.hashtag_id
+                JOIN posts p ON ph.post_id = p.post_id AND p.active = 1
+                LEFT JOIN likes l ON p.post_id = l.post_id
+                LEFT JOIN comments c ON p.post_id = c.post_id AND c.active = 1
+                GROUP BY h.hashtag_id, h.name
+                ORDER BY {$orderColumn} DESC, h.name ASC
+                LIMIT ?
+            ");
+            $stmt->execute([$limit]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("getTopHashtags error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getHashtagTrend(int $limit = 5, int $days = 30): array
+    {
+        try {
+            $stmt = $this->pdo->prepare("
+                SELECT 
+                    h.name,
+                    DATE(p.created_at) as date,
+                    COUNT(*) as count
+                FROM hashtags h
+                JOIN post_hashtags ph ON h.hashtag_id = ph.hashtag_id
+                JOIN posts p ON ph.post_id = p.post_id AND p.active = 1
+                WHERE p.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                  AND h.hashtag_id IN (
+                      SELECT hashtag_id FROM (
+                          SELECT h2.hashtag_id
+                          FROM hashtags h2
+                          JOIN post_hashtags ph2 ON h2.hashtag_id = ph2.hashtag_id
+                          JOIN posts p2 ON ph2.post_id = p2.post_id AND p2.active = 1
+                          WHERE p2.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY)
+                          GROUP BY h2.hashtag_id
+                          ORDER BY COUNT(*) DESC
+                          LIMIT ?
+                      ) top_tags
+                  )
+                GROUP BY h.hashtag_id, h.name, DATE(p.created_at)
+                ORDER BY h.name, date
+            ");
+            $stmt->execute([$days, $days, $limit]);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Build date range labels
+            $labels = [];
+            for ($i = $days - 1; $i >= 0; $i--) {
+                $labels[] = date('Y-m-d', strtotime("-{$i} days"));
+            }
+
+            // Group data by hashtag name
+            $hashtagData = [];
+            foreach ($rows as $row) {
+                $hashtagData[$row['name']][$row['date']] = (int) $row['count'];
+            }
+
+            $datasets = [];
+            $palette = ['#4db8c4', '#FF6384', '#FFCE56', '#9966FF', '#FF9F40'];
+            $idx = 0;
+            foreach ($hashtagData as $name => $dateMap) {
+                $data = [];
+                foreach ($labels as $date) {
+                    $data[] = $dateMap[$date] ?? 0;
+                }
+                $datasets[] = [
+                    'label' => '#' . $name,
+                    'data' => $data,
+                    'borderColor' => $palette[$idx % count($palette)],
+                    'backgroundColor' => 'transparent',
+                    'borderWidth' => 2,
+                    'tension' => 0.4,
+                    'pointRadius' => 3
+                ];
+                $idx++;
+            }
+
+            return [
+                'labels' => array_map(fn($d) => date('d/m', strtotime($d)), $labels),
+                'datasets' => $datasets
+            ];
+        } catch (PDOException $e) {
+            error_log("getHashtagTrend error: " . $e->getMessage());
+            return ['labels' => [], 'datasets' => []];
+        }
+    }
 }
