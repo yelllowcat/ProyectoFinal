@@ -1229,3 +1229,50 @@ function showDialogMessage(title, message) {
         dialog.remove();
     });
 }
+
+// ---------------------------------------------------
+// Enhanced Search Bar
+// ---------------------------------------------------
+
+document.addEventListener("DOMContentLoaded", function () {
+  const searchInput = document.getElementById("globalSearchInput");
+  const searchClear = document.getElementById("globalSearchClear");
+  const searchForm = document.getElementById("globalSearchForm");
+
+  if (searchInput && searchClear) {
+    function toggleClearButton() {
+      searchClear.style.display = searchInput.value.length > 0 ? "flex" : "none";
+    }
+
+    toggleClearButton();
+
+    searchInput.addEventListener("input", toggleClearButton);
+
+    searchClear.addEventListener("click", function () {
+      searchInput.value = "";
+      toggleClearButton();
+      searchInput.focus();
+    });
+
+    // Allow Escape to clear
+    searchInput.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && searchInput.value.length > 0) {
+        e.preventDefault();
+        searchInput.value = "";
+        toggleClearButton();
+        searchInput.focus();
+      }
+    });
+  }
+
+  // Ctrl+K / Cmd+K keyboard shortcut to focus search
+  document.addEventListener("keydown", function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      e.preventDefault();
+      if (searchInput) {
+        searchInput.focus();
+        searchInput.select();
+      }
+    }
+  });
+});

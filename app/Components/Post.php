@@ -189,7 +189,7 @@ class Post
         " . ($this->image ? "<div class='feed-post-image'><img src='{$this->image}' 
         class='post-image-clickable' data-image-url='{$this->image}' alt='{$this->imageAlt}' style='cursor: pointer;'></div>" : "") . "
         <p class='feed-post-text'>
-            {$this->text}
+            {$this->renderHashtags($this->text)}
         </p>
 
         {$actionsHtml}
@@ -357,6 +357,15 @@ class Post
             <div class='reply-date'>{$time} • {$date}</div>
         </div>
         ";
+    }
+
+    private function renderHashtags(string $text): string
+    {
+        return preg_replace(
+            '/(?<!\S)#(\w+)/',
+            '<a href="/hashtag/$1" class="hashtag-link">#$1</a>',
+            $text
+        );
     }
 }
 ?>

@@ -83,6 +83,7 @@ $safe_email = safe_output($user['email'] ?? '');
     require_once 'assets/sidebar.php';
     ?>
     <div class="main-content">
+        <?php require_once 'assets/search_header.php'; ?>
         <div class="content-wrapper">
             <?php
             $profile = new Profile(

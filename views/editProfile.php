@@ -18,6 +18,7 @@
   require_once 'assets/sidebar.php' ?>
 
   <div class="main-content">
+    <?php require_once 'assets/search_header.php'; ?>
     <div class="content-wrapper">
       <form action="/updateProfile" method="POST" enctype="multipart/form-data">
         <div class="profile-section-edit">

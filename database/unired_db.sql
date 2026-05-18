@@ -704,3 +704,118 @@ BEGIN
     SELECT ROW_COUNT() AS affected_rows;
 END$$
 DELIMITER ;
+
+-- ---------------------------------------------------
+-- TABLA hashtags
+CREATE TABLE IF NOT EXISTS hashtags (
+    hashtag_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_name (name)
+) ENGINE=InnoDB;
+
+-- TABLA post_hashtags (relación muchos-a-muchos)
+CREATE TABLE IF NOT EXISTS post_hashtags (
+    post_id INT NOT NULL,
+    hashtag_id INT NOT NULL,
+    PRIMARY KEY (post_id, hashtag_id),
+    FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (hashtag_id) REFERENCES hashtags(hashtag_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Procedimiento: obtener o crear hashtag
+DELIMITER $$
+CREATE PROCEDURE sp_get_or_create_hashtag(
+    IN p_name VARCHAR(50)
+)
+BEGIN
+    DECLARE v_hashtag_id INT;
+    SET p_name = LOWER(TRIM(p_name));
+    
+    SELECT hashtag_id INTO v_hashtag_id FROM hashtags WHERE name = p_name;
+    
+    IF v_hashtag_id IS NULL THEN
+        INSERT INTO hashtags (name) VALUES (p_name);
+        SET v_hashtag_id = LAST_INSERT_ID();
+    END IF;
+    
+    SELECT v_hashtag_id AS hashtag_id;
+END$$
+DELIMITER ;
+
+-- Procedimiento: vincular post con hashtag
+DELIMITER $$
+CREATE PROCEDURE sp_link_post_hashtag(
+    IN p_post_id INT,
+    IN p_hashtag_id INT
+)
+BEGIN
+    INSERT IGNORE INTO post_hashtags (post_id, hashtag_id) VALUES (p_post_id, p_hashtag_id);
+    SELECT ROW_COUNT() AS affected_rows;
+END$$
+DELIMITER ;
+
+-- Procedimiento: desvincular todos los hashtags de un post
+DELIMITER $$
+CREATE PROCEDURE sp_unlink_post_hashtags(
+    IN p_post_id INT
+)
+BEGIN
+    DELETE FROM post_hashtags WHERE post_id = p_post_id;
+END$$
+DELIMITER ;
+
+-- Procedimiento: obtener posts por hashtag
+DELIMITER $$
+CREATE PROCEDURE sp_get_posts_by_hashtag(
+    IN p_name VARCHAR(50)
+)
+BEGIN
+    SELECT p.*, u.full_name AS author_name, u.profile_picture AS author_picture, u.email AS author_email,
+           IFNULL(l.likes_count, 0) AS likes_count,
+           IFNULL(c.comments_count, 0) AS comments_count
+    FROM posts p
+    INNER JOIN users u ON p.user_id = u.user_id
+    INNER JOIN post_hashtags ph ON p.post_id = ph.post_id
+    INNER JOIN hashtags h ON ph.hashtag_id = h.hashtag_id
+    LEFT JOIN (
+        SELECT post_id, COUNT(*) AS likes_count FROM likes GROUP BY post_id
+    ) l ON p.post_id = l.post_id
+    LEFT JOIN (
+        SELECT post_id, COUNT(*) AS comments_count FROM comments WHERE active = 1 GROUP BY post_id
+    ) c ON p.post_id = c.post_id
+    WHERE h.name = LOWER(p_name)
+      AND p.active = 1
+    ORDER BY p.created_at DESC;
+END$$
+DELIMITER ;
+
+-- Procedimiento: obtener hashtags en tendencia
+DELIMITER $$
+CREATE PROCEDURE sp_get_trending_hashtags(
+    IN p_limit INT
+)
+BEGIN
+    SELECT h.name, COUNT(DISTINCT ph.post_id) AS post_count
+    FROM hashtags h
+    JOIN post_hashtags ph ON h.hashtag_id = ph.hashtag_id
+    JOIN posts p ON ph.post_id = p.post_id AND p.active = 1
+    GROUP BY h.hashtag_id, h.name
+    ORDER BY post_count DESC, h.name ASC
+    LIMIT p_limit;
+END$$
+DELIMITER ;
+
+-- Procedimiento: obtener hashtags de un post
+DELIMITER $$
+CREATE PROCEDURE sp_get_hashtags_for_post(
+    IN p_post_id INT
+)
+BEGIN
+    SELECT h.name
+    FROM hashtags h
+    JOIN post_hashtags ph ON h.hashtag_id = ph.hashtag_id
+    WHERE ph.post_id = p_post_id
+    ORDER BY h.name ASC;
+END$$
+DELIMITER ;

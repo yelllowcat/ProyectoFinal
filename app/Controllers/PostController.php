@@ -8,6 +8,7 @@ use App\Models\CommentModel;
 use App\Models\ReplyModel;
 use App\Models\CommentLikeModel;
 use App\Models\ReplyLikeModel;
+use App\Models\HashtagModel;
 
 class PostController
 {
@@ -41,6 +42,13 @@ class PostController
             $result = $postModel->createPost($userId, $safeContent, $imageName);
 
             if ($result) {
+                // Extract and link hashtags (from original content before escaping)
+                $hashtags = HashtagModel::extractHashtags($content);
+                if (!empty($hashtags)) {
+                    $hashtagModel = new HashtagModel();
+                    $hashtagModel->linkPostHashtags($result, $hashtags);
+                }
+
                 flash('success', 'Post publicado correctamente' . ($imageName ? ' con imagen' : ''));
                 redirect('/posts');
             } else {
@@ -109,6 +117,14 @@ class PostController
             $result = $postModel->updatePost($id, $safeContent, $post['image']);
 
             if ($result) {
+                // Re-sync hashtags: unlink old, link new
+                $hashtagModel = new HashtagModel();
+                $hashtagModel->unlinkPostHashtags($id);
+                $hashtags = HashtagModel::extractHashtags($content);
+                if (!empty($hashtags)) {
+                    $hashtagModel->linkPostHashtags($id, $hashtags);
+                }
+
                 flash('success', 'Post actualizado correctamente');
                 redirect('/posts');
             } else {
@@ -137,6 +153,10 @@ class PostController
         $result = $postModel->deletePost($id);
 
         if ($result) {
+            // Clean up hashtag links
+            $hashtagModel = new HashtagModel();
+            $hashtagModel->unlinkPostHashtags($id);
+
             return jsonSuccess(null, 'Post eliminado correctamente');
         } else {
             return jsonError('Error al eliminar el post');

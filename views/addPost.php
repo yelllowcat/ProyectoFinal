@@ -17,6 +17,7 @@ $profilePicture = getProfilePicture($user['profile_picture']);
   <title>UNIRED - Nueva Publicación</title>
   <link rel="stylesheet" href="<?php echo asset('assets/styles/styles.css'); ?>">
   <script src="<?php echo asset('js/main.js'); ?>"></script>
+  <script src="<?php echo asset('js/hashtagAutocomplete.js'); ?>"></script>
 </head>
 
 <body>
@@ -25,6 +26,7 @@ $profilePicture = getProfilePicture($user['profile_picture']);
   require_once 'assets/sidebar.php' ?>
 
   <div class="main-content">
+    <?php require_once 'assets/search_header.php'; ?>
     <div class="edit-container">
       <form action="/posts" method="POST" enctype="multipart/form-data">
         <div class="post-preview">

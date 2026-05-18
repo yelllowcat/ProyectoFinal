@@ -8,6 +8,8 @@ use App\Controllers\ProfileController;
 use App\Controllers\AdminController;
 use App\Controllers\PdfController;
 use App\Controllers\ReportController;
+use App\Controllers\SearchController;
+use App\Controllers\HashtagController;
 
 
 $router->get('/', function () {
@@ -117,6 +119,11 @@ $router->get('/posts', function () {
     requireAuth();
     require __DIR__ . '/../views/posts.php';
 });
+
+$router->get('/search', [SearchController::class, 'index']);
+
+$router->get('/hashtag/:tag', [HashtagController::class, 'show']);
+$router->get('/api/hashtags/suggest', [HashtagController::class, 'suggest']);
 
 $router->get('/editPost/:id', function ($id) {
     requireUser();

@@ -1,19 +1,9 @@
 <?php
 namespace App\views;
+
 use App\Components\Post;
-use App\Models\PostModel;
-use App\Models\LikeModel;
-use App\Models\CommentModel;
-use App\Models\UserModel;
 
-$postModel = new PostModel();
-$likeModel = new LikeModel();
-$commentModel = new CommentModel();
-$userModel = new UserModel();
-
-$postsData = $postModel->getPostsWithCounts();
-$currentUserId = $_SESSION['user_id'];
-
+$currentUserId = getCurrentUserId();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -21,7 +11,7 @@ $currentUserId = $_SESSION['user_id'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UNIRED - Publicaciones</title>
+    <title>UNIRED - #<?php echo safe_output($tag); ?></title>
     <link rel="stylesheet" href="<?php echo asset('assets/styles/styles.css'); ?>">
     <script src="<?php echo asset('js/main.js'); ?>"></script>
 </head>
@@ -34,10 +24,21 @@ $currentUserId = $_SESSION['user_id'];
 
     <div class="main-content">
         <?php require_once 'assets/search_header.php'; ?>
+
         <div class="content-wrapper">
+            <div class="hashtag-page-header">
+                <a href="/posts" class="hashtag-back-link">&larr; Volver a publicaciones</a>
+                <h1 class="hashtag-page-title">
+                    #<?php echo safe_output($tag); ?>
+                </h1>
+                <span class="hashtag-page-count">
+                    <?php echo $postCount; ?> publicacion<?php echo $postCount !== 1 ? 'es' : ''; ?>
+                </span>
+            </div>
+
             <?php
             if (empty($postsData)) {
-                echo '<div class="no-posts">No hay publicaciones aún. <a href="/addPost">Sé el primero en publicar</a></div>';
+                echo '<div class="no-posts">No hay publicaciones con este hashtag aún. <a href="/addPost">Sé el primero en publicar</a></div>';
             } else {
                 foreach ($postsData as $postData) {
                     $hasLiked = $likeModel->hasLiked($postData['post_id'], $currentUserId);
@@ -46,12 +47,11 @@ $currentUserId = $_SESSION['user_id'];
                     $commentsCount = $commentModel->getCommentCount($postData['post_id']);
 
                     $author = $userModel->getUserById($postData['user_id']);
-
-                    $authorPicture = getProfilePicture($author['profile_picture']);
+                    $authorPicture = getProfilePicture($author['profile_picture'] ?? '');
 
                     $postComponent = new Post([
                         'id' => $postData['post_id'],
-                        'author' => $author['full_name'],
+                        'author' => $author['full_name'] ?? 'Usuario',
                         'author_role' => $author['role'] ?? 'user',
                         'date' => date('d/m/Y', strtotime($postData['created_at'])),
                         'image' => $postData['image'] ? "/assets/imagesPosts/{$postData['image']}" : '',

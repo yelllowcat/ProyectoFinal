@@ -33,6 +33,7 @@ $suggestions = $friendController->getSuggestions()['data'];
     $currentPage = 'friends';
     require_once 'assets/sidebar.php' ?>
     <div class="main-content">
+        <?php require_once 'assets/search_header.php'; ?>
         <div class="friends-container">
             <div class="friends-header">
                 <h1 class="friends-title"><?= $userModel->getUserById($userId)['full_name'] ?></h1>
