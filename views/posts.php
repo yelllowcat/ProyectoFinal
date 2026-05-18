@@ -35,7 +35,7 @@ $commentsMap = $commentModel->getFirstCommentsForPosts($postIds, 3);
     <script src="<?php echo asset('js/main.js'); ?>"></script>
 </head>
 
-<body>
+<body class="posts-page">
     <?php
     $currentPage = 'posts';
     require_once 'assets/sidebar.php';
