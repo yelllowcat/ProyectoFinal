@@ -14,10 +14,28 @@ $currentUserId = getCurrentUserId();
 // Determine active tab
 $activeTab = $type ?: 'all';
 
+// Filters
+$currentSort = clean_input($_GET['sort'] ?? '');
+$currentDate = clean_input($_GET['date'] ?? '');
+
 // Count results per category
 $userCount = count($results['users'] ?? []);
 $postCount = count($results['posts'] ?? []);
 $hashtagCount = count($results['hashtags'] ?? []);
+
+function highlightTerm(string $text, string $term): string {
+    if (empty($term)) return safe_output($text);
+    $escapedTerm = preg_quote(safe_output($term), '/');
+    return preg_replace('/(' . $escapedTerm . ')/i', '<mark class="search-highlight">$1</mark>', safe_output($text));
+}
+
+function buildTabUrl(string $query, string $type, string $sort, string $date): string {
+    $params = ['q' => $query];
+    if ($type) $params['type'] = $type;
+    if ($sort) $params['sort'] = $sort;
+    if ($date) $params['date'] = $date;
+    return '/search?' . http_build_query($params);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -30,7 +48,7 @@ $hashtagCount = count($results['hashtags'] ?? []);
     <script src="<?php echo asset('js/main.js'); ?>"></script>
 </head>
 
-<body>
+<body class="search-page">
     <?php
     $currentPage = 'search';
     require_once 'assets/sidebar.php';
@@ -39,12 +57,12 @@ $hashtagCount = count($results['hashtags'] ?? []);
     <div class="main-content">
         <?php require_once 'assets/search_header.php'; ?>
 
-        <div class="content-wrapper">
+        <div class="search-content-wrapper">
             <div class="search-results-container">
                 <?php if (!empty($query)): ?>
                 <div class="search-results-header">
                     <h1 class="search-results-title">
-                        Resultados para "<?php echo safe_output($query); ?>"
+                        Resultados para <span class="search-query-term">"<?php echo safe_output($query); ?>"</span>
                     </h1>
                     <span class="search-results-count">
                         <?php echo $totalResults; ?> resultado<?php echo $totalResults !== 1 ? 's' : ''; ?> encontrado<?php echo $totalResults !== 1 ? 's' : ''; ?>
@@ -67,7 +85,7 @@ $hashtagCount = count($results['hashtags'] ?? []);
                 <?php endif; ?>
 
                 <div class="search-tabs">
-                    <a href="/search?q=<?php echo urlencode($query); ?>" 
+                    <a href="<?php echo buildTabUrl($query, '', $currentSort, $currentDate); ?>"
                        class="search-tab <?php echo $activeTab === 'all' ? 'active' : ''; ?>"
                        data-type="all">
                         Todos
@@ -75,7 +93,7 @@ $hashtagCount = count($results['hashtags'] ?? []);
                             <span class="tab-count"><?php echo $totalResults; ?></span>
                         <?php endif; ?>
                     </a>
-                    <a href="/search?q=<?php echo urlencode($query); ?>&type=users" 
+                    <a href="<?php echo buildTabUrl($query, 'users', $currentSort, $currentDate); ?>"
                        class="search-tab <?php echo $activeTab === 'users' ? 'active' : ''; ?>"
                        data-type="users">
                         Usuarios
@@ -83,7 +101,7 @@ $hashtagCount = count($results['hashtags'] ?? []);
                             <span class="tab-count"><?php echo $userCount; ?></span>
                         <?php endif; ?>
                     </a>
-                    <a href="/search?q=<?php echo urlencode($query); ?>&type=posts" 
+                    <a href="<?php echo buildTabUrl($query, 'posts', $currentSort, $currentDate); ?>"
                        class="search-tab <?php echo $activeTab === 'posts' ? 'active' : ''; ?>"
                        data-type="posts">
                         Publicaciones
@@ -91,7 +109,7 @@ $hashtagCount = count($results['hashtags'] ?? []);
                             <span class="tab-count"><?php echo $postCount; ?></span>
                         <?php endif; ?>
                     </a>
-                    <a href="/search?q=<?php echo urlencode($query); ?>&type=hashtags" 
+                    <a href="<?php echo buildTabUrl($query, 'hashtags', $currentSort, $currentDate); ?>"
                        class="search-tab <?php echo $activeTab === 'hashtags' ? 'active' : ''; ?>"
                        data-type="hashtags">
                         Hashtags
@@ -101,7 +119,41 @@ $hashtagCount = count($results['hashtags'] ?? []);
                     </a>
                 </div>
 
-                <?php if ($totalResults === 0): ?>
+                <?php if ($activeTab !== 'all' && !empty($query)): ?>
+                <div class="search-filters-bar">
+                    <div class="search-filter-group">
+                        <label for="search-sort">Ordenar por</label>
+                        <select id="search-sort" class="search-filter-select" onchange="applySearchFilter()">
+                            <?php if ($activeTab === 'users'): ?>
+                                <option value="" <?php echo $currentSort === '' ? 'selected' : ''; ?>>Nombre (A-Z)</option>
+                                <option value="recent" <?php echo $currentSort === 'recent' ? 'selected' : ''; ?>>Más recientes</option>
+                            <?php elseif ($activeTab === 'posts'): ?>
+                                <option value="" <?php echo $currentSort === '' ? 'selected' : ''; ?>>Más recientes</option>
+                                <option value="relevance" <?php echo $currentSort === 'relevance' ? 'selected' : ''; ?>>Relevancia</option>
+                                <option value="popular" <?php echo $currentSort === 'popular' ? 'selected' : ''; ?>>Más populares</option>
+                                <option value="comments" <?php echo $currentSort === 'comments' ? 'selected' : ''; ?>>Más comentados</option>
+                            <?php elseif ($activeTab === 'hashtags'): ?>
+                                <option value="" <?php echo $currentSort === '' ? 'selected' : ''; ?>>Popularidad</option>
+                                <option value="name" <?php echo $currentSort === 'name' ? 'selected' : ''; ?>>Nombre (A-Z)</option>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+                    <?php if ($activeTab === 'posts'): ?>
+                    <div class="search-filter-group">
+                        <label for="search-date">Fecha</label>
+                        <select id="search-date" class="search-filter-select" onchange="applySearchFilter()">
+                            <option value="" <?php echo $currentDate === '' ? 'selected' : ''; ?>>Cualquier fecha</option>
+                            <option value="hour" <?php echo $currentDate === 'hour' ? 'selected' : ''; ?>>Última hora</option>
+                            <option value="today" <?php echo $currentDate === 'today' ? 'selected' : ''; ?>>Hoy</option>
+                            <option value="week" <?php echo $currentDate === 'week' ? 'selected' : ''; ?>>Esta semana</option>
+                            <option value="month" <?php echo $currentDate === 'month' ? 'selected' : ''; ?>>Este mes</option>
+                        </select>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
+
+                <?php if ($totalResults === 0 && !empty($query)): ?>
                     <div class="no-results">
                         <div class="no-results-icon">
                             <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -114,7 +166,7 @@ $hashtagCount = count($results['hashtags'] ?? []);
                         <a href="/posts" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">Ver publicaciones</a>
                     </div>
                 <?php else: ?>
-                    <div class="search-results-list">
+                    <div class="search-results-list" id="searchResultsList">
                         <?php
                         // Show mixed results for "Todos" tab
                         if ($activeTab === 'all'):
@@ -133,11 +185,13 @@ $hashtagCount = count($results['hashtags'] ?? []);
                                     <?php endif; ?>
                                 </h3>
                                 <div class="search-users-grid">
-                                    <?php foreach ($shownUsers as $user): ?>
+                                    <?php foreach ($shownUsers as $user):
+                                        $status = $user['friendship_status'] ?? 'none';
+                                    ?>
                                         <a href="/profile/<?php echo $user['user_id']; ?>" class="search-user-card">
                                             <img src="<?php echo getProfilePicture($user['profile_picture']); ?>" alt="<?php echo safe_output($user['full_name']); ?>" class="search-user-avatar">
                                             <div class="search-user-info">
-                                                <span class="search-user-name"><?php echo safe_output($user['full_name']); ?></span>
+                                                <span class="search-user-name"><?php echo highlightTerm($user['full_name'], $query); ?></span>
                                                 <?php if (!empty($user['role']) && in_array($user['role'], ['teacher', 'student'])): ?>
                                                     <span class="search-user-role role-badge role-<?php echo $user['role']; ?>">
                                                         <?php echo $user['role'] === 'teacher' ? 'Profesor' : 'Estudiante'; ?>
@@ -184,7 +238,8 @@ $hashtagCount = count($results['hashtags'] ?? []);
                                             'user_id' => $postData['user_id'],
                                             'current_user_id' => $currentUserId,
                                             'has_liked' => $hasLiked,
-                                            'user_avatar' => $authorPicture
+                                            'user_avatar' => $authorPicture,
+                                            'highlight_term' => $query
                                         ]);
                                         echo $postComponent->render();
                                         ?>
@@ -207,7 +262,7 @@ $hashtagCount = count($results['hashtags'] ?? []);
                                 <div class="search-hashtags-grid">
                                     <?php foreach ($shownHashtags as $hashtag): ?>
                                         <a href="/hashtag/<?php echo urlencode(ltrim($hashtag['name'], '#')); ?>" class="search-hashtag-card">
-                                            <span class="search-hashtag-name"><?php echo safe_output($hashtag['name']); ?></span>
+                                            <span class="search-hashtag-name"><?php echo highlightTerm($hashtag['name'], $query); ?></span>
                                             <span class="search-hashtag-count"><?php echo $hashtag['post_count']; ?> publicacion<?php echo $hashtag['post_count'] != 1 ? 'es' : ''; ?></span>
                                         </a>
                                     <?php endforeach; ?>
@@ -220,22 +275,42 @@ $hashtagCount = count($results['hashtags'] ?? []);
                         elseif ($activeTab === 'users'):
                             if (!empty($results['users'])):
                         ?>
-                            <div class="search-users-grid full">
-                                <?php foreach ($results['users'] as $user): ?>
-                                    <a href="/profile/<?php echo $user['user_id']; ?>" class="search-user-card large">
-                                        <img src="<?php echo getProfilePicture($user['profile_picture']); ?>" alt="<?php echo safe_output($user['full_name']); ?>" class="search-user-avatar">
-                                        <div class="search-user-info">
-                                            <span class="search-user-name"><?php echo safe_output($user['full_name']); ?></span>
-                                            <?php if (!empty($user['biography'])): ?>
-                                                <span class="search-user-bio"><?php echo safe_output($user['biography']); ?></span>
-                                            <?php endif; ?>
-                                            <?php if (!empty($user['role']) && in_array($user['role'], ['teacher', 'student'])): ?>
-                                                <span class="search-user-role role-badge role-<?php echo $user['role']; ?>">
-                                                    <?php echo $user['role'] === 'teacher' ? 'Profesor' : 'Estudiante'; ?>
-                                                </span>
+                            <div class="search-users-grid full" id="searchUsersGrid">
+                                <?php foreach ($results['users'] as $user):
+                                    $status = $user['friendship_status'] ?? 'none';
+                                ?>
+                                    <div class="search-user-card large" id="user-card-<?php echo $user['user_id']; ?>">
+                                        <a href="/profile/<?php echo $user['user_id']; ?>" class="search-user-card-link">
+                                            <img src="<?php echo getProfilePicture($user['profile_picture']); ?>" alt="<?php echo safe_output($user['full_name']); ?>" class="search-user-avatar">
+                                            <div class="search-user-info">
+                                                <span class="search-user-name"><?php echo highlightTerm($user['full_name'], $query); ?></span>
+                                                <?php if (!empty($user['biography'])): ?>
+                                                    <span class="search-user-bio"><?php echo highlightTerm($user['biography'], $query); ?></span>
+                                                <?php endif; ?>
+                                                <?php if (!empty($user['role']) && in_array($user['role'], ['teacher', 'student'])): ?>
+                                                    <span class="search-user-role role-badge role-<?php echo $user['role']; ?>">
+                                                        <?php echo $user['role'] === 'teacher' ? 'Profesor' : 'Estudiante'; ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </div>
+                                        </a>
+                                        <div class="search-user-actions">
+                                            <?php if ($user['user_id'] == $currentUserId): ?>
+                                                <span class="search-user-status-badge self">Tú</span>
+                                            <?php elseif ($status === 'friends'): ?>
+                                                <span class="search-user-status-badge friend">Amigos</span>
+                                                <button class="search-user-action-btn btn-remove" data-user-id="<?php echo $user['user_id']; ?>" data-action="remove">Eliminar</button>
+                                            <?php elseif ($status === 'pending_sent'): ?>
+                                                <span class="search-user-status-badge pending">Solicitud enviada</span>
+                                                <button class="search-user-action-btn btn-cancel" data-user-id="<?php echo $user['user_id']; ?>" data-action="cancel">Cancelar</button>
+                                            <?php elseif ($status === 'pending_received'): ?>
+                                                <button class="search-user-action-btn btn-primary" data-user-id="<?php echo $user['user_id']; ?>" data-action="accept">Aceptar</button>
+                                                <button class="search-user-action-btn btn-deny" data-user-id="<?php echo $user['user_id']; ?>" data-action="reject">Rechazar</button>
+                                            <?php else: ?>
+                                                <button class="search-user-action-btn btn-primary" data-user-id="<?php echo $user['user_id']; ?>" data-action="add">Agregar amigo</button>
                                             <?php endif; ?>
                                         </div>
-                                    </a>
+                                    </div>
                                 <?php endforeach; ?>
                             </div>
                         <?php
@@ -268,7 +343,8 @@ $hashtagCount = count($results['hashtags'] ?? []);
                                 'user_id' => $postData['user_id'],
                                 'current_user_id' => $currentUserId,
                                 'has_liked' => $hasLiked,
-                                'user_avatar' => $authorPicture
+                                'user_avatar' => $authorPicture,
+                                'highlight_term' => $query
                             ]);
                             echo $postComponent->render();
                             ?>
@@ -282,10 +358,10 @@ $hashtagCount = count($results['hashtags'] ?? []);
                         elseif ($activeTab === 'hashtags'):
                             if (!empty($results['hashtags'])):
                         ?>
-                            <div class="search-hashtags-grid full">
+                            <div class="search-hashtags-grid full" id="searchHashtagsGrid">
                                 <?php foreach ($results['hashtags'] as $hashtag): ?>
                                     <a href="/hashtag/<?php echo urlencode(ltrim($hashtag['name'], '#')); ?>" class="search-hashtag-card large">
-                                        <span class="search-hashtag-name"><?php echo safe_output($hashtag['name']); ?></span>
+                                        <span class="search-hashtag-name"><?php echo highlightTerm($hashtag['name'], $query); ?></span>
                                         <span class="search-hashtag-count"><?php echo $hashtag['post_count']; ?> publicacion<?php echo $hashtag['post_count'] != 1 ? 'es' : ''; ?></span>
                                     </a>
                                 <?php endforeach; ?>
@@ -297,6 +373,18 @@ $hashtagCount = count($results['hashtags'] ?? []);
                         endif;
                         ?>
                     </div>
+
+                    <?php if ($activeTab !== 'all' && !empty($query) && $totalResults > 0): ?>
+                        <div class="search-sentinel" id="searchSentinel" data-type="<?php echo $activeTab; ?>" data-query="<?php echo safe_output($query); ?>" data-sort="<?php echo safe_output($currentSort); ?>" data-date="<?php echo safe_output($currentDate); ?>">
+                            <div class="search-spinner" id="searchSpinner" style="display: none;">
+                                <div class="skeleton-spinner"></div>
+                                <span>Cargando más resultados...</span>
+                            </div>
+                            <div class="search-no-more" id="searchNoMore" style="display: none;">
+                                <span>No hay más resultados</span>
+                            </div>
+                        </div>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
         </div>
@@ -375,6 +463,17 @@ $hashtagCount = count($results['hashtags'] ?? []);
             </form>
         </div>
     </dialog>
+
+    <script>
+        window.searchConfig = {
+            query: <?php echo json_encode($query); ?>,
+            type: <?php echo json_encode($activeTab); ?>,
+            sort: <?php echo json_encode($currentSort); ?>,
+            date: <?php echo json_encode($currentDate); ?>,
+            currentUserId: <?php echo json_encode($currentUserId); ?>,
+            isTabSpecific: <?php echo json_encode($activeTab !== 'all' && !empty($query)); ?>
+        };
+    </script>
 </body>
 
 </html>

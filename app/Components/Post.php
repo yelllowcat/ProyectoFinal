@@ -22,6 +22,7 @@ class Post
     private $highlightCommentId;
     private $highlightReplyId;
     private $repliesData;
+    private $highlightTerm;
 
     public function __construct($data)
     {
@@ -51,6 +52,7 @@ class Post
         $this->highlightCommentId = $data['highlight_comment_id'] ?? null;
         $this->highlightReplyId = $data['highlight_reply_id'] ?? null;
         $this->repliesData = $data['replies_data'] ?? [];
+        $this->highlightTerm = $data['highlight_term'] ?? '';
     }
 
     public function getId()
@@ -144,6 +146,13 @@ class Post
         }
 
         $singleModeClass = $this->singleMode ? ' post-single-mode' : '';
+
+        // Apply search term highlighting before hashtags
+        $displayText = $this->text;
+        if (!empty($this->highlightTerm)) {
+            $displayText = $this->highlightTermInText($displayText, $this->highlightTerm);
+        }
+
         $actionsHtml = '';
         if (!$this->singleMode) {
             $actionsHtml = "
@@ -189,7 +198,7 @@ class Post
         " . ($this->image ? "<div class='feed-post-image'><img src='{$this->image}' 
         class='post-image-clickable' data-image-url='{$this->image}' alt='{$this->imageAlt}' style='cursor: pointer;'></div>" : "") . "
         <p class='feed-post-text'>
-            {$this->renderHashtags($this->text)}
+            {$this->renderHashtags($displayText)}
         </p>
 
         {$actionsHtml}
@@ -364,6 +373,16 @@ class Post
         return preg_replace(
             '/(?<!\S)#(\w+)/',
             '<a href="/hashtag/$1" class="hashtag-link">#$1</a>',
+            $text
+        );
+    }
+
+    private function highlightTermInText(string $text, string $term): string
+    {
+        $escapedTerm = preg_quote(htmlspecialchars($term), '/');
+        return preg_replace(
+            '/(' . $escapedTerm . ')/i',
+            '<mark class="search-highlight">$1</mark>',
             $text
         );
     }

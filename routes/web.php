@@ -121,6 +121,7 @@ $router->get('/posts', function () {
 });
 
 $router->get('/search', [SearchController::class, 'index']);
+$router->get('/api/search', [SearchController::class, 'apiSearch']);
 
 $router->get('/hashtag/:tag', [HashtagController::class, 'show']);
 $router->get('/api/hashtags/suggest', [HashtagController::class, 'suggest']);
