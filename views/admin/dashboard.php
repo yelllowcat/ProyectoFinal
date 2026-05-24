@@ -34,37 +34,12 @@ namespace App\views\admin;
                         <p class="summary-value" id="summary-users">0</p>
                     </div>
                 </div>
-                <div class="summary-card card-green">
-                    <div class="summary-info">
-                        <h4 class="summary-title">Publicaciones</h4>
-                        <p class="summary-value" id="summary-posts">0</p>
-                    </div>
-                </div>
-                <div class="summary-card card-pink">
-                    <div class="summary-info">
-                        <h4 class="summary-title">Comentarios</h4>
-                        <p class="summary-value" id="summary-comments">0</p>
-                    </div>
-                </div>
-                <div class="summary-card card-yellow">
-                    <div class="summary-info">
-                        <h4 class="summary-title">Me gusta</h4>
-                        <p class="summary-value" id="summary-likes">0</p>
-                    </div>
-                </div>
-                <div class="summary-card card-purple">
-                    <div class="summary-info">
-                        <h4 class="summary-title">Amistades</h4>
-                        <p class="summary-value" id="summary-friendships">0</p>
-                    </div>
-                </div>
                 <div class="summary-card card-orange">
                     <div class="summary-info">
                         <h4 class="summary-title">Hashtags</h4>
                         <p class="summary-value" id="summary-hashtags">0</p>
                     </div>
                 </div>
-            </div>
             </div>
 
             <!-- Stats Nav and Tables (Moved to Top) -->

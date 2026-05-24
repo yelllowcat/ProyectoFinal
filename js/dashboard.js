@@ -100,17 +100,7 @@ function fetchSummaryStats() {
             if (data.success && data.data) {
                 const d = data.data;
                 const elUsers = document.getElementById('summary-users');
-                const elPosts = document.getElementById('summary-posts');
-                const elComments = document.getElementById('summary-comments');
-                const elLikes = document.getElementById('summary-likes');
-
                 if (elUsers) animateValue(elUsers, 0, d.total_users || 0, 1500);
-                if (elPosts) animateValue(elPosts, 0, d.total_posts || 0, 1500);
-                if (elComments) animateValue(elComments, 0, d.total_comments || 0, 1500);
-                if (elLikes) animateValue(elLikes, 0, d.total_likes || 0, 1500);
-
-                const elFriendships = document.getElementById('summary-friendships');
-                if (elFriendships) animateValue(elFriendships, 0, d.total_friendships || 0, 1500);
             }
         })
         .catch(error => console.error('Error fetching summary stats:', error));
