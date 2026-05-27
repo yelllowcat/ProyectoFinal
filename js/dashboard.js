@@ -768,7 +768,7 @@ function fetchTopHashtagsForChart() {
                 const top5 = data.data.slice(0, 5);
                 const labels = top5.map(h => '#' + h.name);
                 const values = top5.map(h => parseInt(h.post_count));
-                renderChartB('bar', labels, values, 'Top Hashtags por Publicaciones', colors.teal, true);
+                renderChartB('bar', labels, values, 'Hashtags más Populares por Cantidad de Publicaciones', colors.teal, true);
             }
         })
         .catch(error => console.error('Error fetching top hashtags for chart:', error));
