@@ -355,9 +355,17 @@ function renderChartB(type, labels, dataArray, titleText, bgColors, horizontal) 
             },
             scales: type === 'bar' && !horizontal ? {
                 x: { grid: { display: false } },
-                y: { beginAtZero: true, grid: { color: colors.gray } }
+                y: {
+                    beginAtZero: true,
+                    grid: { color: colors.gray },
+                    ticks: { precision: 0 }
+                }
             } : (type === 'bar' && horizontal ? {
-                x: { beginAtZero: true, grid: { color: colors.gray } },
+                x: {
+                    beginAtZero: true,
+                    grid: { color: colors.gray },
+                    ticks: { precision: 0 }
+                },
                 y: { grid: { display: false } }
             } : {})
         }
@@ -742,7 +750,11 @@ function renderHashtagTrendChart(data) {
             },
             scales: {
                 x: { grid: { display: false } },
-                y: { beginAtZero: true, grid: { color: colors.gray } }
+                y: {
+                    beginAtZero: true,
+                    grid: { color: colors.gray },
+                    ticks: { precision: 0 }
+                }
             }
         }
     });

@@ -26,17 +26,17 @@ function seedId(): int {
 }
 
 // ── 1. Users ─────────────────────────────────────────────────────────
-echo "  Cleaning old seed users (role = 'user')…\n";
-$pdo->exec("DELETE FROM reply_likes WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
-$pdo->exec("DELETE FROM comment_likes WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
-$pdo->exec("DELETE FROM likes WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
-$pdo->exec("DELETE FROM replies WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
-$pdo->exec("DELETE FROM comments WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
-$pdo->exec("DELETE FROM posts WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
-$pdo->exec("DELETE FROM friend_requests WHERE sender_id IN (SELECT user_id FROM users WHERE role = 'user') OR receiver_id IN (SELECT user_id FROM users WHERE role = 'user')");
-$pdo->exec("DELETE FROM friends WHERE user_id1 IN (SELECT user_id FROM users WHERE role = 'user') OR user_id2 IN (SELECT user_id FROM users WHERE role = 'user')");
-$pdo->exec("DELETE FROM user_update_log WHERE user_id IN (SELECT user_id FROM users WHERE role = 'user')");
-$pdo->exec("DELETE FROM users WHERE role = 'user'");
+echo "  Cleaning old seed users (role != 'admin')…\n";
+$pdo->exec("DELETE FROM reply_likes WHERE user_id IN (SELECT user_id FROM users WHERE role != 'admin')");
+$pdo->exec("DELETE FROM comment_likes WHERE user_id IN (SELECT user_id FROM users WHERE role != 'admin')");
+$pdo->exec("DELETE FROM likes WHERE user_id IN (SELECT user_id FROM users WHERE role != 'admin')");
+$pdo->exec("DELETE FROM replies WHERE user_id IN (SELECT user_id FROM users WHERE role != 'admin')");
+$pdo->exec("DELETE FROM comments WHERE user_id IN (SELECT user_id FROM users WHERE role != 'admin')");
+$pdo->exec("DELETE FROM posts WHERE user_id IN (SELECT user_id FROM users WHERE role != 'admin')");
+$pdo->exec("DELETE FROM friend_requests WHERE sender_id IN (SELECT user_id FROM users WHERE role != 'admin') OR receiver_id IN (SELECT user_id FROM users WHERE role != 'admin')");
+$pdo->exec("DELETE FROM friends WHERE user_id1 IN (SELECT user_id FROM users WHERE role != 'admin') OR user_id2 IN (SELECT user_id FROM users WHERE role != 'admin')");
+$pdo->exec("DELETE FROM user_update_log WHERE user_id IN (SELECT user_id FROM users WHERE role != 'admin')");
+$pdo->exec("DELETE FROM users WHERE role != 'admin'");
 
 $existingCount = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE role != 'admin'")->fetchColumn();
 echo "  Existing non-admin users: $existingCount\n";
@@ -97,7 +97,7 @@ if ($needed > 0) {
 
 // ── 2. Posts ─────────────────────────────────────────────────────────
 $postCount = (int)$pdo->query("SELECT COUNT(*) FROM posts")->fetchColumn();
-$neededPosts = max(0, 55 - $postCount);
+$neededPosts = max(0, 250 - $postCount);
 
 $postIds = [];
 $stmtP = $pdo->query("SELECT post_id FROM posts");
@@ -171,7 +171,7 @@ if ($neededPosts > 0) {
 
 // ── 3. Comments ──────────────────────────────────────────────────────
 $commentCount = (int)$pdo->query("SELECT COUNT(*) FROM comments")->fetchColumn();
-$neededComments = max(0, 150 - $commentCount);
+$neededComments = max(0, 350 - $commentCount);
 $commentIds = [];
 $stmtC = $pdo->query("SELECT comment_id FROM comments");
 while ($row = $stmtC->fetch(PDO::FETCH_ASSOC)) {
@@ -212,7 +212,7 @@ if ($neededComments > 0) {
 
 // ── 4. Replies ───────────────────────────────────────────────────────
 $replyCount = (int)$pdo->query("SELECT COUNT(*) FROM replies")->fetchColumn();
-$neededReplies = max(0, 80 - $replyCount);
+$neededReplies = max(0, 150 - $replyCount);
 $replyIds = [];
 $stmtR = $pdo->query("SELECT reply_id FROM replies");
 while ($row = $stmtR->fetch(PDO::FETCH_ASSOC)) {
@@ -241,7 +241,7 @@ if ($neededReplies > 0) {
 
 // ── 5. Post Likes ────────────────────────────────────────────────────
 $likeCount = (int)$pdo->query("SELECT COUNT(*) FROM likes")->fetchColumn();
-$neededLikes = max(0, 300 - $likeCount);
+$neededLikes = max(0, 800 - $likeCount);
 
 if ($neededLikes > 0) {
     $insLk = $pdo->prepare("INSERT IGNORE INTO likes (post_id, user_id, liked_at) VALUES (?, ?, ?)");
@@ -321,6 +321,65 @@ if ($neededFriends > 0) {
         if ($added >= $neededFriends) break;
     }
     echo "  +$added friendships created.\n";
+}
+
+// ── 9. Hashtags ──────────────────────────────────────────────────────
+$hashtagPool = [
+    'tecnologia','musica','deportes','viajes','comida','arte','libros','cine',
+    'fotografia','naturaleza','uabcs','universidad','examenes','tesis','clase',
+    'estudiantes','profesores','campus','biblioteca','becas','fitness','yoga',
+    'meditacion','salud','cocina','recetas','cafe','playlist','weekend',
+    'motivation','programacion','ia','startup','gaming','desarrollo',
+    'opensource','hackathon','data','machinelearning','webdev','amigos',
+    'familia','celebracion','graduacion','eventos','fiesta','viaje','roadtrip',
+    'memes','random','photooftheday','picoftheday','instagood','happy',
+    'love','summer','winter','autumn','spring','morning','night'
+];
+
+$insHT = $pdo->prepare("INSERT IGNORE INTO hashtags (name) VALUES (?)");
+$hashtagIds = [];
+foreach ($hashtagPool as $tag) {
+    $insHT->execute([$tag]);
+    if ($insHT->rowCount() > 0 || true) {
+        $hashtagIds[$tag] = (int)$pdo->lastInsertId();
+    }
+}
+// Fallback: fetch existing ids for duplicates
+$stmtHT = $pdo->prepare("SELECT hashtag_id, name FROM hashtags WHERE name IN (" . implode(',', array_fill(0, count($hashtagPool), '?')) . ")");
+$stmtHT->execute($hashtagPool);
+while ($row = $stmtHT->fetch(PDO::FETCH_ASSOC)) {
+    $hashtagIds[$row['name']] = (int)$row['hashtag_id'];
+}
+echo "  " . count($hashtagIds) . " hashtags ensured.\n";
+
+// ── 10. Post Hashtags ────────────────────────────────────────────────
+$existingPH = (int)$pdo->query("SELECT COUNT(*) FROM post_hashtags")->fetchColumn();
+$neededPH = max(0, 600 - $existingPH);
+
+if ($neededPH > 0 && count($postIds) > 0 && count($hashtagIds) > 0) {
+    $insPH = $pdo->prepare("INSERT IGNORE INTO post_hashtags (post_id, hashtag_id) VALUES (?, ?)");
+    $htValues = array_values($hashtagIds);
+
+    // Ensure popular hashtags have high volume to raise Y-axis counts
+    $popularTags = ['clase', 'fitness', 'programacion', 'recetas', 'uabcs'];
+    $popularIds = [];
+    foreach ($popularTags as $tag) {
+        if (isset($hashtagIds[$tag])) {
+            $popularIds[] = $hashtagIds[$tag];
+        }
+    }
+
+    $added = 0;
+    for ($i = 0; $i < $neededPH * 5; $i++) {
+        // 70% chance to pick a popular hashtag, 30% chance for a random one
+        $tagId = (random_int(0, 99) < 70 && count($popularIds) > 0) ? pick($popularIds) : pick($htValues);
+        $insPH->execute([pick($postIds), $tagId]);
+        if ($insPH->rowCount() > 0) {
+            $added++;
+            if ($added >= $neededPH) break;
+        }
+    }
+    echo "  +$added post_hashtag links created.\n";
 }
 
 echo "\nDone.\n";

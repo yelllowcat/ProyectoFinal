@@ -126,7 +126,7 @@ class AdminController
         if (!in_array($sort, ['posts', 'likes', 'comments'])) {
             $sort = 'posts';
         }
-        $data = $this->adminModel->getTopHashtags(10, $sort);
+        $data = $this->adminModel->getTopHashtags(20, $sort);
         jsonSuccess($data);
     }
 
@@ -137,7 +137,7 @@ class AdminController
         if (!in_array($range, [7, 30, 90])) {
             $range = 30;
         }
-        $data = $this->adminModel->getHashtagTrend(5, $range);
+        $data = $this->adminModel->getHashtagTrend(10, $range);
         jsonSuccess($data);
     }
 }

@@ -22,7 +22,7 @@ class PdfController
             'users_most_friends' => $this->adminModel->getUsersWithMostFriends(),
             'posts_most_comments' => $this->adminModel->getPostsWithMostComments(),
             'posts_most_likes' => $this->adminModel->getPostsWithMostLikes(),
-            'top_hashtags' => $this->adminModel->getTopHashtags(10, 'posts'),
+            'top_hashtags' => $this->adminModel->getTopHashtags(20, 'posts'),
             'generated_date' => date('d/m/Y H:i:s')
         ];
 

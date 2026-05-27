@@ -525,7 +525,7 @@ class AdminModel
             }
 
             $datasets = [];
-            $palette = ['#4db8c4', '#FF6384', '#FFCE56', '#9966FF', '#FF9F40'];
+            $palette = ['#4db8c4', '#FF6384', '#FFCE56', '#9966FF', '#FF9F40', '#7cb342', '#00b0ff', '#f50057', '#651fff', '#ff3d00'];
             $idx = 0;
             foreach ($hashtagData as $name => $dateMap) {
                 $data = [];
