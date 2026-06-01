@@ -210,7 +210,7 @@ $safe_email = safe_output($user['email'] ?? '');
                     <input type="radio" name="reason" value="Otro"> Otro
                 </label>
 
-                <textarea id="report-reason-details" name="reason_details" placeholder="Detalles opcionales..." style="margin-top: 10px; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; resize: vertical; min-height: 60px;"></textarea>
+                <textarea id="report-reason-details" name="reason_details" maxlength="200" placeholder="Detalles opcionales..." style="margin-top: 10px; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-family: inherit; resize: vertical; min-height: 60px;"></textarea>
 
                 <div class="confirm-actions" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
                     <button type="button" onclick="document.getElementById('report-modal').close()" class="confirm-cancel" style="padding: 8px 16px;">Cancelar</button>
