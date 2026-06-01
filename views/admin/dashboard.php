@@ -77,12 +77,11 @@ namespace App\views\admin;
                                 <th>Nombre</th>
                                 <th>Correo electrónico</th>
                                 <th>Cantidad</th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody id="statsTableBody">
                             <tr>
-                                <td colspan="5" style="text-align: center; padding: 40px;">
+                                <td colspan="4" style="text-align: center; padding: 40px;">
                                     Cargando estadísticas...
                                 </td>
                             </tr>

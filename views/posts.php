@@ -4,10 +4,12 @@ use App\Components\Post;
 use App\Models\PostModel;
 use App\Models\LikeModel;
 use App\Models\CommentModel;
+use App\Models\HashtagModel;
 
 $postModel = new PostModel();
 $likeModel = new LikeModel();
 $commentModel = new CommentModel();
+$hashtagModel = new HashtagModel();
 
 $currentUserId = $_SESSION['user_id'];
 
@@ -22,7 +24,7 @@ $totalPages = (int) ceil($totalPosts / $perPage);
 $postIds = array_column($postsData, 'post_id');
 $likedMap = $likeModel->bulkHasLiked($postIds, $currentUserId);
 $commentsMap = $commentModel->getFirstCommentsForPosts($postIds, 3);
-
+$trendingHashtags = $hashtagModel->getTrendingHashtags(8);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -44,6 +46,20 @@ $commentsMap = $commentModel->getFirstCommentsForPosts($postIds, 3);
     <div class="main-content">
         <?php require_once 'assets/search_header.php'; ?>
         <div class="content-wrapper">
+            <?php if (!empty($trendingHashtags)): ?>
+            <div class="trending-hashtags-widget">
+                <span class="trending-label">Tendencias</span>
+                <div class="trending-hashtags-scroll">
+                    <?php foreach ($trendingHashtags as $tag): ?>
+                        <a href="/hashtag/<?php echo urlencode($tag['name']); ?>" class="trending-hashtag-pill">
+                            #<?php echo safe_output($tag['name']); ?>
+                            <span class="trending-hashtag-count"><?php echo $tag['post_count']; ?></span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <?php
             if (empty($postsData)) {
                 echo '<div class="no-posts">No hay publicaciones aún. <a href="/addPost">Sé el primero en publicar</a></div>';

@@ -40,7 +40,7 @@ $suggestions = $friendController->getSuggestions()['data'];
 
                 <div class="search-bar">
                     <input type="text" id="friendSearchInput" class="search-input" placeholder="Buscar amigos..."
-                        oninput="searchFriends(this.value)">
+                        oninput="searchFriends(this.value)" maxlength="50">
                     <button class="search-clear" id="clearSearchBtn" onclick="clearSearch()"
                         style="display: none;">✕</button>
                 </div>

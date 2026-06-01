@@ -10,7 +10,7 @@
             <input type="text" name="q" class="search-header-input" id="globalSearchInput"
                    placeholder="Buscar publicaciones, usuarios o hashtags..."
                    value="<?php echo safe_output($_GET['q'] ?? ''); ?>"
-                   required minlength="2" autocomplete="off"
+                   required minlength="2" maxlength="100" autocomplete="off"
                    aria-label="Buscar"
                    aria-autocomplete="list"
                    aria-controls="searchHistoryDropdown"

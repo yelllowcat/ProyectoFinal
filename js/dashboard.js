@@ -431,7 +431,6 @@ function renderUserTable(data, countLabel) {
             <th>Nombre</th>
             <th>Correo electrónico</th>
             <th>${countLabel}</th>
-            <th>Acción</th>
         </tr>
     `;
 
@@ -439,7 +438,7 @@ function renderUserTable(data, countLabel) {
     tbody.innerHTML = '';
 
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay datos disponibles.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No hay datos disponibles.</td></tr>';
         return;
     }
 
@@ -450,7 +449,6 @@ function renderUserTable(data, countLabel) {
             <td>${item.full_name}</td>
             <td>${item.email}</td>
             <td style="font-weight:bold; color:${colors.teal}">${item.count}</td>
-            <td><button class="btn-view-profile-table" onclick="window.location.href='/profile?id=${item.user_id}'">Ver perfil</button></td>
         `;
         tbody.appendChild(tr);
     });
@@ -464,7 +462,6 @@ function renderPostTable(data, countLabel) {
             <th>Autor</th>
             <th>Contenido</th>
             <th>${countLabel}</th>
-            <th>Acción</th>
         </tr>
     `;
 
@@ -472,7 +469,7 @@ function renderPostTable(data, countLabel) {
     tbody.innerHTML = '';
 
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay datos disponibles.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No hay datos disponibles.</td></tr>';
         return;
     }
 
@@ -485,7 +482,6 @@ function renderPostTable(data, countLabel) {
             <td>${item.author_name}</td>
             <td>${contentSnippet}</td>
             <td style="font-weight:bold; color:${colors.teal}">${item.count}</td>
-            <td><button class="btn-view-profile-table" onclick="window.location.href='/profile?id=${item.user_id}'">Ver autor</button></td>
         `;
         tbody.appendChild(tr);
     });
@@ -694,7 +690,6 @@ function renderHashtagTable(data) {
             <th>Publicaciones</th>
             <th>Likes</th>
             <th>Comentarios</th>
-            <th>Acción</th>
         </tr>
     `;
 
@@ -702,7 +697,7 @@ function renderHashtagTable(data) {
     tbody.innerHTML = '';
 
     if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay datos disponibles.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No hay datos disponibles.</td></tr>';
         return;
     }
 
@@ -711,9 +706,8 @@ function renderHashtagTable(data) {
         tr.innerHTML = `
             <td><strong>#${item.name}</strong></td>
             <td style="font-weight:bold; color:${colors.teal}">${item.post_count}</td>
-            <td>${item.total_likes}</td>
-            <td>${item.total_comments}</td>
-            <td><button class="btn-view-profile-table" onclick="window.location.href='/hashtag/${encodeURIComponent(item.name)}'">Ver posts</button></td>
+            <td style="font-weight:bold; color:${colors.teal}">${item.total_likes}</td>
+            <td style="font-weight:bold; color:${colors.teal}">${item.total_comments}</td>
         `;
         tbody.appendChild(tr);
     });
