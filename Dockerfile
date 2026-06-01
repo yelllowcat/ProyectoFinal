@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     git \
     default-mysql-client \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -y pdo_mysql gd zip \
+    && docker-php-ext-install pdo_mysql gd zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Enable Apache mod_rewrite
