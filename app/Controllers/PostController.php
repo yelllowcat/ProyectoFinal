@@ -358,10 +358,16 @@ class PostController
                 $replies = $replyModel->getRepliesByComment($commentId);
                 $replyCount = $replyModel->getReplyCount($commentId);
 
+                $commentModel = new CommentModel();
+                $comment = $commentModel->getCommentById($commentId);
+                $postId = $comment['post_id'] ?? null;
+                $postCommentCount = $postId ? $commentModel->getCommentCount($postId) : 0;
+
                 return jsonSuccess([
                     'reply' => $newReply,
                     'replies' => $replies,
-                    'reply_count' => $replyCount
+                    'reply_count' => $replyCount,
+                    'post_comment_count' => $postCommentCount
                 ], 'Respuesta agregada');
             } else {
                 return jsonError('Error al agregar la respuesta');
@@ -391,9 +397,15 @@ class PostController
         if ($result) {
             $updatedReplyCount = $replyModel->getReplyCount($commentId);
 
+            $commentModel = new CommentModel();
+            $comment = $commentModel->getCommentById($commentId);
+            $postId = $comment['post_id'] ?? null;
+            $postCommentCount = $postId ? $commentModel->getCommentCount($postId) : 0;
+
             return jsonSuccess([
                 'reply_count' => $updatedReplyCount,
-                'comment_id' => $commentId
+                'comment_id' => $commentId,
+                'post_comment_count' => $postCommentCount
             ], 'Respuesta eliminada');
         } else {
             return jsonError('Error al eliminar la respuesta o no tienes permisos');

@@ -433,8 +433,11 @@ CREATE PROCEDURE sp_get_comment_count(
 )
 BEGIN
     SELECT COUNT(*) as comment_count 
-    FROM comments 
-    WHERE post_id = p_post_id AND active = 1;
+    FROM (
+        SELECT post_id FROM comments WHERE post_id = p_post_id AND active = 1
+        UNION ALL
+        SELECT c.post_id FROM replies r INNER JOIN comments c ON r.comment_id = c.comment_id WHERE c.post_id = p_post_id AND r.active = 1 AND c.active = 1
+    ) all_comments;
 END$$
 DELIMITER ;
 
@@ -648,8 +651,11 @@ LEFT JOIN (
 ) l ON p.post_id = l.post_id
 LEFT JOIN (
     SELECT post_id, COUNT(*) AS comments_count
-    FROM comments
-    WHERE active = 1
+    FROM (
+        SELECT post_id FROM comments WHERE active = 1
+        UNION ALL
+        SELECT c.post_id FROM replies r INNER JOIN comments c ON r.comment_id = c.comment_id WHERE r.active = 1 AND c.active = 1
+    ) all_comments
     GROUP BY post_id
 ) c ON p.post_id = c.post_id
 WHERE p.active = 1

@@ -9,7 +9,7 @@
         </div>
     </a>
 
-    <a href="/addPost" class="menu-item">
+    <a href="/addPost" class="menu-item <?php echo ($currentPage === 'addPost') ? 'active' : ''; ?>">
         <img src="../assets/images/addPost.png" alt="Nueva publicación" class="menu-icon">
         <span>Nueva publicación</span>
     </a>

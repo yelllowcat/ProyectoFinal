@@ -131,9 +131,12 @@ namespace App\views\admin;
             <!-- Peak Usage Heatmap -->
             <div class="chart-panel full-width">
                 <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                    <h3>Pico de uso de la plataforma</h3>
+                    <div>
+                        <h3>Pico de uso de la plataforma</h3>
+                        <p class="heatmap-subtitle" id="heatmapSubtitle">Actividad acumulada por día y hora — últimos 30 días</p>
+                    </div>
                     <div class="heatmap-toggles">
-                        <button class="heatmap-toggle active" onclick="switchHeatmapRange('30', this)">Últimos 30 días</button>
+                        <button class="heatmap-toggle active" onclick="switchHeatmapRange('30', this)">30 días</button>
                         <button class="heatmap-toggle" onclick="switchHeatmapRange('all', this)">Todo el tiempo</button>
                     </div>
                 </div>

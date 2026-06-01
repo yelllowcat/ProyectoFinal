@@ -206,6 +206,15 @@ document.addEventListener("DOMContentLoaded", function () {
                   toggleBtn.textContent = count > 0 ? `Ver respuestas (${count})` : 'Responder';
                 }
               }
+
+              const postContainer = commentEl ? commentEl.closest(".post-container") : null;
+              if (postContainer && result.data?.post_comment_count !== undefined) {
+                updateCommentCount(postContainer, result.data.post_comment_count);
+                const commentsTitle = postContainer.querySelector(".comments-title");
+                if (commentsTitle) {
+                  commentsTitle.textContent = `Comentarios (${result.data.post_comment_count})`;
+                }
+              }
             } else {
               alert("Error al eliminar la respuesta: " + result.message);
             }
@@ -410,17 +419,30 @@ function updateCommentsSection(postContainer, comments, commentCount, isAddingCo
     const commentUserId = comment.user_id;
 
     let commentMenuHTML = '';
-    if (currentUserId && commentUserId && currentUserId == commentUserId) {
-      commentMenuHTML = `
-        <div class="comment-menu-wrapper">
-          <img src="/assets/images/vertical-dots.png" alt="Opciones de comentario" width="20" 
-               class="comment-menu-trigger" data-menu-id="${commentMenuId}" style="cursor: pointer;">
-          <div class="comment-menu-modal" id="${commentMenuId}">
-            <div class="menu-option delete comment-delete-btn">Eliminar</div>
-            <div class="menu-option">Cancelar</div>
+    if (currentUserId && commentUserId) {
+      if (currentUserId == commentUserId) {
+        commentMenuHTML = `
+          <div class="comment-menu-wrapper">
+            <img src="/assets/images/vertical-dots.png" alt="Opciones de comentario" width="20" 
+                 class="comment-menu-trigger" data-menu-id="${commentMenuId}" style="cursor: pointer;">
+            <div class="comment-menu-modal" id="${commentMenuId}">
+              <div class="menu-option delete comment-delete-btn">Eliminar</div>
+              <div class="menu-option">Cancelar</div>
+            </div>
           </div>
-        </div>
-      `;
+        `;
+      } else {
+        commentMenuHTML = `
+          <div class="comment-menu-wrapper">
+            <img src="/assets/images/vertical-dots.png" alt="Opciones de comentario" width="20" 
+                 class="comment-menu-trigger" data-menu-id="${commentMenuId}" style="cursor: pointer;">
+            <div class="comment-menu-modal" id="${commentMenuId}">
+              <div class="menu-option" style="color: #f44336;" onclick="openReportModal('comment', ${commentId})">Reportar comentario</div>
+              <div class="menu-option">Cancelar</div>
+            </div>
+          </div>
+        `;
+      }
     }
 
     const replyCount = comment.reply_count || 0;
@@ -722,6 +744,15 @@ async function addReply(button) {
       const toggleBtn = commentEl.querySelector(".reply-toggle-btn");
       if (toggleBtn && result.data.reply_count > 0) {
         toggleBtn.textContent = `Ver respuestas (${result.data.reply_count})`;
+      }
+
+      const postContainer = commentEl.closest(".post-container");
+      if (postContainer && result.data.post_comment_count !== undefined) {
+        updateCommentCount(postContainer, result.data.post_comment_count);
+        const commentsTitle = postContainer.querySelector(".comments-title");
+        if (commentsTitle) {
+          commentsTitle.textContent = `Comentarios (${result.data.post_comment_count})`;
+        }
       }
     } else {
       alert("Error al agregar respuesta: " + result.message);

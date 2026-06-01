@@ -71,19 +71,15 @@ class AdminModel
         try {
             $stmt = $this->pdo->prepare("
                 SELECT 
-                    p.post_id,
-                    p.content,
-                    p.created_at,
-                    u.user_id,
-                    u.full_name as author_name,
-                    u.email as author_email,
-                    u.profile_picture as author_picture,
-                    COUNT(c.comment_id) as comment_count
-                FROM posts p
-                JOIN users u ON p.user_id = u.user_id
-                LEFT JOIN comments c ON p.post_id = c.post_id AND c.active = 1
-                WHERE p.active = 1
-                GROUP BY p.post_id, p.content, p.created_at, u.user_id, u.full_name, u.email, u.profile_picture
+                    post_id,
+                    content,
+                    created_at,
+                    user_id,
+                    author_name,
+                    author_email,
+                    author_picture,
+                    comments_count as comment_count
+                FROM v_posts_stats
                 ORDER BY comment_count DESC
                 LIMIT ?
             ");
@@ -179,31 +175,26 @@ class AdminModel
             ");
             $likes = $stmtLikes->fetchAll(PDO::FETCH_ASSOC);
             
-            // Format data for chart
-            $allDates = [];
-            foreach ($posts as $row) { $allDates[$row['date']] = true; }
-            foreach ($comments as $row) { $allDates[$row['date']] = true; }
-            foreach ($likes as $row) { $allDates[$row['date']] = true; }
-            
-            $labels = array_keys($allDates);
-            sort($labels);
-            
+            // Index results by date for quick lookup
+            $postsMap = [];
+            $commentsMap = [];
+            $likesMap = [];
+            foreach ($posts as $row) { $postsMap[$row['date']] = (int)$row['count']; }
+            foreach ($comments as $row) { $commentsMap[$row['date']] = (int)$row['count']; }
+            foreach ($likes as $row) { $likesMap[$row['date']] = (int)$row['count']; }
+
+            // Generate complete 30-day date range, filling zeros for missing days
+            $labels = [];
             $postsData = [];
             $commentsData = [];
             $likesData = [];
-            
-            foreach ($labels as $date) {
-                $postCount = 0;
-                foreach ($posts as $row) { if ($row['date'] === $date) { $postCount = (int)$row['count']; break; } }
-                $postsData[] = $postCount;
-                
-                $commentCount = 0;
-                foreach ($comments as $row) { if ($row['date'] === $date) { $commentCount = (int)$row['count']; break; } }
-                $commentsData[] = $commentCount;
-                
-                $likeCount = 0;
-                foreach ($likes as $row) { if ($row['date'] === $date) { $likeCount = (int)$row['count']; break; } }
-                $likesData[] = $likeCount;
+
+            for ($i = 29; $i >= 0; $i--) {
+                $date = date('Y-m-d', strtotime("-{$i} days"));
+                $labels[] = $date;
+                $postsData[] = $postsMap[$date] ?? 0;
+                $commentsData[] = $commentsMap[$date] ?? 0;
+                $likesData[] = $likesMap[$date] ?? 0;
             }
 
             return [
@@ -257,12 +248,22 @@ class AdminModel
             ");
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
+            // Map yearweek key => count for quick lookup
+            $weekMap = [];
+            foreach ($rows as $row) {
+                $weekMap[$row['week']] = (int)$row['count'];
+            }
+
+            // Generate all 8 weeks, filling zeros for weeks with no registrations
             $labels = [];
             $counts = [];
-            foreach ($rows as $row) {
-                $dateObj = new \DateTime($row['week_start']);
-                $labels[] = 'Sem ' . $dateObj->format('d/m');
-                $counts[] = (int)$row['count'];
+            for ($i = 7; $i >= 0; $i--) {
+                $date = new \DateTime();
+                $date->modify("-{$i} weeks");
+                $date->modify('monday this week');
+                $yw = $date->format('o') . $date->format('W');
+                $labels[] = 'Sem ' . $date->format('d/m');
+                $counts[] = $weekMap[$yw] ?? 0;
             }
             
             return [
@@ -463,13 +464,25 @@ class AdminModel
                     h.hashtag_id,
                     h.name,
                     COUNT(DISTINCT p.post_id) as post_count,
-                    COUNT(DISTINCT l.like_id) as total_likes,
-                    COUNT(DISTINCT c.comment_id) as total_comments
+                    IFNULL(SUM(l.likes_count), 0) as total_likes,
+                    IFNULL(SUM(c.comments_count), 0) as total_comments
                 FROM hashtags h
                 JOIN post_hashtags ph ON h.hashtag_id = ph.hashtag_id
                 JOIN posts p ON ph.post_id = p.post_id AND p.active = 1
-                LEFT JOIN likes l ON p.post_id = l.post_id
-                LEFT JOIN comments c ON p.post_id = c.post_id AND c.active = 1
+                LEFT JOIN (
+                    SELECT post_id, COUNT(*) as likes_count
+                    FROM likes
+                    GROUP BY post_id
+                ) l ON p.post_id = l.post_id
+                LEFT JOIN (
+                    SELECT post_id, COUNT(*) as comments_count
+                    FROM (
+                        SELECT post_id FROM comments WHERE active = 1
+                        UNION ALL
+                        SELECT c.post_id FROM replies r INNER JOIN comments c ON r.comment_id = c.comment_id WHERE r.active = 1 AND c.active = 1
+                    ) all_comments
+                    GROUP BY post_id
+                ) c ON p.post_id = c.post_id
                 GROUP BY h.hashtag_id, h.name
                 ORDER BY {$orderColumn} DESC, h.name ASC
                 LIMIT ?

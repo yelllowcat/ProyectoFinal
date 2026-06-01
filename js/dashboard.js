@@ -215,7 +215,7 @@ function fetchUserGrowth() {
         .then(response => response.json())
         .then(data => {
             if (data.success && data.data) {
-                renderChartA('bar', data.data.labels, data.data.counts, 'Crecimiento de Usuarios (semanas)', colors.teal);
+                renderChartA('bar', data.data.labels, data.data.counts, 'Nuevos registros por semana (últimas 8 sem.)', colors.teal);
             }
         })
         .catch(error => console.error('Error fetching user growth:', error));
@@ -227,7 +227,7 @@ function fetchUserActivitySplit() {
         .then(response => response.json())
         .then(data => {
             if (data.success && data.data) {
-                renderChartB('doughnut', ['Activos', 'Inactivos'], [data.data.active, data.data.inactive], 'Usuarios Activos vs Inactivos', [colors.teal, colors.gray]);
+                renderChartB('doughnut', ['Han publicado', 'Sin publicaciones'], [data.data.active, data.data.inactive], 'Usuarios que han publicado vs. sin publicaciones', [colors.teal, colors.gray]);
             }
         })
         .catch(error => console.error('Error fetching activity split:', error));
@@ -239,15 +239,15 @@ function fetchPostsByDayOfWeek() {
         .then(response => response.json())
         .then(data => {
             if (data.success && data.data && data.data.labels && data.data.counts) {
-                renderChartA('bar', data.data.labels, data.data.counts, 'Publicaciones por Día de la Semana', colors.teal);
+                renderChartA('bar', data.data.labels, data.data.counts, 'Publicaciones por día — todo el tiempo', colors.teal);
             } else {
                 console.error('Invalid postsby-day response:', data);
-                renderChartA('bar', ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'], [0,0,0,0,0,0,0], 'Publicaciones por Día de la Semana', colors.teal);
+                renderChartA('bar', ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'], [0,0,0,0,0,0,0], 'Publicaciones por día — todo el tiempo', colors.teal);
             }
         })
         .catch(error => {
             console.error('Error fetching posts by day:', error);
-            renderChartA('bar', ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'], [0,0,0,0,0,0,0], 'Publicaciones por Día de la Semana', colors.teal);
+            renderChartA('bar', ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'], [0,0,0,0,0,0,0], 'Publicaciones por día — todo el tiempo', colors.teal);
         });
 }
 
@@ -257,7 +257,7 @@ function fetchPostImageRatio() {
         .then(response => response.json())
         .then(data => {
             if (data.success && data.data) {
-                renderChartB('doughnut', ['Con imagen', 'Solo texto'], [data.data.with_image, data.data.text_only], 'Tipo de Contenido', [colors.teal, colors.green]);
+                renderChartB('doughnut', ['Con imagen', 'Solo texto'], [data.data.with_image, data.data.text_only], 'Publicaciones con y sin imagen — todo el tiempo', [colors.teal, colors.green]);
             }
         })
         .catch(error => console.error('Error fetching image ratio:', error));
@@ -271,7 +271,7 @@ function fetchEngagementBreakdown() {
             if (data.success && data.data) {
                 const labels = ['Likes en posts', 'Comentarios', 'Respuestas', 'Likes en comments', 'Likes en replies'];
                 const values = Object.values(data.data);
-                renderChartA('doughnut', labels, values, 'Distribución de Interacciones', [colors.teal, colors.green, colors.pink, colors.yellow, colors.purple]);
+                renderChartA('doughnut', labels, values, 'Distribución de interacciones — todo el tiempo', [colors.teal, colors.green, colors.pink, colors.yellow, colors.purple]);
             }
         })
         .catch(error => console.error('Error fetching engagement:', error));
@@ -286,7 +286,7 @@ function fetchTopEngagedUsers() {
                 const top5 = data.data.slice(0, 5);
                 const labels = top5.map(u => u.full_name.split(' ')[0]);
                 const values = top5.map(u => parseInt(u.total_engagement));
-                renderChartB('bar', labels, values, 'Usuarios con Mayor Participación', colors.teal, true);
+                renderChartB('bar', labels, values, 'Top participación — todo el tiempo', colors.teal, true);
             }
         })
         .catch(error => console.error('Error fetching top engaged users:', error));
@@ -601,6 +601,12 @@ function fetchPeakUsageHeatmap(range) {
 function switchHeatmapRange(range, btn) {
     document.querySelectorAll('.heatmap-toggle').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    var subtitle = document.getElementById('heatmapSubtitle');
+    if (subtitle) {
+        subtitle.textContent = range === 'all'
+            ? 'Actividad acumulada por día y hora — todo el tiempo'
+            : 'Actividad acumulada por día y hora — últimos ' + range + ' días';
+    }
     fetchPeakUsageHeatmap(range);
 }
 
@@ -727,7 +733,7 @@ function fetchHashtagTrend(range = 30) {
 function renderHashtagTrendChart(data) {
     const ctx = document.getElementById('chartA');
     if (!ctx) return;
-    document.getElementById('chartATitle').innerText = 'Tendencia de Hashtags';
+    document.getElementById('chartATitle').innerText = 'Tendencia de Hashtags — últimos ' + (window._hashtagRange || 30) + ' días';
     if (chartAInstance) chartAInstance.destroy();
 
     chartAInstance = new Chart(ctx, {
@@ -777,5 +783,6 @@ function fetchTopHashtagsForChart() {
 window.switchHashtagRange = function(range, btn) {
     document.querySelectorAll('.hashtag-toggles .heatmap-toggle').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    window._hashtagRange = range;
     fetchHashtagTrend(range);
 };

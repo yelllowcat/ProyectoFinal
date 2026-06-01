@@ -79,9 +79,9 @@ $profilePicture = getProfilePicture($user['profile_picture']);
           </div>
 
           <div class="action-buttons">
-            <button type="button" class="btn btn-delete-post" onclick="deletePost(<?= $postId ?>)">Eliminar
+            <button type="button" class="btn btn-deny btn-delete-post" onclick="deletePost(<?= $postId ?>)">Eliminar
               publicación</button>
-            <button type="submit" class="btn btn-save">Guardar Cambios</button>
+            <button type="submit" class="btn btn-primary btn-save">Guardar Cambios</button>
           </div>
         </div>
       </form>

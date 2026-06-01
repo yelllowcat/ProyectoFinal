@@ -382,6 +382,13 @@ body {
 }
 
 /* Heatmap Styles */
+.heatmap-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #999;
+  font-weight: 400;
+}
+
 .heatmap-toggles {
   display: flex;
   gap: 8px;
