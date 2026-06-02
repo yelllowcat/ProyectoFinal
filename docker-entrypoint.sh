@@ -13,7 +13,7 @@ EOF
 # 2. Wait for MySQL to be available
 if [ -n "$DB_HOST" ]; then
     echo "Waiting for database connection at ${DB_HOST}..."
-    until mysqladmin --ssl-mode=DISABLED ping -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS"; do
+    until mysqladmin --skip-ssl ping -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS"; do
         echo "Database is not ready yet, sleeping..."
         sleep 2
     done
@@ -24,14 +24,14 @@ if [ -n "$DB_HOST" ]; then
     sed -i "s/unired_DB/${DB_NAME}/g" /var/www/html/database/unired_db.sql
 
     # 4. Check if tables exist
-    TABLE_COUNT=$(mysql --ssl-mode=DISABLED -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -se "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$DB_NAME';")
+    TABLE_COUNT=$(mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -se "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$DB_NAME';")
     
     if [ "$TABLE_COUNT" -eq 0 ]; then
         echo "No tables found in ${DB_NAME}. Importing unired_db.sql..."
-        mysql --ssl-mode=DISABLED -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /var/www/html/database/unired_db.sql
+        mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /var/www/html/database/unired_db.sql
         
         echo "Running performance optimization migrations..."
-        mysql --ssl-mode=DISABLED -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /var/www/html/database/migrations/2025_05_17_performance_indexes.sql
+        mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /var/www/html/database/migrations/2025_05_17_performance_indexes.sql
         
         if [ "$SEED_DB" = "true" ]; then
             echo "SEED_DB is set to true. Seeding database..."
