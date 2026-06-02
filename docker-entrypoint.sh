@@ -13,7 +13,7 @@ EOF
 # 2. Wait for MySQL to be available
 if [ -n "$DB_HOST" ]; then
     echo "Waiting for database connection at ${DB_HOST}..."
-    until mysqladmin ping -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" --silent; do
+    until mysqladmin ping -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS"; do
         echo "Database is not ready yet, sleeping..."
         sleep 2
     done
