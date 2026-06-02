@@ -23,9 +23,9 @@ if [ -n "$DB_HOST" ]; then
     echo "Adapting unired_db.sql with DB name: ${DB_NAME}..."
     sed -i "s/unired_DB/${DB_NAME}/g" /var/www/html/database/unired_db.sql
 
-    # 4. Check if tables exist
+    # 4. Check if tables exist (BASE TABLEs only)
     echo "Checking for tables in database ${DB_NAME}..."
-    if ! TABLE_COUNT=$(mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -se "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$DB_NAME';"); then
+    if ! TABLE_COUNT=$(mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -se "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$DB_NAME' AND TABLE_TYPE = 'BASE TABLE';"); then
         echo "Error: Failed to query database '${DB_NAME}'. Please check if the database exists and your user credentials have permission to access it."
         exit 1
     fi
@@ -36,17 +36,27 @@ if [ -n "$DB_HOST" ]; then
         echo "Warning: Could not check stored procedures count."
         ROUTINE_COUNT=0
     fi
-    echo "Found ${TABLE_COUNT} tables and ${ROUTINE_COUNT} stored procedures."
 
-    # If tables exist but routines are missing, the DB is in a corrupted/partial state. Reset it.
-    if [ "$TABLE_COUNT" -gt 0 ] && [ "$ROUTINE_COUNT" -eq 0 ]; then
-        echo "Database has tables but is missing stored procedures. Resetting database..."
+    # Check if the view v_posts_stats exists
+    echo "Checking for view v_posts_stats in database ${DB_NAME}..."
+    if ! VIEW_EXISTS=$(mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -se "SELECT COUNT(*) FROM information_schema.views WHERE table_schema = '$DB_NAME' AND table_name = 'v_posts_stats';"); then
+        echo "Warning: Could not check if view exists."
+        VIEW_EXISTS=0
+    fi
+
+    echo "Status: Found ${TABLE_COUNT}/13 tables, ${ROUTINE_COUNT}/41 stored procedures, and view_exists=${VIEW_EXISTS}."
+
+    # If any of the required parts are missing or incomplete, reset and import the full DB.
+    # Total tables = 13, routines = 41, view = 1
+    if [ "$TABLE_COUNT" -lt 13 ] || [ "$ROUTINE_COUNT" -lt 41 ] || [ "$VIEW_EXISTS" -eq 0 ]; then
+        echo "Database is incomplete or corrupted. Resetting database to force a clean import..."
         if mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -e "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME};" 2>/dev/null; then
             echo "Database ${DB_NAME} recreated successfully."
         else
-            echo "Failed to recreate database. Dropping all tables manually instead..."
+            echo "Failed to recreate database. Dropping all tables and views manually instead..."
             mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e '
                 SET FOREIGN_KEY_CHECKS = 0;
+                DROP VIEW IF EXISTS v_posts_stats;
                 SET @tables = NULL;
                 SELECT GROUP_CONCAT("`", table_name, "`") INTO @tables FROM information_schema.tables WHERE table_schema = (SELECT DATABASE());
                 SELECT IFNULL(CONCAT("DROP TABLE IF EXISTS ", @tables), "SELECT 1") INTO @stmt;
