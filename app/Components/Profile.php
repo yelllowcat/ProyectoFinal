@@ -87,9 +87,7 @@ class Profile
                 </div>";
         }
         
-        // Agregar botón de reportar si no es el perfil propio y no es 'stranger' (donde ya se agregó)
-        // Pero para los otros estados, tenemos que insertarlo en el return
-
+        return "";
     }
 
     public function render()

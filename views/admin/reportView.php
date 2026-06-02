@@ -53,7 +53,7 @@ if ($report['reported_user_id']) {
     $profilePicture = getProfilePicture($user['profile_picture'] ?? null);
 
     $profileComponent = new Profile(
-        'stranger',
+        'moderation',
         $user['full_name'] ?? 'Usuario',
         $user['biography'] ?? '',
         count($userPosts),
