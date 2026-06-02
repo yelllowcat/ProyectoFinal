@@ -53,6 +53,11 @@ if [ -n "$DB_HOST" ]; then
     else
         echo "Database already has tables ($TABLE_COUNT tables found). Skipping initialization."
     fi
+
+    echo "Ensuring admin user exists..."
+    if ! php /var/www/html/database/create_admin.php; then
+        echo "Warning: Could not verify or create admin user."
+    fi
 fi
 
 # Execute the CMD (default is apache2-foreground)
