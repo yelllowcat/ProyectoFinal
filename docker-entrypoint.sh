@@ -46,15 +46,25 @@ if [ -n "$DB_HOST" ]; then
 
     echo "Status: Found ${TABLE_COUNT}/13 tables, ${ROUTINE_COUNT}/41 stored procedures, and view_exists=${VIEW_EXISTS}."
 
+    # Determine import credentials (use root if DB_ROOT_PASS is provided to get SUPER privilege for triggers)
+    IMP_USER=$DB_USER
+    IMP_PASS=$DB_PASS
+    if [ -n "$DB_ROOT_PASS" ]; then
+        echo "Root password provided. Trusting function creators..."
+        mysql --skip-ssl -h "$DB_HOST" -u root -p"$DB_ROOT_PASS" -e "SET GLOBAL log_bin_trust_function_creators = 1;" || echo "Warning: Could not set global log_bin_trust_function_creators"
+        IMP_USER="root"
+        IMP_PASS=$DB_ROOT_PASS
+    fi
+
     # If any of the required parts are missing or incomplete, reset and import the full DB.
     # Total tables = 13, routines = 41, view = 1
     if [ "$TABLE_COUNT" -lt 13 ] || [ "$ROUTINE_COUNT" -lt 41 ] || [ "$VIEW_EXISTS" -eq 0 ]; then
         echo "Database is incomplete or corrupted. Resetting database to force a clean import..."
-        if mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -e "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME};" 2>/dev/null; then
+        if mysql --skip-ssl -h "$DB_HOST" -u "$IMP_USER" -p"$IMP_PASS" -e "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME};" 2>/dev/null; then
             echo "Database ${DB_NAME} recreated successfully."
         else
             echo "Failed to recreate database. Dropping all tables and views manually instead..."
-            mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e '
+            mysql --skip-ssl -h "$DB_HOST" -u "$IMP_USER" -p"$IMP_PASS" -D "$DB_NAME" -e '
                 SET FOREIGN_KEY_CHECKS = 0;
                 DROP VIEW IF EXISTS v_posts_stats;
                 SET @tables = NULL;
@@ -71,13 +81,13 @@ if [ -n "$DB_HOST" ]; then
     
     if [ "$TABLE_COUNT" -eq 0 ]; then
         echo "No tables found in ${DB_NAME}. Importing unired_db.sql..."
-        if ! mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /var/www/html/database/unired_db.sql; then
+        if ! mysql --skip-ssl -h "$DB_HOST" -u "$IMP_USER" -p"$IMP_PASS" "$DB_NAME" < /var/www/html/database/unired_db.sql; then
             echo "Error: Failed to import database/unired_db.sql"
             exit 1
         fi
         
         echo "Running performance optimization migrations..."
-        if ! mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /var/www/html/database/migrations/2025_05_17_performance_indexes.sql; then
+        if ! mysql --skip-ssl -h "$DB_HOST" -u "$IMP_USER" -p"$IMP_PASS" "$DB_NAME" < /var/www/html/database/migrations/2025_05_17_performance_indexes.sql; then
             echo "Error: Failed to run database/migrations/2025_05_17_performance_indexes.sql"
             exit 1
         fi
