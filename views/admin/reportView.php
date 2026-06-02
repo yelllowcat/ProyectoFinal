@@ -277,6 +277,9 @@ $statusBadge = $report['status'] === 'pending'
     <link rel="stylesheet" href="<?php echo asset('assets/styles/styles.css'); ?>">
     <link rel="stylesheet" href="<?php echo asset('assets/styles/dashboard.css'); ?>">
     <script src="<?php echo asset('js/main.js'); ?>"></script>
+    <script>
+        window.isUserReport = <?php echo $report['reported_user_id'] ? 'true' : 'false'; ?>;
+    </script>
     <script src="<?php echo asset('js/reportView.js'); ?>"></script>
     <style>
         /* Override styles.css body flex for report view */
@@ -378,15 +381,17 @@ $statusBadge = $report['status'] === 'pending'
                         <span class="btn-text">Desestimar</span>
                         <span class="btn-subtext">Falsa alarma</span>
                     </button>
-                    <button class="moderation-btn delete" data-action="delete" data-report-id="<?php echo $reportId; ?>">
-                        <span class="btn-icon icon-trash"></span>
-                        <span class="btn-text">Eliminar</span>
-                        <span class="btn-subtext">Solo contenido</span>
-                    </button>
+                    <?php if (!$report['reported_user_id']): ?>
+                        <button class="moderation-btn delete" data-action="delete" data-report-id="<?php echo $reportId; ?>">
+                            <span class="btn-icon icon-trash"></span>
+                            <span class="btn-text">Eliminar</span>
+                            <span class="btn-subtext">Solo contenido</span>
+                        </button>
+                    <?php endif; ?>
                     <button class="moderation-btn suspend" data-action="suspend" data-report-id="<?php echo $reportId; ?>">
                         <span class="btn-icon icon-ban"></span>
                         <span class="btn-text">Suspender</span>
-                        <span class="btn-subtext">Usuario + contenido</span>
+                        <span class="btn-subtext"><?php echo $report['reported_user_id'] ? 'Usuario' : 'Usuario + contenido'; ?></span>
                     </button>
                 </div>
             <?php else: ?>

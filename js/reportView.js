@@ -39,7 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const actionLabels = {
         dismiss: {
             title: 'Desestimar reporte',
-            subtitle: 'Marcar este reporte como falsa alarma. El contenido no será eliminado.',
+            subtitle: window.isUserReport
+                ? 'Marcar este reporte como falsa alarma. El usuario no será suspendido.'
+                : 'Marcar este reporte como falsa alarma. El contenido no será eliminado.',
             btnText: 'Desestimar',
             btnColor: '#1565c0'
         },
@@ -51,7 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         suspend: {
             title: 'Suspender usuario',
-            subtitle: 'Suspender al autor del contenido y eliminar el contenido reportado.',
+            subtitle: window.isUserReport
+                ? 'Suspender permanentemente a este usuario. Esta acción no se puede deshacer.'
+                : 'Suspender al autor del contenido y eliminar el contenido reportado.',
             btnText: 'Suspender',
             btnColor: '#ad1457'
         }
