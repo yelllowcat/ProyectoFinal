@@ -560,7 +560,7 @@ function renderReportTable(data) {
             <td>${statusBadge}</td>
             <td>
                 <div style="display:flex; gap: 5px;">
-                    <a href="${targetUrl}" target="_blank" class="btn-view-profile-table" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; background-color: #4db8c4;">
+                    <a href="${targetUrl}" class="btn-view-profile-table" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; background-color: #4db8c4;">
                         Detalles
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: white; vertical-align: middle;">
                             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
