@@ -24,18 +24,30 @@ if [ -n "$DB_HOST" ]; then
     sed -i "s/unired_DB/${DB_NAME}/g" /var/www/html/database/unired_db.sql
 
     # 4. Check if tables exist
-    TABLE_COUNT=$(mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -se "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$DB_NAME';")
+    echo "Checking for tables in database ${DB_NAME}..."
+    if ! TABLE_COUNT=$(mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -se "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$DB_NAME';"); then
+        echo "Error: Failed to query database '${DB_NAME}'. Please check if the database exists and your user credentials have permission to access it."
+        exit 1
+    fi
     
     if [ "$TABLE_COUNT" -eq 0 ]; then
         echo "No tables found in ${DB_NAME}. Importing unired_db.sql..."
-        mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /var/www/html/database/unired_db.sql
+        if ! mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /var/www/html/database/unired_db.sql; then
+            echo "Error: Failed to import database/unired_db.sql"
+            exit 1
+        fi
         
         echo "Running performance optimization migrations..."
-        mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /var/www/html/database/migrations/2025_05_17_performance_indexes.sql
+        if ! mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < /var/www/html/database/migrations/2025_05_17_performance_indexes.sql; then
+            echo "Error: Failed to run database/migrations/2025_05_17_performance_indexes.sql"
+            exit 1
+        fi
         
         if [ "$SEED_DB" = "true" ]; then
             echo "SEED_DB is set to true. Seeding database..."
-            php /var/www/html/database/seed.php
+            if ! php /var/www/html/database/seed.php; then
+                echo "Warning: Database seeding failed."
+            fi
         fi
         echo "Database initialization completed successfully."
     else
