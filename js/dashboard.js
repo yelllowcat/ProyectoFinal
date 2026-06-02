@@ -568,7 +568,7 @@ function renderReportTable(data) {
                             <line x1="10" y1="14" x2="21" y2="3"></line>
                         </svg>
                     </a>
-                    ${item.status === 'pending' ? `<button class="btn-view-profile-table" style="background:#4caf50;" onclick="resolveReport(${item.report_id})">Resolver</button>` : ''}
+                    ${item.status === 'pending' ? `<button class="btn-view-profile-table" style="background:#4caf50;" onclick="resolveReport(${item.report_id}, ${item.reported_user_id ? 'true' : 'false'})">Resolver</button>` : ''}
                     <button class="btn-view-profile-table" style="background:#f44336;" onclick="deleteReport(${item.report_id})">Eliminar</button>
                 </div>
             </td>
@@ -577,9 +577,25 @@ function renderReportTable(data) {
     });
 }
 
-window.resolveReport = function(id) {
+window.resolveReport = function(id, isUserReport) {
     const modal = document.getElementById('resolve-report-modal');
     document.getElementById('resolve-report-id').value = id;
+    
+    const select = document.getElementById('resolve-action');
+    if (select) {
+        const deleteOption = select.querySelector('option[value="delete"]');
+        const suspendOption = select.querySelector('option[value="suspend"]');
+        
+        if (isUserReport) {
+            if (deleteOption) deleteOption.style.display = 'none';
+            if (suspendOption) suspendOption.textContent = 'Suspender usuario';
+        } else {
+            if (deleteOption) deleteOption.style.display = 'block';
+            if (suspendOption) suspendOption.textContent = 'Suspender usuario y eliminar contenido';
+        }
+        select.value = 'dismiss';
+    }
+    
     modal.showModal();
 };
 
