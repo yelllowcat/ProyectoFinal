@@ -17,5 +17,9 @@
     },
     "config": {
         "optimize-autoloader": true
+    },
+    "scripts": {
+        "db:seed": "php database/seed.php",
+        "db:create-admin": "php database/create_admin.php"
     }
 }
