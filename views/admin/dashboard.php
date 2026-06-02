@@ -233,6 +233,20 @@ namespace App\views\admin;
                     <button type="button" class="btn-secondary" onclick="document.getElementById('resolve-report-modal').close()" style="flex: 1; padding: 10px; border-radius: 8px; background: #eee; border: none; cursor: pointer; font-weight: 600;">Cancelar</button>
                 </div>
             </form>
+    </dialog>
+
+    <dialog id="confirm-delete-report-modal" class="confirm-dialog">
+        <div class="confirm-box" style="max-width: 400px; padding: 20px;">
+            <div class="confirm-head">
+                <h3>Confirmar eliminación</h3>
+                <p class="confirm-subtitle">¿Estás seguro/a de que deseas eliminar este reporte permanentemente?</p>
+            </div>
+            <div class="confirm-sep"></div>
+            <input type="hidden" id="delete-report-id">
+            <div class="confirm-actions" style="display: flex; gap: 10px;">
+                <button id="btn-confirm-delete-report" class="btn-primary" style="flex: 1; padding: 10px; border-radius: 8px; background: #e74c3c; color: white; border: none; cursor: pointer; font-weight: 600;">Eliminar</button>
+                <button type="button" class="btn-secondary" onclick="document.getElementById('confirm-delete-report-modal').close()" style="flex: 1; padding: 10px; border-radius: 8px; background: #eee; border: none; cursor: pointer; font-weight: 600;">Cancelar</button>
+            </div>
         </div>
     </dialog>
 

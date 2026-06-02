@@ -76,6 +76,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    const confirmDeleteBtn = document.getElementById('btn-confirm-delete-report');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', async function() {
+            const id = document.getElementById('delete-report-id').value;
+            try {
+                const res = await fetch(`/admin/reports/${id}`, { method: 'DELETE' });
+                const json = await res.json();
+                if (json.success) {
+                    document.getElementById('confirm-delete-report-modal').close();
+                    fetchReports();
+                } else {
+                    alert(json.message);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        });
+    }
 });
 
 // Animate numbers counting up
@@ -564,18 +583,11 @@ window.resolveReport = function(id) {
     modal.showModal();
 };
 
-window.deleteReport = async function(id) {
-    if (!confirm('¿Eliminar este reporte permanentemente?')) return;
-    try {
-        const res = await fetch(`/admin/reports/${id}`, { method: 'DELETE' });
-        const json = await res.json();
-        if (json.success) {
-            fetchReports();
-        } else {
-            alert(json.message);
-        }
-    } catch (e) {
-        console.error(e);
+window.deleteReport = function(id) {
+    const modal = document.getElementById('confirm-delete-report-modal');
+    if (modal) {
+        document.getElementById('delete-report-id').value = id;
+        modal.showModal();
     }
 };
 
