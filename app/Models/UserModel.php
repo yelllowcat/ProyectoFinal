@@ -24,23 +24,38 @@ class UserModel
         error_log("Database error [{$errorCode}]: {$errorMessage}");
 
         if ($errorCode == '45000') {
-            if (preg_match('/: (.+)$/', $errorMessage, $matches)) {
+            $customMessage = '';
+            if (preg_match('/1644\s+(.+)$/', $errorMessage, $matches)) {
                 $customMessage = trim($matches[1]);
-
-                $messageMap = [
-                    'El correo ya está registrado' => 'Este correo electrónico ya está en uso.',
-                    'Correo no encontrado' => 'Usuario no encontrado.',
-                    'Usuario no encontrado' => 'Usuario no encontrado.'
-                ];
-
-                foreach ($messageMap as $dbMsg => $userMsg) {
-                    if (strpos($customMessage, $dbMsg) !== false) {
-                        return $userMsg;
-                    }
-                }
-
-                return $customMessage;
+            } elseif (preg_match('/: (.+)$/', $errorMessage, $matches)) {
+                $customMessage = trim($matches[1]);
+            } else {
+                $customMessage = $errorMessage;
             }
+
+            // Normalizar codificación en caso de caracteres corruptos de MySQL
+            $cleanMessage = $customMessage;
+            if (strpos($customMessage, 'estÃ¡') !== false) {
+                $cleanMessage = str_replace('estÃ¡', 'está', $customMessage);
+            }
+
+            // Mapeo robusto a mensajes amigables
+            if (
+                strpos($cleanMessage, 'El correo ya está registrado') !== false ||
+                (strpos($cleanMessage, 'correo') !== false && strpos($cleanMessage, 'registrado') !== false)
+            ) {
+                return 'Este correo electrónico ya está en uso.';
+            }
+
+            if (
+                strpos($cleanMessage, 'Correo no encontrado') !== false ||
+                strpos($cleanMessage, 'Usuario no encontrado') !== false ||
+                strpos($cleanMessage, 'no encontrado') !== false
+            ) {
+                return 'Usuario no encontrado.';
+            }
+
+            return $cleanMessage;
         }
 
         if ($errorCode == '23000' && strpos($errorMessage, 'Duplicate entry') !== false) {

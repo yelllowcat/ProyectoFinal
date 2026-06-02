@@ -36,7 +36,7 @@ $commentsMap = $commentsMap ?? [];
                     #<?php echo safe_output($tag); ?>
                 </h1>
                 <span class="hashtag-page-count">
-                    <?php echo $postCount; ?> publicacion<?php echo $postCount !== 1 ? 'es' : ''; ?>
+                    <?php echo $postCount; ?> <?php echo $postCount === 1 ? 'publicación' : 'publicaciones'; ?>
                 </span>
             </div>
 

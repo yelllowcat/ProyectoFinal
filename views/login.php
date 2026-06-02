@@ -24,9 +24,9 @@ use App\Components\Alert;
 
     <form method="post" action="/login">
       <div class="form-group">
-        <input type="email" id="email" placeholder="Correo electronico" name="email"
+        <input type="email" id="email" placeholder="Correo electrónico" name="email"
           value="<?= safe_output($_POST['email'] ?? '') ?>" required onpaste="return false;" maxlength="200" />
-        <label for="email" class="form-label" data-help="Formato: correo@ejemplo.com">Correo electronico</label>
+        <label for="email" class="form-label" data-help="Formato: correo@ejemplo.com">Correo electrónico</label>
       </div>
 
       <div class="form-group password-field">
@@ -42,7 +42,7 @@ use App\Components\Alert;
         ¿Eres un nuevo usuario? <a href="/register">Registrarse</a>
       </div>
 
-      <button type="submit">Iniciar sesion</button>
+      <button type="submit">Iniciar sesión</button>
     </form>
 </body>
 

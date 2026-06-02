@@ -261,7 +261,7 @@ function buildTabUrl(string $query, string $type, string $sort, string $date): s
                                     <?php foreach ($shownHashtags as $hashtag): ?>
                                         <a href="/hashtag/<?php echo urlencode(ltrim($hashtag['name'], '#')); ?>" class="search-hashtag-card">
                                             <span class="search-hashtag-name"><?php echo highlightTerm($hashtag['name'], $query); ?></span>
-                                            <span class="search-hashtag-count"><?php echo $hashtag['post_count']; ?> publicacion<?php echo $hashtag['post_count'] != 1 ? 'es' : ''; ?></span>
+                                            <span class="search-hashtag-count"><?php echo $hashtag['post_count']; ?> <?php echo $hashtag['post_count'] == 1 ? 'publicación' : 'publicaciones'; ?></span>
                                         </a>
                                     <?php endforeach; ?>
                                 </div>
@@ -360,7 +360,7 @@ function buildTabUrl(string $query, string $type, string $sort, string $date): s
                                 <?php foreach ($results['hashtags'] as $hashtag): ?>
                                     <a href="/hashtag/<?php echo urlencode(ltrim($hashtag['name'], '#')); ?>" class="search-hashtag-card large">
                                         <span class="search-hashtag-name"><?php echo highlightTerm($hashtag['name'], $query); ?></span>
-                                        <span class="search-hashtag-count"><?php echo $hashtag['post_count']; ?> publicacion<?php echo $hashtag['post_count'] != 1 ? 'es' : ''; ?></span>
+                                        <span class="search-hashtag-count"><?php echo $hashtag['post_count']; ?> <?php echo $hashtag['post_count'] == 1 ? 'publicación' : 'publicaciones'; ?></span>
                                     </a>
                                 <?php endforeach; ?>
                             </div>
