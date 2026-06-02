@@ -29,6 +29,35 @@ if [ -n "$DB_HOST" ]; then
         echo "Error: Failed to query database '${DB_NAME}'. Please check if the database exists and your user credentials have permission to access it."
         exit 1
     fi
+
+    # Check for stored routines (procedures)
+    echo "Checking for stored procedures in database ${DB_NAME}..."
+    if ! ROUTINE_COUNT=$(mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -se "SELECT COUNT(*) FROM information_schema.routines WHERE routine_schema = '$DB_NAME';"); then
+        echo "Warning: Could not check stored procedures count."
+        ROUTINE_COUNT=0
+    fi
+    echo "Found ${TABLE_COUNT} tables and ${ROUTINE_COUNT} stored procedures."
+
+    # If tables exist but routines are missing, the DB is in a corrupted/partial state. Reset it.
+    if [ "$TABLE_COUNT" -gt 0 ] && [ "$ROUTINE_COUNT" -eq 0 ]; then
+        echo "Database has tables but is missing stored procedures. Resetting database..."
+        if mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -e "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME};" 2>/dev/null; then
+            echo "Database ${DB_NAME} recreated successfully."
+        else
+            echo "Failed to recreate database. Dropping all tables manually instead..."
+            mysql --skip-ssl -h "$DB_HOST" -u "$DB_USER" -p"$DB_PASS" -D "$DB_NAME" -e '
+                SET FOREIGN_KEY_CHECKS = 0;
+                SET @tables = NULL;
+                SELECT GROUP_CONCAT("`", table_name, "`") INTO @tables FROM information_schema.tables WHERE table_schema = (SELECT DATABASE());
+                SELECT IFNULL(CONCAT("DROP TABLE IF EXISTS ", @tables), "SELECT 1") INTO @stmt;
+                PREPARE stmt FROM @stmt;
+                EXECUTE stmt;
+                DEALLOCATE PREPARE stmt;
+                SET FOREIGN_KEY_CHECKS = 1;
+            '
+        fi
+        TABLE_COUNT=0
+    fi
     
     if [ "$TABLE_COUNT" -eq 0 ]; then
         echo "No tables found in ${DB_NAME}. Importing unired_db.sql..."
