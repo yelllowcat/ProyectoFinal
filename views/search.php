@@ -43,7 +43,7 @@ function buildTabUrl(string $query, string $type, string $sort, string $date): s
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNIRED - Buscar: <?php echo safe_output($query); ?></title>
     <link rel="stylesheet" href="<?php echo asset('assets/styles/styles.css'); ?>">
-    <script src="<?php echo asset('js/main.js'); ?>"></script>
+    <script src="<?php echo asset('js/main.js'); ?>" defer></script>
 </head>
 
 <body class="search-page">

@@ -11,6 +11,9 @@ $userModel = new UserModel();
 $friendModel = new FriendModel();
 $friendController = new FriendController();
 
+$currentUser = $userModel->getUserById($userId);
+$currentUserFullName = safe_output($currentUser['full_name'] ?? 'Usuario');
+
 $friends = $friendModel->getFriends($userId);
 $requests = $friendModel->getPendingRequests($userId);
 $sentRequests = $friendModel->getSentRequests($userId);
@@ -24,8 +27,8 @@ $suggestions = $friendController->getSuggestions()['data'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UNIRED - Amigos</title>
     <link rel="stylesheet" href="<?php echo asset('assets/styles/styles.css'); ?>">
-    <script src="<?php echo asset('js/main.js'); ?>"></script>
-    <script src="<?php echo asset('js/friends.js'); ?>"></script>
+    <script src="<?php echo asset('js/main.js'); ?>" defer></script>
+    <script src="<?php echo asset('js/friends.js'); ?>" defer></script>
 </head>
 
 <body>
@@ -36,7 +39,7 @@ $suggestions = $friendController->getSuggestions()['data'];
         <?php require_once 'assets/search_header.php'; ?>
         <div class="friends-container">
             <div class="friends-header">
-                <h1 class="friends-title"><?= $userModel->getUserById($userId)['full_name'] ?></h1>
+                <h1 class="friends-title"><?= $currentUserFullName ?></h1>
 
                 <div class="search-bar">
                     <input type="text" id="friendSearchInput" class="search-input" placeholder="Buscar amigos..."
@@ -61,48 +64,48 @@ $suggestions = $friendController->getSuggestions()['data'];
                 <?php
                 foreach ($friends as $friend) {
                     $friendCard = new FriendCard(
-                        $friend['user_id'],
-                        $friend['full_name'],
-                        date('d/m/Y', strtotime($userModel->getUserById($friend['user_id'])['registration_date'])),
+                        (string) $friend['user_id'],
+                        $friend['full_name'] ?? 'Usuario',
+                        date('d/m/Y', strtotime($friend['registration_date'] ?? 'now')),
                         'friends',
-                        getProfilePicture($userModel->getUserById($friend['user_id'])['profile_picture']),
+                        getProfilePicture($friend['profile_picture'] ?? ''),
                         null
                     );
                     echo $friendCard->render();
                 }
                 foreach ($requests as $request) {
                     $friendCard = new FriendCard(
-                        $request['sender_id'],
-                        $userModel->getUserById($request['sender_id'])['full_name'],
-                        date('d/m/Y', strtotime($userModel->getUserById($request['sender_id'])['registration_date'])),
+                        (string) $request['sender_id'],
+                        $request['full_name'] ?? 'Usuario',
+                        date('d/m/Y', strtotime($request['registration_date'] ?? 'now')),
                         'request',
-                        getProfilePicture($userModel->getUserById($request['sender_id'])['profile_picture']),
-                        $request['request_id'],
+                        getProfilePicture($request['profile_picture'] ?? ''),
+                        (string) $request['request_id'],
                         null
                     );
                     echo $friendCard->render();
                 }
                 foreach ($sentRequests as $sentRequest) {
                     $friendCard = new FriendCard(
-                        $sentRequest['receiver_id'],
-                        $userModel->getUserById($sentRequest['receiver_id'])['full_name'],
-                        date('d/m/Y', strtotime($userModel->getUserById($sentRequest['receiver_id'])['registration_date'])),
+                        (string) $sentRequest['receiver_id'],
+                        $sentRequest['full_name'] ?? 'Usuario',
+                        date('d/m/Y', strtotime($sentRequest['registration_date'] ?? 'now')),
                         'pending',
-                        getProfilePicture($userModel->getUserById($sentRequest['receiver_id'])['profile_picture']),
-                        $sentRequest['receiver_id'],
+                        getProfilePicture($sentRequest['profile_picture'] ?? ''),
+                        (string) $sentRequest['receiver_id'],
                         null
                     );
                     echo $friendCard->render();
                 }
                 foreach ($suggestions as $suggestion) {
                     $friendCard = new FriendCard(
-                        $suggestion['user_id'],
-                        $suggestion['full_name'],
-                        date('d/m/Y', strtotime($userModel->getUserById($suggestion['user_id'])['registration_date'])),
+                        (string) $suggestion['user_id'],
+                        $suggestion['full_name'] ?? 'Usuario',
+                        date('d/m/Y', strtotime($suggestion['registration_date'] ?? 'now')),
                         'suggestion',
-                        getProfilePicture($suggestion['profile_picture']),
+                        getProfilePicture($suggestion['profile_picture'] ?? ''),
                         null,
-                        $suggestion['email'],
+                        $suggestion['email'] ?? null,
                     );
 
                     echo $friendCard->render();

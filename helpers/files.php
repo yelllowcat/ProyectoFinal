@@ -8,10 +8,18 @@
  */
 function asset($path)
 {
-    $realFile = $_SERVER['DOCUMENT_ROOT'] . '/' . $path;
+    static $cache = [];
+
+    if (isset($cache[$path])) {
+        return $cache[$path];
+    }
+
+    $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? (__DIR__ . '/..');
+    $realFile = $docRoot . '/' . $path;
 
     if (file_exists($realFile)) {
-        return '/' . $path . '?v=' . filemtime($realFile);
+        return $cache[$path] = '/' . $path . '?v=' . filemtime($realFile);
     }
-}
 
+    return null;
+}

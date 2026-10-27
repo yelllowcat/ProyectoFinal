@@ -45,6 +45,7 @@ class FriendModel
             u.full_name,
             u.email,
             u.profile_picture,
+            u.registration_date,
             NULL AS friendship_date
         FROM friends
         JOIN users u 
@@ -56,12 +57,22 @@ class FriendModel
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    public function countFriends(int $userId): int
+    {
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) FROM friends
+            WHERE user_id1 = ? OR user_id2 = ?
+        ");
+        $stmt->execute([$userId, $userId]);
+        return (int) $stmt->fetchColumn();
+    }
+
     public function getPendingRequests($userId)
     {
         $sql = "
             SELECT 
                 fr.request_id, fr.sender_id, fr.receiver_id, fr.request_date,
-                u.full_name, u.email, u.profile_picture
+                u.full_name, u.email, u.profile_picture, u.registration_date
             FROM friend_requests fr
             JOIN users u ON u.user_id = fr.sender_id
             WHERE fr.receiver_id = ? AND fr.status = 'pending'
@@ -74,7 +85,7 @@ class FriendModel
     public function getSuggestions($userId, $limit = 10)
     {
         $stmt = $this->pdo->prepare(
-            "SELECT u.user_id, u.full_name, u.email, u.profile_picture
+            "SELECT u.user_id, u.full_name, u.email, u.profile_picture, u.registration_date
          FROM users u
          WHERE u.user_id != ?
          AND u.user_id NOT IN (
@@ -228,7 +239,7 @@ class FriendModel
     {
         $stmt = $this->pdo->prepare(
             "SELECT fr.request_id, fr.receiver_id, fr.request_date,
-                u.full_name, u.email, u.profile_picture
+                u.full_name, u.email, u.profile_picture, u.registration_date
          FROM friend_requests fr
          JOIN users u ON fr.receiver_id = u.user_id
          WHERE fr.sender_id = ? AND fr.status = 'pending'

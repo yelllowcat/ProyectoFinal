@@ -185,7 +185,7 @@ class Post
         <div class='feed-post-header'>
             <a href='/profile/{$this->userId}' class='feed-post-user'>
                 <div class='feed-post-avatar'>
-                    <img src='{$this->userAvatar}' alt='Avatar de {$this->author}' class='post-user-avatar'>
+                    <img src='{$this->userAvatar}' alt='Avatar de {$this->author}' class='post-user-avatar' loading='lazy' decoding='async'>
                 </div>
                 <div class='feed-post-user-info'>
                     <h3 style='display:flex; align-items:center; gap:5px;'>{$this->author} {$roleBadge}</h3>
@@ -196,7 +196,7 @@ class Post
         </div>
 
         " . ($this->image ? "<div class='feed-post-image'><img src='{$this->image}' 
-        class='post-image-clickable' data-image-url='{$this->image}' alt='{$this->imageAlt}' style='cursor: pointer;'></div>" : "") . "
+        class='post-image-clickable' data-image-url='{$this->image}' alt='{$this->imageAlt}' loading='lazy' decoding='async' style='cursor: pointer;'></div>" : "") . "
         <p class='feed-post-text'>
             {$this->renderHashtags($displayText)}
         </p>

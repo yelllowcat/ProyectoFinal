@@ -1,4 +1,5 @@
 <?php
+
 function isLoggedIn()
 {
     return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
@@ -182,13 +183,30 @@ function safe_output($data)
 
 function getProfilePicture($filename)
 {
-    $imagePath = $_SERVER['DOCUMENT_ROOT'] . "/assets/imagesProfile/{$filename}";
-    $defaultPath = $_SERVER['DOCUMENT_ROOT'] . "/assets/imagesProfile/default_avatar.png";
-    $defaultImage = "/assets/imagesProfile/default_avatar.png?v=" . (file_exists($defaultPath) ? filemtime($defaultPath) : time());
+    static $cache = [];
+    static $defaultImage = null;
 
-    if (empty($filename) || !file_exists($imagePath)) {
-        return $defaultImage;
+    $key = (string) ($filename ?? '');
+    if (isset($cache[$key])) {
+        return $cache[$key];
     }
 
-    return "/assets/imagesProfile/{$filename}?v=" . filemtime($imagePath);
+    $docRoot = $_SERVER['DOCUMENT_ROOT'] ?? (__DIR__ . '/..');
+
+    if ($defaultImage === null) {
+        $defaultPath = $docRoot . "/assets/imagesProfile/default_avatar.png";
+        $defaultVersion = file_exists($defaultPath) ? filemtime($defaultPath) : 1;
+        $defaultImage = "/assets/imagesProfile/default_avatar.png?v=" . $defaultVersion;
+    }
+
+    if ($key === '') {
+        return $cache[$key] = $defaultImage;
+    }
+
+    $imagePath = $docRoot . "/assets/imagesProfile/{$key}";
+    if (!file_exists($imagePath)) {
+        return $cache[$key] = $defaultImage;
+    }
+
+    return $cache[$key] = "/assets/imagesProfile/{$key}?v=" . filemtime($imagePath);
 }

@@ -1,6 +1,12 @@
 RewriteEngine On
 RewriteBase /
 
+<IfModule mod_headers.c>
+    <FilesMatch "\.(png|jpg|jpeg|gif|ico|svg|webp|css|js)$">
+        Header set Cache-Control "public, max-age=604800, immutable"
+    </FilesMatch>
+</IfModule>
+
 # Allow direct access to files and directories
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

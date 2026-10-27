@@ -46,7 +46,7 @@ class FriendCard
         return "
         <div class='friend-card' data-status='{$this->status}'>
             <a href='/profile/{$this->id}'>
-                <img src='{$escapedAvatarUrl}' alt='Avatar de {$this->name}' class='friend-avatar'>
+                <img src='{$escapedAvatarUrl}' alt='Avatar de {$this->name}' class='friend-avatar' loading='lazy' decoding='async'>
                 <h3 class='friend-name'>{$this->name}</h3>
                 <p class='friend-date'>Se unió el: {$this->joinDate}</p>
             </a>
