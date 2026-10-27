@@ -1667,38 +1667,4 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll(".search-user-card").forEach((card) => {
     attachFriendActionHandlers(card);
   });
-
-  initSidebarPrefetch();
 });
-
-function initSidebarPrefetch() {
-  const prefetchedUrls = new Set();
-  const sidebarLinks = document.querySelectorAll(".sidebar a.menu-item[data-prefetch]");
-
-  sidebarLinks.forEach((link) => {
-    const href = link.getAttribute("href");
-    if (!href || link.classList.contains("active")) {
-      return;
-    }
-
-    const triggerPrefetch = () => {
-      if (prefetchedUrls.has(href)) {
-        return;
-      }
-      prefetchedUrls.add(href);
-      const linkTag = document.createElement("link");
-      linkTag.rel = "prefetch";
-      linkTag.href = href;
-      document.head.appendChild(linkTag);
-    };
-
-    link.addEventListener("mouseenter", triggerPrefetch, { once: true, passive: true });
-    link.addEventListener("focus", triggerPrefetch, { once: true, passive: true });
-    link.addEventListener("click", () => {
-      document.querySelectorAll(".sidebar a.menu-item.active").forEach((item) => {
-        item.classList.remove("active");
-      });
-      link.classList.add("active");
-    });
-  });
-}

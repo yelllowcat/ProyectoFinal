@@ -22,6 +22,15 @@ function requireAdmin()
         http_response_code(403);
         die('Access denied. Admin privileges required.');
     }
+
+    if (
+        ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
+        && empty($_SESSION['flash'])
+        && !isset($_SESSION['error'])
+        && !isset($_SESSION['success'])
+    ) {
+        session_write_close();
+    }
 }
 
 function requireUser()
@@ -31,6 +40,15 @@ function requireUser()
     if (!isRegularUser() && !isAdmin()) {
         http_response_code(403);
         die('Access denied. User privileges required.');
+    }
+
+    if (
+        ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET'
+        && empty($_SESSION['flash'])
+        && !isset($_SESSION['error'])
+        && !isset($_SESSION['success'])
+    ) {
+        session_write_close();
     }
 }
 

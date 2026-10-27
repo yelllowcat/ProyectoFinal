@@ -1,35 +1,35 @@
 <div class="sidebar" id="sidebar">
     <button class="sidebar-toggle-btn" id="sidebarToggle">
-        <img src="/assets/images/menu.png" alt="Toggle Menu" decoding="async">
+        <img src="/assets/images/menu.png" alt="Toggle Menu">
     </button>
 
     <a href="/">
         <div class="logo-container">
-            <img class="logo" src="/assets/images/logoUnired.png" alt="UNIRED Logo" decoding="async">
+            <img class="logo" src="/assets/images/logoUnired.png" alt="UNIRED Logo">
         </div>
     </a>
 
-    <a href="/addPost" class="menu-item <?php echo ($currentPage === 'addPost') ? 'active' : ''; ?>" data-prefetch>
-        <img src="/assets/images/addPost.png" alt="Nueva publicación" class="menu-icon" decoding="async">
+    <a href="/addPost" class="menu-item <?php echo ($currentPage === 'addPost') ? 'active' : ''; ?>">
+        <img src="/assets/images/addPost.png" alt="Nueva publicación" class="menu-icon">
         <span>Nueva publicación</span>
     </a>
 
-    <a href="/posts" class="menu-item <?php echo ($currentPage === 'posts') ? 'active' : ''; ?>" data-prefetch>
-        <img src="/assets/images/posts.png" alt="Publicaciones" class="menu-icon" decoding="async">
+    <a href="/posts" class="menu-item <?php echo ($currentPage === 'posts') ? 'active' : ''; ?>">
+        <img src="/assets/images/posts.png" alt="Publicaciones" class="menu-icon">
         <span>Publicaciones</span>
     </a>
 
-    <a href="/friends" class="menu-item <?php echo ($currentPage === 'friends') ? 'active' : ''; ?>" data-prefetch>
-        <img src="/assets/images/friends.png" alt="Amigos" class="menu-icon" decoding="async">
+    <a href="/friends" class="menu-item <?php echo ($currentPage === 'friends') ? 'active' : ''; ?>">
+        <img src="/assets/images/friends.png" alt="Amigos" class="menu-icon">
         <span>Amigos</span>
     </a>
-    <a href="/profile" class="menu-item <?php echo ($currentPage === 'profile') ? 'active' : ''; ?>" data-prefetch>
-        <img src="/assets/images/profile.png" alt="Perfil" class="menu-icon" decoding="async">
+    <a href="/profile" class="menu-item <?php echo ($currentPage === 'profile') ? 'active' : ''; ?>">
+        <img src="/assets/images/profile.png" alt="Perfil" class="menu-icon">
         <span>Perfil</span>
     </a>
 
     <a href="/logout" class="menu-item <?php echo ($currentPage === 'logout') ? 'active' : ''; ?>" id="logout">
-        <img src="/assets/images/logout.png" alt="Cerrar sesión" class="menu-icon" decoding="async">
+        <img src="/assets/images/logout.png" alt="Cerrar sesión" class="menu-icon">
         <span>Cerrar sesión</span>
     </a>
     <dialog id="confirm-logout-modal" class="confirm-dialog" aria-labelledby="confirm-logout-title">

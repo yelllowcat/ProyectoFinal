@@ -16,8 +16,8 @@ $profilePicture = getProfilePicture($user['profile_picture']);
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UNIRED - Nueva Publicación</title>
   <link rel="stylesheet" href="<?php echo asset('assets/styles/styles.css'); ?>">
-  <script src="<?php echo asset('js/main.js'); ?>" defer></script>
-  <script src="<?php echo asset('js/hashtagAutocomplete.js'); ?>" defer></script>
+  <script src="<?php echo asset('js/main.js'); ?>"></script>
+  <script src="<?php echo asset('js/hashtagAutocomplete.js'); ?>"></script>
 </head>
 
 <body>
