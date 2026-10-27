@@ -851,8 +851,12 @@ function handleProfileImageSelect(event) {
 //update post
 
 async function deletePost(postId) {
-  if (!confirm("¿Estás seguro de que deseas eliminar esta publicación?"))
-    return;
+  const confirmed = await showConfirmDialog(
+    "Confirmar eliminación",
+    "¿Estás seguro/a de que deseas eliminar esta publicación?",
+    "Eliminar publicación"
+  );
+  if (!confirmed) return;
 
   try {
     const response = await fetch("/posts/" + postId, {
@@ -863,14 +867,19 @@ async function deletePost(postId) {
     const result = await response.json();
 
     if (result.success) {
-      alert("Publicación eliminada correctamente");
-      window.location.href = "/posts";
+      showDialogMessage(
+        "Publicación eliminada",
+        "La publicación se eliminó correctamente.",
+        function () {
+          window.location.href = "/posts";
+        }
+      );
     } else {
-      alert("Error: " + result.message);
+      showDialogMessage("Error", result.message || "No se pudo eliminar la publicación.");
     }
   } catch (error) {
     console.error("Error:", error);
-    alert("Error de conexión");
+    showDialogMessage("Error de conexión", "No se pudo conectar con el servidor.");
   }
 }
 
@@ -1239,18 +1248,45 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-function showDialogMessage(title, message) {
+function showConfirmDialog(title, message, confirmText = 'Eliminar', cancelText = 'Cancelar') {
+    return new Promise((resolve) => {
+        const dialog = document.createElement('dialog');
+        dialog.className = 'confirm-dialog';
+        dialog.innerHTML = `
+            <div class="confirm-box">
+                <div class="confirm-head">
+                    <h3>${title}</h3>
+                    <p class="confirm-subtitle">${message}</p>
+                </div>
+                <div class="confirm-sep"></div>
+                <form method="dialog" class="confirm-actions">
+                    <button value="confirm" class="confirm-delete">${confirmText}</button>
+                    <button value="cancel" class="confirm-cancel">${cancelText}</button>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(dialog);
+        dialog.showModal();
+        dialog.addEventListener('close', () => {
+            const confirmed = dialog.returnValue === 'confirm';
+            dialog.remove();
+            resolve(confirmed);
+        });
+    });
+}
+
+function showDialogMessage(title, message, onClose) {
     const dialog = document.createElement('dialog');
     dialog.className = 'confirm-dialog';
     dialog.innerHTML = `
-        <div class="confirm-box" style="max-width: 350px;">
+        <div class="confirm-box">
             <div class="confirm-head">
                 <h3>${title}</h3>
                 <p class="confirm-subtitle">${message}</p>
             </div>
             <div class="confirm-sep"></div>
-            <div class="confirm-actions" style="display:flex; justify-content:center;">
-                <button class="confirm-cancel" style="width:100%;" onclick="this.closest('dialog').close()">Aceptar</button>
+            <div class="confirm-actions">
+                <button type="button" class="confirm-primary" onclick="this.closest('dialog').close()">Aceptar</button>
             </div>
         </div>
     `;
@@ -1258,6 +1294,9 @@ function showDialogMessage(title, message) {
     dialog.showModal();
     dialog.addEventListener('close', () => {
         dialog.remove();
+        if (typeof onClose === 'function') {
+            onClose();
+        }
     });
 }
 

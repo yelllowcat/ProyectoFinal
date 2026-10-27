@@ -49,7 +49,7 @@ $profilePicture = getProfilePicture($user['profile_picture']);
   <div class="main-content">
     <?php require_once 'assets/search_header.php'; ?>
     <div class="edit-container">
-      <form id="editPostForm" method="POST" action="/editPost/<?= $postId ?>">
+      <form id="editPostForm" method="POST" action="/editPost/<?= $postId ?>" novalidate>
         <div class="post-preview">
           <div class="post-header-section">
             <img src="<?= $profilePicture ?>" alt="User Avatar" class="post-avatar">
@@ -79,9 +79,8 @@ $profilePicture = getProfilePicture($user['profile_picture']);
           </div>
 
           <div class="action-buttons">
-            <button type="button" class="btn btn-deny btn-delete-post" onclick="deletePost(<?= $postId ?>)">Eliminar
-              publicación</button>
-            <button type="submit" class="btn btn-primary btn-save">Guardar Cambios</button>
+            <button type="button" class="btn btn-deny btn-delete-post" onclick="deletePost(<?= $postId ?>)">Eliminar publicación</button>
+            <button type="submit" class="btn btn-primary btn-save">Guardar cambios</button>
           </div>
         </div>
       </form>
