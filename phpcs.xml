@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<ruleset name="UNIRED Coding Standard">
+    <description>Estándares de codificación y calidad para UNIRED (PHP MVC).</description>
+
+    <!-- Directorios y archivos a analizar por defecto -->
+    <file>app</file>
+    <file>config</file>
+    <file>helpers</file>
+    <file>routes</file>
+    <file>tests</file>
+    <file>index.php</file>
+
+    <!-- Exclusiones (código de terceros, vistas híbridas HTML, migraciones/seeds y assets) -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/views/*</exclude-pattern>
+    <exclude-pattern>*/database/*</exclude-pattern>
+    <exclude-pattern>*/assets/*</exclude-pattern>
+    <exclude-pattern>*/js/*</exclude-pattern>
+
+    <!-- Argumentos por defecto: colores, progreso y reporte resumen + detalles -->
+    <arg name="colors"/>
+    <arg value="sp"/>
+    <arg name="encoding" value="utf-8"/>
+
+    <!-- Base: PSR-12 -->
+    <rule ref="PSR12">
+        <!-- Permitir archivos procedurales de entrada, rutas, configuración y helpers sin namespace -->
+        <exclude name="PSR1.Files.SideEffects.FoundWithSymbols"/>
+        <!-- Permitir saltos de línea CRLF/LF en entornos multiplataforma (Windows/Linux) -->
+        <exclude name="Generic.Files.LineEndings"/>
+    </rule>
+
+    <!-- Límites de longitud de línea (Objetivo: 100 caracteres, Umbral de revisión: 120) -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="100"/>
+            <property name="absoluteLineLimit" value="120"/>
+            <property name="ignoreComments" value="true"/>
+        </properties>
+    </rule>
+    <!-- Superar 120 caracteres se reporta como advertencia de revisión para no bloquear SQL/cadenas legadas -->
+    <rule ref="Generic.Files.LineLength.MaxExceeded">
+        <type>warning</type>
+    </rule>
+
+    <!-- Complejidad ciclomática (Objetivo: <= 10, Error crítico: > 15) -->
+    <rule ref="Generic.Metrics.CyclomaticComplexity">
+        <properties>
+            <property name="complexity" value="10"/>
+            <property name="absoluteComplexity" value="15"/>
+        </properties>
+    </rule>
+
+    <!-- Nivel de anidamiento (Objetivo: 1-2, Advertencia en > 3, Error en > 5) -->
+    <rule ref="Generic.Metrics.NestingLevel">
+        <properties>
+            <property name="nestingLevel" value="3"/>
+            <property name="absoluteNestingLevel" value="5"/>
+        </properties>
+    </rule>
+
+    <!-- Prohibir bloques catch vacíos y sentencias vacías -->
+    <rule ref="Generic.CodeAnalysis.EmptyStatement"/>
+    <rule ref="Generic.CodeAnalysis.UnconditionalIfStatement"/>
+
+    <!-- Prohibir funciones inseguras o de depuración olvidadas -->
+    <rule ref="Generic.PHP.ForbiddenFunctions">
+        <properties>
+            <property name="forbiddenFunctions" type="array">
+                <element key="eval" value="null"/>
+                <element key="var_dump" value="null"/>
+                <element key="dd" value="null"/>
+            </property>
+        </properties>
+    </rule>
+</ruleset>

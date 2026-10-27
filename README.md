@@ -202,6 +202,31 @@ El proyecto utiliza stored procedures para operaciones complejas:
 3. El receptor acepta/rechaza
 4. Una vez aceptada, ambos son amigos
 
+## 🧪 Calidad de Código, Estándares y Pruebas
+El proyecto cuenta con estándares de programación documentados y herramientas automáticas de verificación:
+
+- **Documentación de reglas:**
+  - [`CONTRIBUTING.md`](CONTRIBUTING.md) — Guía de contribución y flujo de trabajo para desarrolladores.
+  - [`docs/estandares-de-codigo.md`](docs/estandares-de-codigo.md) — Especificación completa de arquitectura, límites de complejidad, seguridad y matriz de verificación.
+
+- **Comandos de verificación (Composer):**
+  ```bash
+  # Formatear código PHP automáticamente (PSR-12)
+  composer format
+
+  # Ejecutar linter de estilo y métricas de complejidad (PHP_CodeSniffer)
+  composer lint
+
+  # Ejecutar análisis estático (PHPStan)
+  composer analyze
+
+  # Ejecutar pruebas unitarias automatizadas (PHPUnit)
+  composer test
+
+  # Ejecutar suite completa de verificación
+  composer check
+  ```
+
 ## 👥 Contribuidores
 
 Proyecto Final - Red Social Universitaria

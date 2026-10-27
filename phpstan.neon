@@ -1,0 +1,28 @@
+parameters:
+    level: 2
+    paths:
+        - app
+        - config
+        - helpers
+        - routes
+        - tests
+    bootstrapFiles:
+        - tests/bootstrap.php
+    excludePaths:
+        - vendor
+        - views
+        - database
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        # Excepción documentada: $router se instancia en index.php antes de incluir routes/web.php
+        -
+            message: '#Variable \$router might not be defined\.#'
+            path: routes/web.php
+        # Excepción documentada: redirect() ejecuta exit() en helpers/auth.php en el flujo legado de AuthController
+        -
+            message: '#Variable \$role might not be defined\.#'
+            path: app/Controllers/AuthController.php
+        # Excepción documentada: asset() en helpers/files.php retorna implícitamente null cuando el archivo no existe
+        -
+            message: '#Function asset\(\) should return string\|null but return statement is missing\.#'
+            path: helpers/files.php

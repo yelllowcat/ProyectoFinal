@@ -6,6 +6,11 @@
         "vlucas/phpdotenv": "^5.6",
         "tecnickcom/tcpdf": "^6.10"
     },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^4.0",
+        "phpstan/phpstan": "^2.3",
+        "phpunit/phpunit": "^11.5"
+    },
     "autoload": {
         "psr-4": {
             "App\\": "app/"
@@ -15,11 +20,25 @@
             "helpers/files.php"
         ]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "config": {
         "optimize-autoloader": true
     },
     "scripts": {
         "db:seed": "php database/seed.php",
-        "db:create-admin": "php database/create_admin.php"
+        "db:create-admin": "php database/create_admin.php",
+        "lint": "phpcs --standard=phpcs.xml",
+        "format": "phpcbf --standard=phpcs.xml",
+        "analyze": "phpstan analyse -c phpstan.neon --memory-limit=512M",
+        "test": "phpunit -c phpunit.xml",
+        "check": [
+            "@lint",
+            "@analyze",
+            "@test"
+        ]
     }
 }

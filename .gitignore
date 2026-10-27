@@ -9,3 +9,13 @@
 /logs
 *logs
 .antigravitycli/
+.phpunit.cache/
+.phpstan.cache/
+.phpcs-cache
+node_modules/
+
+# Reglas locales de agentes IA y configuraciones auxiliares de JS
+AGENTS.md
+eslint.config.mjs
+.prettierrc.json
+.prettierignore
