@@ -49,8 +49,9 @@ class FriendModel
             NULL AS friendship_date
         FROM friends
         JOIN users u 
-            ON (u.user_id = friends.user_id1 AND friends.user_id2 = ?)
-            OR (u.user_id = friends.user_id2 AND friends.user_id1 = ?)
+            ON ((u.user_id = friends.user_id1 AND friends.user_id2 = ?)
+            OR (u.user_id = friends.user_id2 AND friends.user_id1 = ?))
+        WHERE u.role != 'admin'
     ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$userId, $userId]);
@@ -75,7 +76,7 @@ class FriendModel
                 u.full_name, u.email, u.profile_picture, u.registration_date
             FROM friend_requests fr
             JOIN users u ON u.user_id = fr.sender_id
-            WHERE fr.receiver_id = ? AND fr.status = 'pending'
+            WHERE fr.receiver_id = ? AND fr.status = 'pending' AND u.role != 'admin'
         ";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$userId]);
@@ -88,6 +89,8 @@ class FriendModel
             "SELECT u.user_id, u.full_name, u.email, u.profile_picture, u.registration_date
          FROM users u
          WHERE u.user_id != ?
+         AND u.role != 'admin'
+         AND u.active = 1
          AND u.user_id NOT IN (
              SELECT user_id1 FROM friends WHERE user_id2 = ?
              UNION
@@ -242,7 +245,7 @@ class FriendModel
                 u.full_name, u.email, u.profile_picture, u.registration_date
          FROM friend_requests fr
          JOIN users u ON fr.receiver_id = u.user_id
-         WHERE fr.sender_id = ? AND fr.status = 'pending'
+         WHERE fr.sender_id = ? AND fr.status = 'pending' AND u.role != 'admin'
          ORDER BY fr.request_date DESC"
         );
         $stmt->execute([$userId]);

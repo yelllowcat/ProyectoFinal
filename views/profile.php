@@ -15,6 +15,11 @@ $userId = $segments[1] ?? getCurrentUserId();
 $userModel = new UserModel();
 $user = $userModel->getUserById($userId);
 
+if (!$user || ($user['role'] ?? '') === 'admin') {
+    flash('error', 'Usuario no encontrado');
+    redirect('/posts');
+}
+
 $postModel = new PostModel();
 $likeModel = new LikeModel();
 $commentModel = new CommentModel();

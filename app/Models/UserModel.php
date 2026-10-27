@@ -172,7 +172,7 @@ class UserModel
     {
         $sql = "SELECT user_id, full_name, profile_picture, biography, registration_date 
                 FROM users 
-                WHERE active = 1";
+                WHERE active = 1 AND role != 'admin'";
 
         $params = [];
 
@@ -193,6 +193,7 @@ class UserModel
         $sql = "SELECT u.user_id, u.full_name, u.profile_picture, u.biography, u.registration_date
                 FROM users u
                 WHERE u.active = 1 
+                AND u.role != 'admin'
                 AND u.user_id != ?
                 ORDER BY u.registration_date DESC
                 LIMIT ?";

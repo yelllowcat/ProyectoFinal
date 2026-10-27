@@ -1,3 +1,44 @@
+(function () {
+  try {
+    const savedTheme = localStorage.getItem("unired_theme");
+    if (savedTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  } catch (e) {}
+})();
+
+document.addEventListener("DOMContentLoaded", function () {
+  const themeBtn = document.getElementById("themeToggle");
+  const themeText = document.getElementById("themeToggleText");
+
+  function syncThemeLabel() {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    if (themeText) {
+      themeText.textContent = isDark ? "Modo claro" : "Modo oscuro";
+    }
+  }
+
+  syncThemeLabel();
+
+  if (themeBtn) {
+    themeBtn.addEventListener("click", function () {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      if (isDark) {
+        document.documentElement.removeAttribute("data-theme");
+        try {
+          localStorage.setItem("unired_theme", "light");
+        } catch (e) {}
+      } else {
+        document.documentElement.setAttribute("data-theme", "dark");
+        try {
+          localStorage.setItem("unired_theme", "dark");
+        } catch (e) {}
+      }
+      syncThemeLabel();
+    });
+  }
+});
+
 const COMMENTS_PER_LOAD = 3;
 
 async function toggleMenu(event, menuId) {

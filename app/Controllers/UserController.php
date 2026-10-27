@@ -21,8 +21,8 @@ class UserController
 
         $user = $this->userModel->getUserById($id);
 
-        if (!$user) {
-            flash('error', 'User not found');
+        if (!$user || ($user['role'] ?? '') === 'admin') {
+            flash('error', 'Usuario no encontrado');
             redirect('/posts');
         }
 

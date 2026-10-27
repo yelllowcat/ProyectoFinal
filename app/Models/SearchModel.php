@@ -80,6 +80,7 @@ class SearchModel
                     SELECT user_id, full_name, profile_picture, biography, role, registration_date
                     FROM users
                     WHERE active = 1
+                    AND role != 'admin'
                     AND MATCH(full_name, email) AGAINST(? IN BOOLEAN MODE)
                     ORDER BY {$orderBy}
                     LIMIT ? OFFSET ?
@@ -92,6 +93,7 @@ class SearchModel
                     SELECT user_id, full_name, profile_picture, biography, role, registration_date
                     FROM users
                     WHERE active = 1
+                    AND role != 'admin'
                     AND (full_name LIKE ? OR email LIKE ?)
                     ORDER BY {$orderBy}
                     LIMIT ? OFFSET ?
@@ -115,14 +117,14 @@ class SearchModel
                 $fulltextTerm = '*' . $rawTerm . '*';
                 $stmt = $this->pdo->prepare("
                     SELECT COUNT(*) FROM users
-                    WHERE active = 1 AND MATCH(full_name, email) AGAINST(? IN BOOLEAN MODE)
+                    WHERE active = 1 AND role != 'admin' AND MATCH(full_name, email) AGAINST(? IN BOOLEAN MODE)
                 ");
                 $stmt->execute([$fulltextTerm]);
             } else {
                 $likeTerm = '%' . $rawTerm . '%';
                 $stmt = $this->pdo->prepare("
                     SELECT COUNT(*) FROM users
-                    WHERE active = 1 AND (full_name LIKE ? OR email LIKE ?)
+                    WHERE active = 1 AND role != 'admin' AND (full_name LIKE ? OR email LIKE ?)
                 ");
                 $stmt->execute([$likeTerm, $likeTerm]);
             }

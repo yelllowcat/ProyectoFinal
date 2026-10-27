@@ -34,26 +34,48 @@ $suggestions = $friendController->getSuggestions()['data'];
 <body>
     <?php
     $currentPage = 'friends';
-    require_once 'assets/sidebar.php' ?>
+    require_once 'assets/sidebar.php';
+    ?>
     <div class="main-content">
-        <?php require_once 'assets/search_header.php'; ?>
         <div class="friends-container">
             <div class="friends-header">
-                <h1 class="friends-title"><?= $currentUserFullName ?></h1>
+                <div class="friends-header-top">
+                    <div class="friends-header-info">
+                        <span class="friends-badge">Comunidad UNIRED</span>
+                        <h1 class="friends-title"><?= $currentUserFullName ?></h1>
+                        <p class="friends-subtitle">Gestiona tus amigos, solicitudes y descubre nuevas conexiones</p>
+                    </div>
 
-                <div class="search-bar">
-                    <input type="text" id="friendSearchInput" class="search-input" placeholder="Buscar amigos..."
-                        oninput="searchFriends(this.value)" maxlength="50">
-                    <button class="search-clear" id="clearSearchBtn" onclick="clearSearch()"
-                        style="display: none;">✕</button>
+                    <div class="search-bar">
+                        <span class="search-bar-icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </span>
+                        <input type="text" id="friendSearchInput" class="search-input" placeholder="Buscar amigos por nombre..."
+                            oninput="searchFriends(this.value)" maxlength="50" autocomplete="off">
+                        <button type="button" class="search-clear" id="clearSearchBtn" onclick="clearSearch()"
+                            style="display: none;" aria-label="Limpiar búsqueda">✕</button>
+                    </div>
                 </div>
 
                 <div class="friends-tabs">
-                    <div class="tab active" data-filter="friend" onclick="filterFriends(event, 'friend')">Todos los
-                        amigos</div>
-                    <div class="tab" data-filter="request" onclick="filterFriends(event, 'request')">Solicitudes</div>
-                    <div class="tab" data-filter="pending" onclick="filterFriends(event, 'pending')">Pendientes</div>
-                    <div class="tab" data-filter="suggestion" onclick="filterFriends(event, 'suggestion')">Sugerencias
+                    <div class="tab active" data-filter="friend" onclick="filterFriends(event, 'friend')">
+                        <span>Todos los amigos</span>
+                        <span class="tab-badge" id="badge-friend"><?= count($friends) ?></span>
+                    </div>
+                    <div class="tab" data-filter="request" onclick="filterFriends(event, 'request')">
+                        <span>Solicitudes</span>
+                        <span class="tab-badge" id="badge-request"><?= count($requests) ?></span>
+                    </div>
+                    <div class="tab" data-filter="pending" onclick="filterFriends(event, 'pending')">
+                        <span>Pendientes</span>
+                        <span class="tab-badge" id="badge-pending"><?= count($sentRequests) ?></span>
+                    </div>
+                    <div class="tab" data-filter="suggestion" onclick="filterFriends(event, 'suggestion')">
+                        <span>Sugerencias</span>
+                        <span class="tab-badge" id="badge-suggestion"><?= count($suggestions) ?></span>
                     </div>
                 </div>
             </div>
@@ -114,7 +136,16 @@ $suggestions = $friendController->getSuggestions()['data'];
 
             </div>
             <div id="noResultsMessage" class="no-results" style="display: none;">
-                <p>No se encontraron resultados para tu búsqueda.</p>
+                <div class="no-results-icon">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <h3 id="noResultsTitle">Sin resultados</h3>
+                <p id="noResultsSubtitle">No se encontraron personas en esta sección.</p>
             </div>
         </div>
     </div>

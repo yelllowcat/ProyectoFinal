@@ -27,7 +27,8 @@ class FriendController
         if ($senderEmail === $receiverEmail)
             return ['success' => false, 'message' => 'No puedes enviarte solicitud a ti mismo'];
 
-        if (!$this->userModel->getUserByEmail($receiverEmail))
+        $targetUser = $this->userModel->getUserByEmail($receiverEmail);
+        if (!$targetUser || ($targetUser['role'] ?? '') === 'admin')
             return ['success' => false, 'message' => 'Usuario no encontrado'];
 
         $ok = $this->friendModel->sendRequestByEmail($senderEmail, $receiverEmail);
@@ -54,7 +55,8 @@ class FriendController
         if ($senderId === $receiverId)
             return ['success' => false, 'message' => 'No puedes enviarte solicitud a ti mismo'];
 
-        if (!$this->userModel->getUserById($receiverId))
+        $targetUser = $this->userModel->getUserById($receiverId);
+        if (!$targetUser || ($targetUser['role'] ?? '') === 'admin')
             return ['success' => false, 'message' => 'Usuario no encontrado'];
 
         $ok = $this->friendModel->sendRequest($senderId, $receiverId);

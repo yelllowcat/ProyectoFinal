@@ -44,11 +44,13 @@ class FriendCard
         $escapedAvatarUrl = htmlspecialchars($this->avatarUrl, ENT_QUOTES, 'UTF-8');
 
         return "
-        <div class='friend-card' data-status='{$this->status}'>
-            <a href='/profile/{$this->id}'>
-                <img src='{$escapedAvatarUrl}' alt='Avatar de {$this->name}' class='friend-avatar'>
+        <div class='friend-card' data-status='{$this->status}' data-user-id='{$this->id}'>
+            <a href='/profile/{$this->id}' class='friend-card-link'>
+                <div class='friend-avatar-wrap'>
+                    <img src='{$escapedAvatarUrl}' alt='Avatar de {$this->name}' class='friend-avatar'>
+                </div>
                 <h3 class='friend-name'>{$this->name}</h3>
-                <p class='friend-date'>Se unió el: {$this->joinDate}</p>
+                <p class='friend-date'>Miembro desde {$this->joinDate}</p>
             </a>
             <div class='friend-actions'>
                 {$buttons}
@@ -63,7 +65,7 @@ class FriendCard
             case 'request':
                 return "
                     <button data-request-id='{$this->requestId}' data-action='accept' class='btn btn-primary btn-accept btn-action'>Aceptar</button>
-                    <button data-request-id='{$this->requestId}' data-action='deny' class='btn btn-deny btn-action'>Eliminar</button>
+                    <button data-request-id='{$this->requestId}' data-action='deny' class='btn btn-deny btn-action'>Rechazar</button>
                 ";
             case 'pending':
                 return "
@@ -71,11 +73,11 @@ class FriendCard
                 ";
             case 'suggestion':
                 return "
-                    <button data-suggestion-id='{$this->id}' data-action='add' class='btn btn-primary btn-add btn-action'>Agregar</button>
-                    <button data-suggestion-id='{$this->id}' data-action='deny' class='btn btn-deny btn-action'>Eliminar</button>
+                    <button data-suggestion-id='{$this->id}' data-action='add' class='btn btn-primary btn-add btn-action'>Agregar amigo</button>
+                    <button data-suggestion-id='{$this->id}' data-action='deny' class='btn btn-ghost-dismiss btn-action'>Ocultar</button>
                 ";
             default:
-                return "<a href='/profile/{$this->id}'><button data-user-id='{$this->id}' data-action='view' class='btn btn-view-profile btn-action'>Ver perfil</button></a>";
+                return "<a href='/profile/{$this->id}' class='friend-view-link'><button data-user-id='{$this->id}' data-action='view' class='btn btn-view-profile btn-action'>Ver perfil</button></a>";
         }
     }
 }
