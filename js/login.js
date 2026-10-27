@@ -100,8 +100,8 @@ function validateEmail() {
 function validatePassword() {
   const password = this.value;
   
-  if (password && password.length < 8) {
-    this.setCustomValidity('La contraseña debe tener al menos 8 caracteres');
+  if (password && password.length < 6) {
+    this.setCustomValidity('La contraseña debe tener al menos 6 caracteres');
     shakeElement(this);
     return false;
   } else {
@@ -144,3 +144,4 @@ function shakeElement(element) {
 }
 
 console.log('Login.js loaded');
+

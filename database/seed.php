@@ -105,7 +105,7 @@ if ($needed > 0) {
         $firstName = $firstNames[$i % count($firstNames)];
         $lastName  = $lastNames[array_rand($lastNames)];
         $fn = $firstName . ' ' . $lastName;
-        $username = strtolower($firstName) . '.' . strtolower($lastName);
+        $tr = ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u','ñ'=>'n','Á'=>'a','É'=>'e','Í'=>'i','Ó'=>'o','Ú'=>'u','Ü'=>'u','Ñ'=>'n']; $username = strtolower(strtr($firstName, $tr)) . '.' . strtolower(strtr($lastName, $tr));
 
         $isTeacher = $i % 2 === 0;
         $role    = $isTeacher ? 'teacher' : 'student';
@@ -407,3 +407,4 @@ if ($neededPH > 0 && count($postIds) > 0 && count($hashtagIds) > 0) {
 }
 
 echo "\nDone.\n";
+
