@@ -127,19 +127,13 @@ class HashtagModel
         try {
             $offset = ($page - 1) * $perPage;
             $stmt = $this->pdo->prepare("
-                SELECT p.*, u.full_name AS author_name, u.profile_picture AS author_picture, u.email AS author_email,
-                       IFNULL(l.likes_count, 0) AS likes_count,
-                       IFNULL(c.comments_count, 0) AS comments_count
+                SELECT p.*, u.full_name AS author_name, u.profile_picture AS author_picture, u.email AS author_email, u.role AS author_role,
+                       (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id) AS likes_count,
+                       (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.post_id AND c.active = 1) AS comments_count
                 FROM posts p
                 INNER JOIN users u ON p.user_id = u.user_id
                 INNER JOIN post_hashtags ph ON p.post_id = ph.post_id
                 INNER JOIN hashtags h ON ph.hashtag_id = h.hashtag_id
-                LEFT JOIN (
-                    SELECT post_id, COUNT(*) AS likes_count FROM likes GROUP BY post_id
-                ) l ON p.post_id = l.post_id
-                LEFT JOIN (
-                    SELECT post_id, COUNT(*) AS comments_count FROM comments WHERE active = 1 GROUP BY post_id
-                ) c ON p.post_id = c.post_id
                 WHERE h.name = LOWER(:name)
                   AND p.active = 1
                 ORDER BY p.created_at DESC

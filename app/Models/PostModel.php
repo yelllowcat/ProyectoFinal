@@ -51,9 +51,25 @@ class PostModel
         try {
             $offset = ($page - 1) * $perPage;
             $stmt = $this->pdo->prepare("
-                SELECT * FROM v_posts_stats
-                ORDER BY created_at DESC
-                LIMIT ? OFFSET ?
+                SELECT
+                    p.post_id,
+                    p.user_id,
+                    p.content,
+                    p.image,
+                    p.created_at,
+                    p.updated_at,
+                    u.full_name AS author_name,
+                    u.profile_picture AS author_picture,
+                    u.email AS author_email,
+                    u.role AS author_role,
+                    (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id) AS likes_count,
+                    (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.post_id AND c.active = 1) AS comments_count
+                FROM (
+                    SELECT post_id FROM posts WHERE active = 1 ORDER BY created_at DESC LIMIT ? OFFSET ?
+                ) page
+                INNER JOIN posts p ON p.post_id = page.post_id
+                INNER JOIN users u ON p.user_id = u.user_id
+                ORDER BY p.created_at DESC
             ");
             $stmt->execute([$perPage, $offset]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -80,10 +96,23 @@ class PostModel
     {
         try {
             $stmt = $this->pdo->prepare("
-            SELECT *
-            FROM v_posts_stats
-            WHERE post_id = ?
-        ");
+                SELECT
+                    p.post_id,
+                    p.user_id,
+                    p.content,
+                    p.image,
+                    p.created_at,
+                    p.updated_at,
+                    u.full_name AS author_name,
+                    u.profile_picture AS author_picture,
+                    u.email AS author_email,
+                    u.role AS author_role,
+                    (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id) AS likes_count,
+                    (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.post_id AND c.active = 1) AS comments_count
+                FROM posts p
+                INNER JOIN users u ON p.user_id = u.user_id
+                WHERE p.post_id = ? AND p.active = 1
+            ");
             $stmt->execute([$postId]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -127,11 +156,24 @@ class PostModel
     {
         try {
             $stmt = $this->pdo->prepare("
-            SELECT *
-            FROM v_posts_stats
-            WHERE user_id = ?
-            ORDER BY created_at DESC
-        ");
+                SELECT
+                    p.post_id,
+                    p.user_id,
+                    p.content,
+                    p.image,
+                    p.created_at,
+                    p.updated_at,
+                    u.full_name AS author_name,
+                    u.profile_picture AS author_picture,
+                    u.email AS author_email,
+                    u.role AS author_role,
+                    (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id) AS likes_count,
+                    (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.post_id AND c.active = 1) AS comments_count
+                FROM posts p
+                INNER JOIN users u ON p.user_id = u.user_id
+                WHERE p.user_id = ? AND p.active = 1
+                ORDER BY p.created_at DESC
+            ");
             $stmt->execute([$userId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -146,10 +188,25 @@ class PostModel
         try {
             $offset = ($page - 1) * $perPage;
             $stmt = $this->pdo->prepare("
-                SELECT * FROM v_posts_stats
-                WHERE user_id = ?
-                ORDER BY created_at DESC
-                LIMIT ? OFFSET ?
+                SELECT
+                    p.post_id,
+                    p.user_id,
+                    p.content,
+                    p.image,
+                    p.created_at,
+                    p.updated_at,
+                    u.full_name AS author_name,
+                    u.profile_picture AS author_picture,
+                    u.email AS author_email,
+                    u.role AS author_role,
+                    (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id) AS likes_count,
+                    (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.post_id AND c.active = 1) AS comments_count
+                FROM (
+                    SELECT post_id FROM posts WHERE user_id = ? AND active = 1 ORDER BY created_at DESC LIMIT ? OFFSET ?
+                ) page
+                INNER JOIN posts p ON p.post_id = page.post_id
+                INNER JOIN users u ON p.user_id = u.user_id
+                ORDER BY p.created_at DESC
             ");
             $stmt->execute([$userId, $perPage, $offset]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

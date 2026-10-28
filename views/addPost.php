@@ -6,6 +6,7 @@ $userId = getCurrentUserId();
 $userModel = new UserModel();
 $user = $userModel->getUserById($userId);
 $profilePicture = getProfilePicture($user['profile_picture']);
+$userRole = $user['role'] ?? 'user';
 
 ?>
 <!DOCTYPE html>
@@ -23,47 +24,66 @@ $profilePicture = getProfilePicture($user['profile_picture']);
 <body>
   <?php
   $currentPage = 'addPost';
-  require_once 'assets/sidebar.php' ?>
+  require_once 'assets/sidebar.php';
+  ?>
 
   <div class="main-content">
-    <?php require_once 'assets/search_header.php'; ?>
-    <div class="edit-container">
+    <div class="edit-container add-post-container">
       <form action="/posts" method="POST" enctype="multipart/form-data">
-        <div class="post-preview">
-          <div class="post-header-section">
-            <img src="<?= $profilePicture ?>" alt="User Avatar" class="post-avatar">
-            <div class="post-user-info">
-              <h3><?= safe_output($_SESSION['user_name'] ?? 'Usuario') ?></h3>
-              <div class="post-date-info">Publicando ahora</div>
+        <div class="post-preview add-post-card">
+          <div class="add-post-top-header">
+            <div class="post-header-section">
+              <img src="<?= $profilePicture ?>" alt="User Avatar" class="post-avatar">
+              <div class="post-user-info">
+                <div class="add-post-author-row">
+                  <h3><?= safe_output($_SESSION['user_name'] ?? 'Usuario') ?></h3>
+                  <?php if ($userRole === 'teacher'): ?>
+                    <span class="role-badge role-teacher">Profesor</span>
+                  <?php elseif ($userRole === 'student'): ?>
+                    <span class="role-badge role-student">Estudiante</span>
+                  <?php endif; ?>
+                </div>
+                <div class="post-date-info">Compartiendo con la comunidad UNIRED</div>
+              </div>
             </div>
+            <span class="add-post-badge">Nueva publicación</span>
           </div>
 
           <div class="post-prompt">
-            <div class="post-prompt-title">¿Qué estás pensando?</div>
-            <div class="post-prompt-subtitle">Comparte con nosotros</div>
+            <div class="post-prompt-title">¿Qué estás pensando hoy?</div>
+            <div class="post-prompt-subtitle">Comparte ideas, dudas, noticias o eventos con tus compañeros</div>
+          </div>
+
+          <div class="post-text-section add-post-textarea-box">
+            <textarea class="post-textarea" id="postText" name="content" maxlength="500" oninput="updateCounter()"
+              placeholder="Escribe aquí tu publicación... Puedes usar #hashtags para clasificarla" minlength="1" required></textarea>
+            <div class="char-counter"><span id="charCount">0</span> / 500 caracteres</div>
           </div>
 
           <div class="add-post-image-section" id="drop-zone" onclick="document.getElementById('post_image').click()">
-            <img class="add-post-image" src="../assets/images/addImage.png" alt="add Image" />
-            <div class="image-upload-text">Haz clic o arrastra una imagen aquí</div>
+            <div class="upload-icon-circle">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="4" ry="4"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </div>
+            <div class="image-upload-text">Haz clic para subir o arrastra una imagen aquí</div>
+            <div class="image-upload-subtext">PNG, JPG o GIF (máx. 5 MB) — Opcional</div>
           </div>
 
           <input type="file" id="post_image" name="post_image" accept="image/png, image/jpeg, image/jpg, image/gif"
             style="display: none;" onchange="handleImageSelect(event)">
 
-          <div id="imagePreview" class="image-preview" style="display: none;">
+          <div id="imagePreview" class="post-image-preview" style="display: none;">
             <img id="previewImage" src="" alt="Vista previa">
-            <button type="button" class="btn-remove-image" onclick="removeImage()">Quitar imagen</button>
-          </div>
-
-          <div class="post-text-section">
-            <textarea class="post-textarea" id="postText" name="content" maxlength="500" oninput="updateCounter()"
-              placeholder="Escribe lo que quieres compartir..." minlength="1" required></textarea>
-            <div class="char-counter"><span id="charCount">0</span>/500</div>
-          </div>
-
-          <div class="action-buttons">
-            <button type="submit" class="btn btn-primary btn-post">Publicar</button>
+            <button type="button" class="btn-remove-preview" onclick="removeImage()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              Quitar imagen
+            </button>
           </div>
 
           <div class="predefined-hashtags-section">
@@ -81,44 +101,20 @@ $profilePicture = getProfilePicture($user['profile_picture']);
               <div class="selected-hashtags-list" id="selectedHashtagsList"></div>
             </div>
           </div>
+
+          <div class="action-buttons add-post-actions">
+            <button type="submit" class="btn btn-primary btn-post">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+              Publicar ahora
+            </button>
+          </div>
         </div>
       </form>
     </div>
   </div>
-
-  <style>
-    .add-post-image-section {
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border: 2px dashed #ddd;
-      border-radius: 10px;
-      margin: 15px 0;
-      transition: all 0.3s ease;
-    }
-
-    .add-post-image-section.dragover {
-      background-color: rgba(0, 0, 0, 0.05);
-      border-color: #007bff;
-      transform: scale(1.02);
-    }
-
-    .image-preview {
-      position: relative;
-      text-align: center;
-    }
-
-    .image-preview img {
-      max-width: 100%;
-      max-height: 300px;
-      border-radius: 10px;
-    }
-
-    .btn-remove-image {
-      background: rgba(220, 53, 69, 0.9);
-    }
-  </style>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -137,11 +133,9 @@ $profilePicture = getProfilePicture($user['profile_picture']);
         const tag = pill.dataset.tag;
         if (selectedHashtags.has(tag)) return;
 
-        // Add to selected set
         selectedHashtags.add(tag);
         pill.classList.add('selected');
 
-        // Append to textarea if not already present
         const tagText = '#' + tag;
         const regex = new RegExp('(^|\\s)' + tagText + '(\\s|$)', 'i');
         if (!regex.test(textarea.value)) {
@@ -160,14 +154,11 @@ $profilePicture = getProfilePicture($user['profile_picture']);
         const tag = removeBtn.dataset.tag;
         if (!tag) return;
 
-        // Remove from selected set
         selectedHashtags.delete(tag);
 
-        // Unmark predefined pill
         const pill = predefinedList.querySelector('.predefined-hashtag-pill[data-tag="' + tag + '"]');
         if (pill) pill.classList.remove('selected');
 
-        // Remove from textarea
         const tagText = '#' + tag;
         const regex = new RegExp('(^|\\s)' + tagText + '(\\s|$)', 'g');
         textarea.value = textarea.value.replace(regex, ' ').replace(/\s+/g, ' ').trim();

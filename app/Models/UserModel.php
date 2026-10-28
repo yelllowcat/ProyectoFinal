@@ -9,6 +9,7 @@ require_once __DIR__ . '/../../config/database.php';
 class UserModel
 {
     private $pdo;
+    private static array $userCache = [];
 
     public function __construct()
     {
@@ -130,6 +131,11 @@ class UserModel
 
     public function getUserById($id)
     {
+        $cacheKey = (int) $id;
+        if (array_key_exists($cacheKey, self::$userCache)) {
+            return self::$userCache[$cacheKey];
+        }
+
         try {
             $stmt = $this->pdo->prepare("
             SELECT user_id, full_name, email, profile_picture, biography, role, registration_date
@@ -137,7 +143,9 @@ class UserModel
             WHERE user_id = ?
         ");
             $stmt->execute([$id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            self::$userCache[$cacheKey] = $user;
+            return $user;
         } catch (PDOException $e) {
             error_log("getUserById error: " . $e->getMessage());
             return false;
@@ -146,6 +154,7 @@ class UserModel
 
     public function updateUser($userId, $fullName, $biography, $profilePicture = null)
     {
+        unset(self::$userCache[(int) $userId]);
         try {
             if ($profilePicture) {
                 $stmt = $this->pdo->prepare("

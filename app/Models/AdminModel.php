@@ -123,25 +123,22 @@ class AdminModel
     public function getSummaryStats()
     {
         try {
-            $stats = [];
-            
-            $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM users WHERE active = 1 AND role != 'admin'");
-            $stats['total_users'] = (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
-            
-            $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM posts WHERE active = 1");
-            $stats['total_posts'] = (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
-            
-            $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM comments WHERE active = 1");
-            $stmt2 = $this->pdo->query("SELECT COUNT(*) as total FROM replies WHERE active = 1");
-            $stats['total_comments'] = (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'] + (int)$stmt2->fetch(PDO::FETCH_ASSOC)['total'];
-            
-            $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM likes");
-            $stats['total_likes'] = (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
-            
-            $stmt = $this->pdo->query("SELECT COUNT(*) as total FROM friends");
-            $stats['total_friendships'] = (int)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
-            
-            return $stats;
+            $row = $this->pdo->query("
+                SELECT
+                    (SELECT COUNT(*) FROM users WHERE active = 1 AND role != 'admin') AS total_users,
+                    (SELECT COUNT(*) FROM posts WHERE active = 1) AS total_posts,
+                    (SELECT COUNT(*) FROM comments WHERE active = 1) + (SELECT COUNT(*) FROM replies WHERE active = 1) AS total_comments,
+                    (SELECT COUNT(*) FROM likes) AS total_likes,
+                    (SELECT COUNT(*) FROM friends) AS total_friendships
+            ")->fetch(PDO::FETCH_ASSOC);
+
+            return [
+                'total_users' => (int) ($row['total_users'] ?? 0),
+                'total_posts' => (int) ($row['total_posts'] ?? 0),
+                'total_comments' => (int) ($row['total_comments'] ?? 0),
+                'total_likes' => (int) ($row['total_likes'] ?? 0),
+                'total_friendships' => (int) ($row['total_friendships'] ?? 0),
+            ];
         } catch (PDOException $e) {
             error_log("getSummaryStats error: " . $e->getMessage());
             return [];
