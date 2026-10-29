@@ -136,6 +136,7 @@ ProyectoFinal/
 - **Booleanos descriptivos:** Usa prefijos `is`, `has`, `can` o `should` (`isLoggedIn()`, `hasLiked()`, `canEdit()`, `hasFlash()`).
 - **Colecciones en plural:** Usa nombres plurales para arreglos y listados (`$comments`, `$hashtags`, `$friendCards`).
 - **Prohibición de emojis:** Queda estrictamente prohibido el uso de emojis en cualquier parte del código fuente (PHP, JavaScript, CSS, SQL), comentarios de código, mensajes de confirmación de control de versiones (commits) y documentación técnica. Todo el proyecto debe mantener un estilo sobrio, formal y profesional.
+- **Idioma del código y comentarios (English Only):** Todo el código fuente nuevo o modificado (nombres de variables, métodos, clases, constantes y funciones), comentarios de código y mensajes de commit debe escribirse en inglés. Los documentos de análisis o recomendaciones dirigidos al usuario se mantienen en español.
 
 ---
 

@@ -6,7 +6,7 @@
 
 if (PHP_SAPI !== 'cli') {
     http_response_code(403);
-    exit('Acceso denegado: este script solo puede ejecutarse desde la terminal (CLI).');
+    exit('Access denied: this script can only be run from the command line (CLI).');
 }
 
 require __DIR__ . '/../vendor/autoload.php';
