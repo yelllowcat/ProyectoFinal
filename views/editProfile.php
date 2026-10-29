@@ -22,6 +22,7 @@
     <?= \App\Components\Alert::render(); ?>
     <div class="content-wrapper">
       <form action="/updateProfile" method="POST" enctype="multipart/form-data">
+        <?= function_exists('csrfField') ? csrfField() : '' ?>
         <div class="profile-section-edit">
           <div class="profile-photo-edit">
 
@@ -62,6 +63,47 @@
             oninput="updateCounter()"><?= safe_output($user['biography'] ?? '') ?></textarea>
           <div class="char-counter"><span id="charCount"><?= strlen($user['biography'] ?? '') ?></span>/500</div>
         </div>
+        <div class="form-group">
+          <label for="department">Departamento Académico</label>
+          <select id="department" name="department" class="form-select">
+            <option value="">Selecciona tu departamento...</option>
+            <?php
+            $departments = [
+                'Ciencias de la Computación',
+                'Ciencias Marinas y Costeras',
+                'Ciencias Sociales y Jurídicas',
+                'Humanidades',
+                'Economía y Administración',
+                'Ingeniería Pesquera',
+                'Agronomía y Zootecnia',
+                'Ciencias de la Tierra'
+            ];
+            $currentDept = $user['department'] ?? '';
+            foreach ($departments as $dept): ?>
+              <option value="<?= $dept ?>" <?= $currentDept === $dept ? 'selected' : '' ?>><?= $dept ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="career">Carrera</label>
+          <input type="text" id="career" name="career" value="<?= safe_output($user['career'] ?? '') ?>"
+            placeholder="Ej. Lic. en Desarrollo de Software" maxlength="100">
+        </div>
+
+        <?php if (($user['role'] ?? 'user') !== 'teacher'): ?>
+        <div class="form-group">
+          <label for="semester">Semestre</label>
+          <select id="semester" name="semester" class="form-select">
+            <option value="">Selecciona tu semestre...</option>
+            <?php
+            $currentSemester = isset($user['semester']) ? (int) $user['semester'] : 0;
+            for ($s = 1; $s <= 12; $s++): ?>
+              <option value="<?= $s ?>" <?= $currentSemester === $s ? 'selected' : '' ?>><?= $s ?>° Semestre</option>
+            <?php endfor; ?>
+          </select>
+        </div>
+        <?php endif; ?>
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary btn-save">Guardar</button>

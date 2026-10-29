@@ -93,7 +93,11 @@ $suggestions = $friendController->getSuggestions()['data'];
                         date('d/m/Y', strtotime($friend['registration_date'] ?? 'now')),
                         'friends',
                         getProfilePicture($friend['profile_picture'] ?? ''),
-                        null
+                        null,
+                        $friend['email'] ?? null,
+                        $friend['career'] ?? null,
+                        $friend['department'] ?? null,
+                        isset($friend['semester']) && $friend['semester'] !== null ? (int) $friend['semester'] : null
                     );
                     echo $friendCard->render();
                 }
@@ -105,7 +109,10 @@ $suggestions = $friendController->getSuggestions()['data'];
                         'request',
                         getProfilePicture($request['profile_picture'] ?? ''),
                         (string) $request['request_id'],
-                        null
+                        $request['email'] ?? null,
+                        $request['career'] ?? null,
+                        $request['department'] ?? null,
+                        isset($request['semester']) && $request['semester'] !== null ? (int) $request['semester'] : null
                     );
                     echo $friendCard->render();
                 }
@@ -117,7 +124,10 @@ $suggestions = $friendController->getSuggestions()['data'];
                         'pending',
                         getProfilePicture($sentRequest['profile_picture'] ?? ''),
                         (string) $sentRequest['receiver_id'],
-                        null
+                        $sentRequest['email'] ?? null,
+                        $sentRequest['career'] ?? null,
+                        $sentRequest['department'] ?? null,
+                        isset($sentRequest['semester']) && $sentRequest['semester'] !== null ? (int) $sentRequest['semester'] : null
                     );
                     echo $friendCard->render();
                 }
@@ -130,6 +140,10 @@ $suggestions = $friendController->getSuggestions()['data'];
                         getProfilePicture($suggestion['profile_picture'] ?? ''),
                         null,
                         $suggestion['email'] ?? null,
+                        $suggestion['career'] ?? null,
+                        $suggestion['department'] ?? null,
+                        isset($suggestion['semester']) && $suggestion['semester'] !== null ? (int) $suggestion['semester'] : null,
+                        $suggestion['suggestion_reason'] ?? null
                     );
 
                     echo $friendCard->render();

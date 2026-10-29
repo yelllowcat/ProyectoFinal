@@ -14,9 +14,12 @@ class AuthController
             $email = clean_input($_POST['email'] ?? '');
             $password = trim($_POST['password'] ?? '');
             $confirm_password = trim($_POST['confirm_password'] ?? '');
+            $department = clean_input($_POST['department'] ?? '');
+            $career = clean_input($_POST['career'] ?? '');
+            $semester = isset($_POST['semester']) && $_POST['semester'] !== '' ? intval($_POST['semester']) : null;
 
             if (empty($full_name) || empty($email) || empty($password) || empty($confirm_password)) {
-                $_SESSION['error'] = 'Por favor completa todos los campos.';
+                $_SESSION['error'] = 'Por favor completa todos los campos requeridos.';
                 redirect('/register');
             }
 
@@ -36,7 +39,15 @@ class AuthController
             }
 
             $userModel = new UserModel();
-            $result = $userModel->registerUser($full_name, $email, $password, $role);
+            $result = $userModel->registerUser(
+                $full_name,
+                $email,
+                $password,
+                $role,
+                $department ?: null,
+                $career ?: null,
+                $role === 'teacher' ? null : $semester
+            );
 
             if ($result === true) {
                 $_SESSION['success'] = 'Registro exitoso. Inicia sesión.';

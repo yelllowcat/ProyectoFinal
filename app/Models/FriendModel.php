@@ -39,6 +39,9 @@ class FriendModel
             u.full_name,
             u.email,
             u.profile_picture,
+            u.department,
+            u.career,
+            u.semester,
             u.registration_date,
             NULL AS friendship_date
         FROM friends
@@ -67,7 +70,7 @@ class FriendModel
         $sql = "
             SELECT 
                 fr.request_id, fr.sender_id, fr.receiver_id, fr.request_date,
-                u.full_name, u.email, u.profile_picture, u.registration_date
+                u.full_name, u.email, u.profile_picture, u.department, u.career, u.semester, u.registration_date
             FROM friend_requests fr
             JOIN users u ON u.user_id = fr.sender_id
             WHERE fr.receiver_id = ? AND fr.status = 'pending' AND u.role != 'admin'
@@ -80,27 +83,47 @@ class FriendModel
     public function getSuggestions($userId, $limit = 10)
     {
         $stmt = $this->pdo->prepare(
-            "SELECT u.user_id, u.full_name, u.email, u.profile_picture, u.registration_date
-         FROM users u
-         WHERE u.user_id != ?
-         AND u.role != 'admin'
-         AND u.active = 1
-         AND u.user_id NOT IN (
-             SELECT user_id1 FROM friends WHERE user_id2 = ?
-             UNION
-             SELECT user_id2 FROM friends WHERE user_id1 = ?
-         )
-         AND u.user_id NOT IN (
-             SELECT receiver_id FROM friend_requests 
-             WHERE sender_id = ? AND status = 'pending'
-             UNION
-             SELECT sender_id FROM friend_requests 
-             WHERE receiver_id = ? AND status = 'pending'
-         )
-         ORDER BY u.registration_date DESC
-         LIMIT ?"
+            "SELECT 
+                u.user_id, 
+                u.full_name, 
+                u.email, 
+                u.profile_picture, 
+                u.department, 
+                u.career, 
+                u.semester, 
+                u.role, 
+                u.registration_date,
+                CASE 
+                    WHEN cu.career IS NOT NULL AND cu.career != '' AND u.career = cu.career THEN 'Estudian tu misma carrera'
+                    WHEN cu.department IS NOT NULL AND cu.department != '' AND u.department = cu.department THEN 'De tu mismo departamento'
+                    ELSE NULL
+                END AS suggestion_reason,
+                (
+                    (CASE WHEN cu.career IS NOT NULL AND cu.career != '' AND u.career = cu.career THEN 10 ELSE 0 END) +
+                    (CASE WHEN cu.department IS NOT NULL AND cu.department != '' AND u.department = cu.department THEN 5 ELSE 0 END) +
+                    (CASE WHEN cu.semester IS NOT NULL AND u.semester = cu.semester THEN 2 ELSE 0 END)
+                ) AS affinity_score
+             FROM users u
+             LEFT JOIN users cu ON cu.user_id = ?
+             WHERE u.user_id != ?
+               AND u.role != 'admin'
+               AND u.active = 1
+               AND u.user_id NOT IN (
+                   SELECT user_id1 FROM friends WHERE user_id2 = ?
+                   UNION
+                   SELECT user_id2 FROM friends WHERE user_id1 = ?
+               )
+               AND u.user_id NOT IN (
+                   SELECT receiver_id FROM friend_requests 
+                   WHERE sender_id = ? AND status = 'pending'
+                   UNION
+                   SELECT sender_id FROM friend_requests 
+                   WHERE receiver_id = ? AND status = 'pending'
+               )
+             ORDER BY affinity_score DESC, u.registration_date DESC
+             LIMIT ?"
         );
-        $stmt->execute([$userId, $userId, $userId, $userId, $userId, $limit]);
+        $stmt->execute([$userId, $userId, $userId, $userId, $userId, $userId, $limit]);
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
@@ -227,7 +250,7 @@ class FriendModel
     {
         $stmt = $this->pdo->prepare(
             "SELECT fr.request_id, fr.receiver_id, fr.request_date,
-                u.full_name, u.email, u.profile_picture, u.registration_date
+                u.full_name, u.email, u.profile_picture, u.department, u.career, u.semester, u.registration_date
          FROM friend_requests fr
          JOIN users u ON fr.receiver_id = u.user_id
          WHERE fr.sender_id = ? AND fr.status = 'pending' AND u.role != 'admin'

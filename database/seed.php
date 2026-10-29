@@ -104,21 +104,51 @@ if ($needed > 0) {
         'Historiador. Divulgación científica.', 'Psicóloga infantil. Desarrollo humano.',
         'Ingeniero de datos. Big Data y ML.'];
 
-    $insU = $pdo->prepare("INSERT INTO users (full_name, email, password, role, biography, profile_picture, registration_date) VALUES (?, ?, ?, ?, ?, ?, ?)");
+    $departmentsMap = [
+        'Ciencias de la Computacion' => [
+            'Ing. en Sistemas Computacionales',
+            'Lic. en Desarrollo de Software',
+            'Lic. en Tecnologias de Informacion'
+        ],
+        'Ciencias Marinas y Costeras' => [
+            'Lic. en Biologia Marina',
+            'Lic. en Geologia Marina'
+        ],
+        'Ciencias Sociales y Juridicas' => [
+            'Lic. en Derecho',
+            'Lic. en Ciencias Politicas'
+        ],
+        'Humanidades' => [
+            'Lic. en Filosofia',
+            'Lic. en Comunicacion'
+        ],
+        'Economia y Administracion' => [
+            'Lic. en Administracion de Empresas',
+            'Lic. en Economia'
+        ]
+    ];
+    $deptKeys = array_keys($departmentsMap);
+
+    $insU = $pdo->prepare("INSERT INTO users (full_name, email, password, role, biography, profile_picture, department, career, semester, registration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     for ($i = 0; $i < $needed; $i++) {
         $firstName = $firstNames[$i % count($firstNames)];
         $lastName  = $lastNames[array_rand($lastNames)];
         $fn = $firstName . ' ' . $lastName;
-        $tr = ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u','ñ'=>'n','Á'=>'a','É'=>'e','Í'=>'i','Ó'=>'o','Ú'=>'u','Ü'=>'u','Ñ'=>'n']; $username = strtolower(strtr($firstName, $tr)) . '.' . strtolower(strtr($lastName, $tr));
+        $username = strtolower(preg_replace('/[^a-zA-Z0-9]/' , '', $firstName)) . '.' . strtolower(preg_replace('/[^a-zA-Z0-9]/' , '', $lastName));
 
         $isTeacher = $i % 2 === 0;
         $role    = $isTeacher ? 'teacher' : 'student';
         $domain  = $isTeacher ? '@uabcs.mx' : '@alu.uabcs.mx';
         $email   = $username . $domain;
 
+        $dept = $deptKeys[$i % count($deptKeys)];
+        $careerList = $departmentsMap[$dept];
+        $career = $careerList[$i % count($careerList)];
+        $semester = $isTeacher ? null : (($i % 8) + 1);
+
         $pass = password_hash('user123', PASSWORD_DEFAULT);
-        $insU->execute([$fn, $email, $pass, $role, $biographies[$i % count($biographies)], pick($avatars), randDate(random_int(1, 28))]);
+        $insU->execute([$fn, $email, $pass, $role, $biographies[$i % count($biographies)], pick($avatars), $dept, $career, $semester, randDate(random_int(1, 28))]);
         $userIds[] = (int)$pdo->lastInsertId();
     }
     echo "  +$needed new users created. Total: " . count($userIds) . "\n";

@@ -6,23 +6,33 @@ class FriendCard
 {
     private string $id;
     private string $name;
-
     private string $joinDate;
     private string $status;
-
     private ?string $avatarUrl;
     private ?string $requestId;
-
-    private ?string $suggestionId;
     private ?string $email;
+    private ?string $career;
+    private ?string $department;
+    private ?int $semester;
+    private ?string $suggestionReason;
 
-
-    public function __construct(string $id, string $name, string $joinDate, string $status = 'friend', ?string $avatarUrl = null, ?string $requestId = null, ?string $email = null)
-    {
+    public function __construct(
+        string $id,
+        string $name,
+        string $joinDate,
+        string $status = 'friend',
+        ?string $avatarUrl = null,
+        ?string $requestId = null,
+        ?string $email = null,
+        ?string $career = null,
+        ?string $department = null,
+        ?int $semester = null,
+        ?string $suggestionReason = null
+    ) {
         $this->id = $id;
-        $this->name = htmlspecialchars($name);
-        $this->joinDate = htmlspecialchars($joinDate);
-        $this->status = htmlspecialchars($status);
+        $this->name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+        $this->joinDate = htmlspecialchars($joinDate, ENT_QUOTES, 'UTF-8');
+        $this->status = htmlspecialchars($status, ENT_QUOTES, 'UTF-8');
 
         if ($avatarUrl) {
             if (strpos($avatarUrl, '/') !== 0) {
@@ -35,7 +45,11 @@ class FriendCard
         }
 
         $this->requestId = $requestId;
-        $this->email = $email ? htmlspecialchars($email) : null;
+        $this->email = $email ? htmlspecialchars($email, ENT_QUOTES, 'UTF-8') : null;
+        $this->career = $career ? htmlspecialchars($career, ENT_QUOTES, 'UTF-8') : null;
+        $this->department = $department ? htmlspecialchars($department, ENT_QUOTES, 'UTF-8') : null;
+        $this->semester = $semester !== null ? (int) $semester : null;
+        $this->suggestionReason = $suggestionReason ? htmlspecialchars($suggestionReason, ENT_QUOTES, 'UTF-8') : null;
     }
 
     public function render(): string
@@ -43,13 +57,28 @@ class FriendCard
         $buttons = $this->getButtons();
         $escapedAvatarUrl = htmlspecialchars($this->avatarUrl, ENT_QUOTES, 'UTF-8');
 
+        $academicMeta = '';
+        if ($this->career) {
+            $semesterText = $this->semester ? " &middot; {$this->semester}&deg; Semestre" : '';
+            $academicMeta = "<p class='friend-academic'>{$this->career}{$semesterText}</p>";
+        } elseif ($this->department) {
+            $academicMeta = "<p class='friend-academic'>{$this->department}</p>";
+        }
+
+        $reasonBadge = '';
+        if ($this->suggestionReason) {
+            $reasonBadge = "<span class='suggestion-reason-badge'>{$this->suggestionReason}</span>";
+        }
+
         return "
         <div class='friend-card' data-status='{$this->status}' data-user-id='{$this->id}'>
             <a href='/profile/{$this->id}' class='friend-card-link'>
                 <div class='friend-avatar-wrap'>
                     <img src='{$escapedAvatarUrl}' alt='Avatar de {$this->name}' class='friend-avatar'>
                 </div>
+                {$reasonBadge}
                 <h3 class='friend-name'>{$this->name}</h3>
+                {$academicMeta}
                 <p class='friend-date'>Miembro desde {$this->joinDate}</p>
             </a>
             <div class='friend-actions'>

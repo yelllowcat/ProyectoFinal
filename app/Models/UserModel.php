@@ -66,16 +66,23 @@ class UserModel
         return $defaultMessage;
     }
 
-    public function registerUser($full_name, $email, $password, $role = 'user')
+    public function registerUser($full_name, $email, $password, $role = 'user', $department = null, $career = null, $semester = null)
     {
         try {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
-            $stmt = $this->pdo->prepare("CALL sp_register_user(:full_name, :email, :password, :role)");
+            $stmt = $this->pdo->prepare("CALL sp_register_user(:full_name, :email, :password, :role, :department, :career, :semester)");
             $stmt->bindParam(':full_name', $full_name);
             $stmt->bindParam(':email', $email);
             $stmt->bindParam(':password', $hashedPassword);
             $stmt->bindParam(':role', $role);
+            $stmt->bindParam(':department', $department);
+            $stmt->bindParam(':career', $career);
+            if ($semester !== null) {
+                $stmt->bindValue(':semester', (int) $semester, \PDO::PARAM_INT);
+            } else {
+                $stmt->bindValue(':semester', null, \PDO::PARAM_NULL);
+            }
             $stmt->execute();
 
             return true;
@@ -141,7 +148,7 @@ class UserModel
 
         try {
             $stmt = $this->pdo->prepare("
-            SELECT user_id, full_name, email, profile_picture, biography, role, registration_date
+            SELECT user_id, full_name, email, profile_picture, biography, role, department, career, semester, registration_date
             FROM users 
             WHERE user_id = ?
         ");
@@ -155,24 +162,24 @@ class UserModel
         }
     }
 
-    public function updateUser($userId, $fullName, $biography, $profilePicture = null)
+    public function updateUser($userId, $fullName, $biography, $profilePicture = null, $department = null, $career = null, $semester = null)
     {
         unset(self::$userCache[(int) $userId]);
         try {
             if ($profilePicture) {
                 $stmt = $this->pdo->prepare("
                 UPDATE users 
-                SET full_name = ?, biography = ?, profile_picture = ?, updated_at = NOW() 
+                SET full_name = ?, biography = ?, department = ?, career = ?, semester = ?, profile_picture = ?, updated_at = NOW() 
                 WHERE user_id = ?
             ");
-                return $stmt->execute([$fullName, $biography, $profilePicture, $userId]);
+                return $stmt->execute([$fullName, $biography, $department, $career, $semester, $profilePicture, $userId]);
             } else {
                 $stmt = $this->pdo->prepare("
                 UPDATE users 
-                SET full_name = ?, biography = ?, updated_at = NOW() 
+                SET full_name = ?, biography = ?, department = ?, career = ?, semester = ?, updated_at = NOW() 
                 WHERE user_id = ?
             ");
-                return $stmt->execute([$fullName, $biography, $userId]);
+                return $stmt->execute([$fullName, $biography, $department, $career, $semester, $userId]);
             }
         } catch (PDOException $e) {
             error_log("updateUser error: " . $e->getMessage());

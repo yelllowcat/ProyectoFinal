@@ -9,6 +9,9 @@ CREATE TABLE IF NOT EXISTS users (
     profile_picture VARCHAR(255) DEFAULT 'default_avatar.png',
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    department VARCHAR(100) DEFAULT NULL,
+    career VARCHAR(100) DEFAULT NULL,
+    semester INT DEFAULT NULL,
     registration_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     role VARCHAR(20) DEFAULT 'user',
     active BOOLEAN DEFAULT TRUE,
@@ -158,14 +161,17 @@ CREATE PROCEDURE sp_register_user(
     IN p_full_name VARCHAR(100),
     IN p_email VARCHAR(100),
     IN p_password VARCHAR(255),
-    IN p_role VARCHAR(20)
+    IN p_role VARCHAR(20),
+    IN p_department VARCHAR(100),
+    IN p_career VARCHAR(100),
+    IN p_semester INT
 )
 BEGIN
     IF EXISTS (SELECT 1 FROM users WHERE email = p_email) THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El correo ya está registrado';
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El correo ya esta registrado';
     ELSE
-        INSERT INTO users (full_name, email, password, role)
-        VALUES (p_full_name, p_email, p_password, p_role);
+        INSERT INTO users (full_name, email, password, role, department, career, semester)
+        VALUES (p_full_name, p_email, p_password, p_role, p_department, p_career, p_semester);
     END IF;
 END$$
 DELIMITER ;

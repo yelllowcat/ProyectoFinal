@@ -13,9 +13,24 @@ class Profile
     private $userId;
     private $profilePicture;
     private $userRole;
+    private ?string $department;
+    private ?string $career;
+    private ?int $semester;
 
-    public function __construct($viewState = 'own', $userName = 'Usuario', $userBio = '', $postCount = 0, $likesCount = 0, $friendsCount = 0, $userId = null, $profilePicture = null, $userRole = 'user')
-    {
+    public function __construct(
+        $viewState = 'own',
+        $userName = 'Usuario',
+        $userBio = '',
+        $postCount = 0,
+        $likesCount = 0,
+        $friendsCount = 0,
+        $userId = null,
+        $profilePicture = null,
+        $userRole = 'user',
+        ?string $department = null,
+        ?string $career = null,
+        ?int $semester = null
+    ) {
         $this->viewState = $viewState;
         $this->userName = htmlspecialchars($userName);
         $this->userBio = $userBio ? htmlspecialchars($userBio) : $this->getDefaultBio();
@@ -25,6 +40,9 @@ class Profile
         $this->userId = $userId;
         $this->profilePicture = $profilePicture;
         $this->userRole = $userRole;
+        $this->department = $department;
+        $this->career = $career;
+        $this->semester = $semester !== null ? (int) $semester : null;
     }
 
     private function getDefaultBio()
@@ -92,7 +110,21 @@ class Profile
 
     public function render()
     {
-        $actionButtons = $this->getActionButtons();
+                $actionButtons = $this->getActionButtons();
+
+        $academicPills = [];
+        if (!empty($this->department)) {
+            $safeDept = htmlspecialchars($this->department, ENT_QUOTES, 'UTF-8');
+            $academicPills[] = "<span class='academic-pill'><span class='academic-pill-label'>Departamento:</span> {$safeDept}</span>";
+        }
+        if (!empty($this->career)) {
+            $safeCareer = htmlspecialchars($this->career, ENT_QUOTES, 'UTF-8');
+            $academicPills[] = "<span class='academic-pill'><span class='academic-pill-label'>Carrera:</span> {$safeCareer}</span>";
+        }
+        if (!empty($this->semester) && $this->userRole !== 'teacher') {
+            $academicPills[] = "<span class='academic-pill'><span class='academic-pill-label'>Semestre:</span> {$this->semester}&deg; Semestre</span>";
+        }
+        $academicInfoHtml = !empty($academicPills) ? "<div class='profile-academic-container'>" . implode('', $academicPills) . "</div>" : "";
 
         $roleBadge = "";
         if ($this->userRole === 'teacher') {
@@ -108,6 +140,7 @@ class Profile
     </div>
     <h2 class='profile-name' style='display:flex; justify-content:center; align-items:center;'>{$this->userName} {$roleBadge}</h2>
     <p class='profile-bio'>{$this->userBio}</p>
+    {$academicInfoHtml}
 
     <div class='stats-container'>
         <div class='stat'>

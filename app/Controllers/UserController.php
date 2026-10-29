@@ -79,11 +79,21 @@ class UserController
 
             $safeFullName = clean_input($fullName);
             $safeBiography = clean_input($biography);
+            $department = clean_input($_POST['department'] ?? '');
+            $career = clean_input($_POST['career'] ?? '');
+            $semester = isset($_POST['semester']) && $_POST['semester'] !== '' ? intval($_POST['semester']) : null;
+            if ($oldUser && ($oldUser['role'] ?? '') === 'teacher') {
+                $semester = null;
+            }
+
             $result = $this->userModel->updateUser(
                 $userId,
                 $safeFullName,
                 $safeBiography,
-                $profilePicture
+                $profilePicture,
+                $department ?: null,
+                $career ?: null,
+                $semester
             );
 
             if ($result) {

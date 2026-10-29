@@ -108,7 +108,10 @@ $safe_email = safe_output($user['email'] ?? '');
                 $friendsCount,
                 $userId,
                 $profilePicture,
-                $user['role'] ?? 'user'
+                $user['role'] ?? 'user',
+                $user['department'] ?? null,
+                $user['career'] ?? null,
+                isset($user['semester']) && $user['semester'] !== null ? (int) $user['semester'] : null
             );
             echo $profile->render();
 
