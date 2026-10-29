@@ -250,11 +250,7 @@ class PostController
         }
     }
 
-    public function unlike($id)
-    {
-        requireAuth();
-        return ['success' => true];
-    }
+
 
     public function addComment($postId)
     {

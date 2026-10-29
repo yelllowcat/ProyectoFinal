@@ -123,6 +123,11 @@ class FriendController
         return ['success' => $ok];
     }
 
+    public function cancelRequest($id)
+    {
+        return $this->cancelRequestByUserId($id);
+    }
+
     public function removeFriend($id)
     {
         requireAuth();
@@ -192,11 +197,12 @@ class FriendController
         return ['success' => true, 'data' => $suggestions];
     }
 
-    public function getStatus($params)
+    public function getStatus($params = [])
     {
         requireAuth();
         $userId = $_SESSION['user_id'];
-        $otherUserId = intval(clean_input($params['id'] ?? ''));
+        $otherId = is_array($params) ? ($params['id'] ?? ($_GET['id'] ?? 0)) : $params;
+        $otherUserId = intval(clean_input($otherId));
 
         if (!$otherUserId) {
             return ['success' => false, 'message' => 'ID requerido'];
@@ -205,5 +211,29 @@ class FriendController
         $status = $this->friendModel->getFriendshipStatus($userId, $otherUserId);
 
         return ['success' => true, 'status' => $status];
+    }
+
+    public function getFriendshipStatus($params = [])
+    {
+        return $this->getStatus($params);
+    }
+
+    public function getFriendsCounts()
+    {
+        requireAuth();
+        $userId = $_SESSION['user_id'];
+
+        $friends = count($this->friendModel->getFriends($userId));
+        $requests = count($this->friendModel->getPendingRequests($userId));
+        $sent = count($this->friendModel->getSentRequests($userId));
+
+        return [
+            'success' => true,
+            'data' => [
+                'friends' => $friends,
+                'requests' => $requests,
+                'sent' => $sent
+            ]
+        ];
     }
 }
