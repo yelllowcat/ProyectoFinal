@@ -109,6 +109,9 @@ class UserModel
                 $passwordValid = password_verify($password, $user['password']);
 
                 if ($passwordValid) {
+                    if (isset($user['active']) && (int) $user['active'] === 0) {
+                        return 'Tu cuenta ha sido suspendida. Contacta al administrador.';
+                    }
                     return $user;
                 }
             }

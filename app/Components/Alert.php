@@ -6,8 +6,20 @@ class Alert
     {
         $html = '';
 
+        if (function_exists('hasFlash') && hasFlash()) {
+            foreach (getFlash() as $flashItem) {
+                $type = htmlspecialchars($flashItem['type'] ?? 'info', ENT_QUOTES, 'UTF-8');
+                $msg = htmlspecialchars($flashItem['message'] ?? '', ENT_QUOTES, 'UTF-8');
+                $html .= "
+            <div class='alert alert-{$type}'>
+                {$msg}
+            </div>
+            ";
+            }
+        }
+
         if (isset($_SESSION['error'])) {
-            $error = htmlspecialchars($_SESSION['error']);
+            $error = htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8');
             $html .= "
             <div class='alert alert-error'>
                 {$error}
@@ -17,7 +29,7 @@ class Alert
         }
 
         if (isset($_SESSION['success'])) {
-            $success = htmlspecialchars($_SESSION['success']);
+            $success = htmlspecialchars($_SESSION['success'], ENT_QUOTES, 'UTF-8');
             $html .= "
             <div class='alert alert-success'>
                 {$success}

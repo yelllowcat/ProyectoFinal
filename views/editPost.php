@@ -48,6 +48,7 @@ $profilePicture = getProfilePicture($user['profile_picture']);
 
   <div class="main-content">
     <?php require_once 'assets/search_header.php'; ?>
+    <?= \App\Components\Alert::render(); ?>
     <div class="edit-container">
       <form id="editPostForm" method="POST" action="/editPost/<?= $postId ?>" novalidate>
         <div class="post-preview">

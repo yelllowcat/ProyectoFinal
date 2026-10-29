@@ -26,9 +26,9 @@ class UserController
             redirect('/posts');
         }
 
-        $user['full_name'] = safe_output($user['full_name'] ?? '');
-        $user['biography'] = safe_output($user['biography'] ?? '');
-        $user['email'] = safe_output($user['email'] ?? '');
+        $user['full_name'] = $user['full_name'] ?? '';
+        $user['biography'] = $user['biography'] ?? '';
+        $user['email'] = $user['email'] ?? '';
 
         $posts = [];
         require __DIR__ . '/../../views/profile.php';
@@ -42,8 +42,8 @@ class UserController
         $user = $this->userModel->getUserById($userId);
 
         if ($user) {
-            $user['full_name'] = safe_output($user['full_name'] ?? '');
-            $user['biography'] = safe_output($user['biography'] ?? '');
+            $user['full_name'] = $user['full_name'] ?? '';
+            $user['biography'] = $user['biography'] ?? '';
         }
 
         require __DIR__ . '/../../views/editProfile.php';
@@ -65,13 +65,20 @@ class UserController
             }
 
             $profilePicture = null;
+            $oldUser = $this->userModel->getUserById($userId);
 
             if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
                 $profilePicture = $this->handleProfileImageUpload($_FILES['profile_picture']);
+                if ($profilePicture && !empty($oldUser['profile_picture']) && $oldUser['profile_picture'] !== 'default_avatar.png') {
+                    $oldPath = __DIR__ . '/../../assets/imagesProfile/' . $oldUser['profile_picture'];
+                    if (file_exists($oldPath)) {
+                        @unlink($oldPath);
+                    }
+                }
             }
 
-            $safeFullName = safe_output($fullName);
-            $safeBiography = safe_output($biography);
+            $safeFullName = clean_input($fullName);
+            $safeBiography = clean_input($biography);
             $result = $this->userModel->updateUser(
                 $userId,
                 $safeFullName,
@@ -94,23 +101,37 @@ class UserController
 
     private function handleProfileImageUpload($imageFile)
     {
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        $allowedMimes = [
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp'
+        ];
         $maxSize = 5 * 1024 * 1024;
-
-        if (!in_array($imageFile['type'], $allowedTypes)) {
-            flash('error', 'Solo se permiten imágenes JPEG y PNG');
-            return null;
-        }
 
         if ($imageFile['size'] > $maxSize) {
             flash('error', 'La imagen no puede ser mayor a 5MB');
             return null;
         }
 
-        $uploadDir = __DIR__ . '/../../assets/imagesProfile/';
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = $finfo ? finfo_file($finfo, $imageFile['tmp_name']) : false;
+        if ($finfo) {
+            finfo_close($finfo);
+        }
 
-        $extension = pathinfo($imageFile['name'], PATHINFO_EXTENSION);
-        $fileName = microtime(true) . '_' . uniqid() . '.' . $extension;
+        if (!$mime || !isset($allowedMimes[$mime])) {
+            flash('error', 'Solo se permiten imagenes JPEG, PNG, GIF y WebP validas');
+            return null;
+        }
+
+        $uploadDir = __DIR__ . '/../../assets/imagesProfile/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $extension = $allowedMimes[$mime];
+        $fileName = bin2hex(random_bytes(16)) . '.' . $extension;
         $filePath = $uploadDir . $fileName;
 
         if (move_uploaded_file($imageFile['tmp_name'], $filePath)) {
@@ -143,9 +164,17 @@ class UserController
             $result = $userModel->deleteUser($userId);
 
             if ($result) {
-                session_destroy();
+                if (!empty($user['profile_picture']) && $user['profile_picture'] !== 'default_avatar.png') {
+                    $avatarPath = __DIR__ . '/../../assets/imagesProfile/' . $user['profile_picture'];
+                    if (file_exists($avatarPath)) {
+                        @unlink($avatarPath);
+                    }
+                }
+                clearUserSession();
+                jsonSuccess(null, 'Cuenta eliminada exitosamente');
                 exit; 
             } else {
+                jsonError('Error al eliminar la cuenta');
                 exit;
             }
 

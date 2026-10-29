@@ -16,8 +16,10 @@ class HashtagModel
 
     public static function extractHashtags(string $content): array
     {
-        preg_match_all('/#(\w{1,50})/', $content, $matches);
-        $hashtags = array_map('strtolower', $matches[1]);
+        preg_match_all('/#([\p{L}\p{N}_]{1,50})/u', $content, $matches);
+        $hashtags = array_map(function ($tag) {
+            return mb_strtolower($tag, 'UTF-8');
+        }, $matches[1]);
         return array_values(array_unique($hashtags));
     }
 

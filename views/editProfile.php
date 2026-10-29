@@ -19,6 +19,7 @@
 
   <div class="main-content">
     <?php require_once 'assets/search_header.php'; ?>
+    <?= \App\Components\Alert::render(); ?>
     <div class="content-wrapper">
       <form action="/updateProfile" method="POST" enctype="multipart/form-data">
         <div class="profile-section-edit">

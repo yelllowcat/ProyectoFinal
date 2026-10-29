@@ -673,7 +673,7 @@ LEFT JOIN (
     ) all_comments
     GROUP BY post_id
 ) c ON p.post_id = c.post_id
-WHERE p.active = 1
+WHERE p.active = 1 AND u.active = 1
 ORDER BY p.created_at DESC;
 
 DELIMITER $$

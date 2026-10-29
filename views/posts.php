@@ -45,6 +45,7 @@ $trendingHashtags = $hashtagModel->getTrendingHashtags(8);
 
     <div class="main-content">
         <?php require_once 'assets/search_header.php'; ?>
+        <?= \App\Components\Alert::render(); ?>
         <div class="content-wrapper">
             <?php if (!empty($trendingHashtags)): ?>
             <div class="trending-hashtags-widget">

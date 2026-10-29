@@ -99,7 +99,8 @@ class CommentModel
             $placeholders = implode(',', array_fill(0, count($postIds), '?'));
             $stmt = $this->pdo->prepare("
                 SELECT c.*, u.full_name, u.profile_picture,
-                    (SELECT COUNT(*) FROM replies r WHERE r.comment_id = c.comment_id AND r.active = 1) as reply_count
+                    (SELECT COUNT(*) FROM replies r WHERE r.comment_id = c.comment_id AND r.active = 1) as reply_count,
+                    (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.comment_id) as likes_count
                 FROM comments c
                 JOIN users u ON c.user_id = u.user_id
                 WHERE c.post_id IN ($placeholders) AND c.active = 1

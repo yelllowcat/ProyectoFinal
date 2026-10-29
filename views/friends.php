@@ -5,18 +5,19 @@ use App\Controllers\FriendController;
 use App\Models\FriendModel;
 use App\Models\UserModel;
 
-$userId = $_GET['id'] ?? getCurrentUserId();
+$currentUserId = getCurrentUserId();
+$viewUserId = isset($_GET['id']) ? intval($_GET['id']) : $currentUserId;
 
 $userModel = new UserModel();
 $friendModel = new FriendModel();
 $friendController = new FriendController();
 
-$currentUser = $userModel->getUserById($userId);
+$currentUser = $userModel->getUserById($currentUserId);
 $currentUserFullName = safe_output($currentUser['full_name'] ?? 'Usuario');
 
-$friends = $friendModel->getFriends($userId);
-$requests = $friendModel->getPendingRequests($userId);
-$sentRequests = $friendModel->getSentRequests($userId);
+$friends = $friendModel->getFriends($viewUserId);
+$requests = $friendModel->getPendingRequests($currentUserId);
+$sentRequests = $friendModel->getSentRequests($currentUserId);
 $suggestions = $friendController->getSuggestions()['data'];
 ?>
 <!DOCTYPE html>
@@ -37,6 +38,7 @@ $suggestions = $friendController->getSuggestions()['data'];
     require_once 'assets/sidebar.php';
     ?>
     <div class="main-content">
+        <?= \App\Components\Alert::render(); ?>
         <div class="friends-container">
             <div class="friends-header">
                 <div class="friends-header-top">

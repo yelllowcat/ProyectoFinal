@@ -76,6 +76,7 @@ class AuthController
                 $_SESSION['user_email'] = safe_output($user['email']);
                 $_SESSION['user_name'] = safe_output($user['full_name']);
                 $_SESSION['user_role'] = safe_output($user['role'] ?? 'user');
+                $_SESSION['user_active'] = (int) ($user['active'] ?? 1);
 
                 $_SESSION['success'] = 'Inicio de sesión exitoso.';
                 if (isAdmin()) {

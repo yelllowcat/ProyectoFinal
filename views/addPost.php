@@ -28,6 +28,7 @@ $userRole = $user['role'] ?? 'user';
   ?>
 
   <div class="main-content">
+    <?= \App\Components\Alert::render(); ?>
     <div class="edit-container add-post-container">
       <form action="/posts" method="POST" enctype="multipart/form-data">
         <div class="post-preview add-post-card">

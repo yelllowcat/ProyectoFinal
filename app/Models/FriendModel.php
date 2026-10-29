@@ -106,6 +106,21 @@ class FriendModel
 
     public function sendRequest($senderId, $receiverId)
     {
+        $senderId = (int) $senderId;
+        $receiverId = (int) $receiverId;
+
+        if (!$senderId || !$receiverId || $senderId === $receiverId) {
+            return false;
+        }
+
+        if ($this->alreadyFriends($senderId, $receiverId)) {
+            return false;
+        }
+
+        if ($this->existingRequest($senderId, $receiverId)) {
+            return false;
+        }
+
         $sql = "
             INSERT INTO friend_requests (sender_id, receiver_id, status)
             VALUES (?, ?, 'pending')
@@ -125,8 +140,10 @@ class FriendModel
             $stmt->execute([$requestId]);
             $req = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-            if (!$req || $req['receiver_id'] != $receiverId)
+            if (!$req || $req['receiver_id'] != $receiverId) {
+                $this->pdo->rollBack();
                 return false;
+            }
 
             $this->pdo->prepare(
                 "UPDATE friend_requests SET status='accepted', response_date=NOW()
@@ -141,7 +158,9 @@ class FriendModel
             return true;
 
         } catch (\Exception $e) {
-            $this->pdo->rollBack();
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
             return false;
         }
     }

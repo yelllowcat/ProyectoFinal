@@ -11,6 +11,12 @@ function requireAuth($redirectTo = '/login')
         $_SESSION['intended_url'] = $_SERVER['REQUEST_URI'];
         redirect($redirectTo);
     }
+
+    if (isset($_SESSION['user_active']) && (int) $_SESSION['user_active'] === 0) {
+        clearUserSession();
+        $_SESSION['error'] = 'Tu cuenta ha sido suspendida. Contacta al administrador.';
+        redirect('/login');
+    }
 }
 
 function requireAdmin()
@@ -213,4 +219,28 @@ function getProfilePicture($filename)
     }
 
     return $cache[$key] = "/assets/imagesProfile/{$key}?v=" . filemtime($imagePath);
+}
+
+
+function generateCsrfToken(): string
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function csrfField(): string
+{
+    $token = generateCsrfToken();
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';
+}
+
+function validateCsrfToken(?string $token = null): bool
+{
+    $token = $token ?? ($_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? ''));
+    if (empty($_SESSION['csrf_token']) || empty($token)) {
+        return false;
+    }
+    return hash_equals($_SESSION['csrf_token'], $token);
 }

@@ -96,6 +96,7 @@ $safe_email = safe_output($user['email'] ?? '');
     ?>
     <div class="main-content">
         <?php require_once 'assets/search_header.php'; ?>
+        <?= \App\Components\Alert::render(); ?>
         <div class="content-wrapper">
             <?php
             $profile = new Profile(
@@ -128,7 +129,7 @@ $safe_email = safe_output($user['email'] ?? '');
                     $authorName = $postData['author_name'] ?? $safe_full_name;
                     $authorPicture = $profilePicture;
 
-                    $safe_post_content = safe_output($postData['content'] ?? '');
+                    $safe_post_content = $postData['content'] ?? '';
 
                     $postComponent = new Post([
                         'id' => $postData['post_id'],

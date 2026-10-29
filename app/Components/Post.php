@@ -267,12 +267,13 @@ class Post
             $replyToggleHtml = '';
             $replyInputHtml = '';
             if (!$this->singleMode) {
+                $commentLikesCount = (int) ($comment['likes_count'] ?? 0);
                 $replyToggleHtml = "
                 <button class='reply-toggle-btn' onclick='toggleReplies(this)'>
                     {$replyBtnText}
                 </button>
                 <button class='comment-like-btn' onclick='handleCommentLike(this)' data-comment-id='{$commentId}'>
-                    <img src='/assets/images/heartOutline.png' alt='Like' width='14'> 0
+                    <img src='/assets/images/heartOutline.png' alt='Like' width='14'> {$commentLikesCount}
                 </button>";
                 $replyInputHtml = "
                 <div class='reply-input-container'>
@@ -371,7 +372,7 @@ class Post
     private function renderHashtags(string $text): string
     {
         return preg_replace(
-            '/(?<!\S)#(\w+)/',
+            '/(?<!\S)#([\p{L}\p{N}_]+)/u',
             '<a href="/hashtag/$1" class="hashtag-link">#$1</a>',
             $text
         );

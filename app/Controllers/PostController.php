@@ -38,7 +38,7 @@ class PostController
 
             $postModel = new PostModel();
 
-            $safeContent = safe_output($content);
+            $safeContent = clean_input($content);
             $result = $postModel->createPost($userId, $safeContent, $imageName);
 
             if ($result) {
@@ -62,23 +62,37 @@ class PostController
 
     private function handleImageUpload($imageFile)
     {
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+        $allowedMimes = [
+            'image/jpeg' => 'jpg',
+            'image/png'  => 'png',
+            'image/gif'  => 'gif',
+            'image/webp' => 'webp'
+        ];
         $maxSize = 5 * 1024 * 1024;
-
-        if (!in_array($imageFile['type'], $allowedTypes)) {
-            flash('error', 'Solo se permiten imágenes JPEG, PNG y GIF');
-            return null;
-        }
 
         if ($imageFile['size'] > $maxSize) {
             flash('error', 'La imagen no puede ser mayor a 5MB');
             return null;
         }
 
-        $uploadDir = __DIR__ . '/../../assets/imagesPosts/';
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = $finfo ? finfo_file($finfo, $imageFile['tmp_name']) : false;
+        if ($finfo) {
+            finfo_close($finfo);
+        }
 
-        $extension = pathinfo($imageFile['name'], PATHINFO_EXTENSION);
-        $fileName = microtime(true) . '_' . uniqid() . '.' . $extension;
+        if (!$mime || !isset($allowedMimes[$mime])) {
+            flash('error', 'Solo se permiten imagenes JPEG, PNG, GIF y WebP validas');
+            return null;
+        }
+
+        $uploadDir = __DIR__ . '/../../assets/imagesPosts/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $extension = $allowedMimes[$mime];
+        $fileName = bin2hex(random_bytes(16)) . '.' . $extension;
         $filePath = $uploadDir . $fileName;
 
         if (move_uploaded_file($imageFile['tmp_name'], $filePath)) {
@@ -113,7 +127,7 @@ class PostController
                 return;
             }
 
-            $safeContent = safe_output($content);
+            $safeContent = clean_input($content);
             $result = $postModel->updatePost($id, $safeContent, $post['image']);
 
             if ($result) {
@@ -156,6 +170,14 @@ class PostController
             // Clean up hashtag links
             $hashtagModel = new HashtagModel();
             $hashtagModel->unlinkPostHashtags($id);
+
+            // Clean up orphaned image file if present
+            if (!empty($post['image'])) {
+                $postImagePath = __DIR__ . '/../../assets/imagesPosts/' . $post['image'];
+                if (file_exists($postImagePath)) {
+                    @unlink($postImagePath);
+                }
+            }
 
             return jsonSuccess(null, 'Post eliminado correctamente');
         } else {
@@ -267,7 +289,7 @@ class PostController
                 return jsonError('El comentario no puede estar vacío');
             }
 
-            $safeComment = safe_output($comment);
+            $safeComment = clean_input($comment);
             $commentId = $commentModel->createComment($postId, $userId, $safeComment);
 
             if ($commentId) {
@@ -346,7 +368,7 @@ class PostController
                 return jsonError('La respuesta no puede estar vacía');
             }
 
-            $safeReply = safe_output($reply);
+            $safeReply = clean_input($reply);
             $replyId = $replyModel->createReply($commentId, $userId, $safeReply);
 
             if ($replyId) {

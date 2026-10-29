@@ -63,9 +63,15 @@ class PostModel
                     u.email AS author_email,
                     u.role AS author_role,
                     (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id) AS likes_count,
-                    (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.post_id AND c.active = 1) AS comments_count
+                    ((SELECT COUNT(*) FROM comments c WHERE c.post_id = p.post_id AND c.active = 1) +
+                     (SELECT COUNT(*) FROM replies r INNER JOIN comments cr ON r.comment_id = cr.comment_id WHERE cr.post_id = p.post_id AND r.active = 1 AND cr.active = 1)) AS comments_count
                 FROM (
-                    SELECT post_id FROM posts WHERE active = 1 ORDER BY created_at DESC LIMIT ? OFFSET ?
+                    SELECT p_sub.post_id
+                    FROM posts p_sub
+                    INNER JOIN users u_sub ON p_sub.user_id = u_sub.user_id
+                    WHERE p_sub.active = 1 AND u_sub.active = 1
+                    ORDER BY p_sub.created_at DESC
+                    LIMIT ? OFFSET ?
                 ) page
                 INNER JOIN posts p ON p.post_id = page.post_id
                 INNER JOIN users u ON p.user_id = u.user_id
@@ -82,7 +88,12 @@ class PostModel
     public function getTotalPostsCount(): int
     {
         try {
-            $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM posts WHERE active = 1");
+            $stmt = $this->pdo->prepare("
+                SELECT COUNT(*)
+                FROM posts p
+                INNER JOIN users u ON p.user_id = u.user_id
+                WHERE p.active = 1 AND u.active = 1
+            ");
             $stmt->execute();
             return (int) $stmt->fetchColumn();
         } catch (PDOException $e) {
