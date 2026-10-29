@@ -12,13 +12,7 @@ class FriendModel
         $this->pdo = getDB();
     }
 
-    private function getUserIdByEmail($email)
-    {
-        $stmt = $this->pdo->prepare("SELECT user_id FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch(\PDO::FETCH_ASSOC);
-        return $user['user_id'] ?? null;
-    }
+
 
     private function alreadyFriends($u1, $u2)
     {
@@ -120,24 +114,7 @@ class FriendModel
         return $stmt->execute([$senderId, $receiverId]);
     }
 
-    public function sendRequestByEmail($senderEmail, $receiverEmail)
-    {
-        $senderId = $this->getUserIdByEmail($senderEmail);
-        $receiverId = $this->getUserIdByEmail($receiverEmail);
 
-        if (!$senderId || !$receiverId || $senderId == $receiverId)
-            return false;
-        if ($this->alreadyFriends($senderId, $receiverId))
-            return false;
-        if ($this->existingRequest($senderId, $receiverId))
-            return false;
-
-        $stmt = $this->pdo->prepare(
-            "INSERT INTO friend_requests (sender_id, receiver_id, status)
-             VALUES (?, ?, 'pending')"
-        );
-        return $stmt->execute([$senderId, $receiverId]);
-    }
 
     public function acceptRequest($requestId, $receiverId)
     {
@@ -203,18 +180,7 @@ class FriendModel
         return $stmt->execute([$senderId, $receiverId]);
     }
 
-    public function removeFriend($emailA, $emailB)
-    {
-        $u1 = $this->getUserIdByEmail($emailA);
-        $u2 = $this->getUserIdByEmail($emailB);
 
-        if (!$u1 || !$u2)
-            return false;
-
-        $sql = "DELETE FROM friends 
-                WHERE (user_id1=? AND user_id2=?) OR (user_id1=? AND user_id2=?)";
-        return $this->pdo->prepare($sql)->execute([$u1, $u2, $u2, $u1]);
-    }
 
     public function removeFriendById($userId, $friendId)
     {

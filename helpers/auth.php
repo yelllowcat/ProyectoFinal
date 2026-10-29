@@ -93,21 +93,7 @@ function canEdit($resourceUserId)
     return isOwner($resourceUserId) || isAdmin();
 }
 
-function setUserSession($userData)
-{
-    $_SESSION['user_id'] = $userData['id_usuario'];
-    $_SESSION['user_data'] = [
-        'id' => $userData['id_usuario'],
-        'username' => $userData['nombre_usuario'],
-        'email' => $userData['correo_electronico'],
-        'name' => $userData['nombre_completo'] ?? '',
-        'profile_picture' => $userData['foto_perfil'] ?? '',
-        'role' => $userData['rol'] ?? 'user',
-        'created_at' => $userData['fecha_registro'] ?? null
-    ];
 
-    session_regenerate_id(true);
-}
 
 function clearUserSession()
 {

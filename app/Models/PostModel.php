@@ -229,21 +229,14 @@ class PostModel
     }
 
 
-    public function getPostsWithCounts()
+    /**
+     * Alias for getAllPosts for backward compatibility.
+     *
+     * @return array
+     */
+    public function getPostsWithCounts(): array
     {
-        try {
-            $stmt = $this->pdo->prepare("
-            SELECT *
-            FROM v_posts_stats
-            ORDER BY created_at DESC
-        ");
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        } catch (PDOException $e) {
-            error_log("getPostsWithCounts error: " . $e->getMessage());
-            return [];
-        }
+        return $this->getAllPosts();
     }
 
 }

@@ -41,16 +41,7 @@ CREATE TABLE IF NOT EXISTS comments (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- TABLA hidden_comments
-CREATE TABLE IF NOT EXISTS hidden_comments (
-    hidden_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    comment_id INT NOT NULL,
-    hidden_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE,
-    UNIQUE (user_id, comment_id)
-) ENGINE=InnoDB;
+
 
 -- TABLA likes
 CREATE TABLE IF NOT EXISTS likes (
@@ -156,7 +147,6 @@ CREATE TABLE IF NOT EXISTS reports (
 -- SELECT * FROM posts;
 -- SELECT * FROM comments;
 -- SELECT * FROM likes;
--- SELECT * FROM hidden_comments;
 -- SELECT * FROM friend_requests;
 -- SELECT * FROM friends;
 -- SELECT * FROM user_update_log;

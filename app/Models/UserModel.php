@@ -216,8 +216,7 @@ class UserModel
 {
     try {
         
-        $stmt1 = $this->pdo->prepare("DELETE FROM hidden_comments WHERE user_id = ?");
-        $stmt1->execute([$userId]);
+
         
         $stmt6 = $this->pdo->prepare("DELETE FROM user_update_log WHERE user_id = ?");
         $stmt6->execute([$userId]);

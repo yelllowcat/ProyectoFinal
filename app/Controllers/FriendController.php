@@ -15,29 +15,7 @@ class FriendController
         $this->userModel = new UserModel();
     }
 
-    public function sendRequest($params)
-    {
-        requireAuth();
 
-        $senderEmail = $_SESSION['email'];
-        $receiverEmail = clean_input($params['email'] ?? '');
-
-        if (!$receiverEmail)
-            return ['success' => false, 'message' => 'Email no especificado'];
-        if ($senderEmail === $receiverEmail)
-            return ['success' => false, 'message' => 'No puedes enviarte solicitud a ti mismo'];
-
-        $targetUser = $this->userModel->getUserByEmail($receiverEmail);
-        if (!$targetUser || ($targetUser['role'] ?? '') === 'admin')
-            return ['success' => false, 'message' => 'Usuario no encontrado'];
-
-        $ok = $this->friendModel->sendRequestByEmail($senderEmail, $receiverEmail);
-
-        return [
-            'success' => $ok,
-            'message' => $ok ? 'Solicitud enviada' : 'No se pudo enviar'
-        ];
-    }
 
     public function sendRequestById($id)
     {
@@ -128,20 +106,7 @@ class FriendController
         return $this->cancelRequestByUserId($id);
     }
 
-    public function removeFriend($id)
-    {
-        requireAuth();
 
-        $currentEmail = $_SESSION['email'];
-        $otherEmail = $id;
-
-        if (!$otherEmail)
-            return ['success' => false, 'message' => 'Email requerido'];
-
-        $ok = $this->friendModel->removeFriend($currentEmail, $otherEmail);
-
-        return ['success' => $ok];
-    }
 
     public function removeFriendById($id)
     {
