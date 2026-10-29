@@ -16,6 +16,7 @@ node_modules/
 
 # Reglas locales de agentes IA y configuraciones auxiliares de JS
 AGENTS.md
+CHANGELOG.md
 eslint.config.mjs
 .prettierrc.json
 .prettierignore

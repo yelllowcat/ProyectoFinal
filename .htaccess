@@ -1,5 +1,20 @@
+Options -Indexes
+
 RewriteEngine On
 RewriteBase /
+
+# Block access to hidden files and directories (.env, .git, etc.)
+RewriteRule (^|/)\. - [F,L]
+
+# Block direct HTTP access to internal directories
+RewriteRule ^(app|config|database|docs|helpers|routes|tests|vendor|views)(/|$) - [F,L]
+
+# Block direct HTTP access to configuration, build, log, SQL, and script files
+RewriteRule ^(composer\.(json|lock)|phpunit\.xml|phpcs\.xml|phpstan\.neon|Dockerfile|docker-entrypoint\.sh)$ - [F,L,NC]
+RewriteRule \.(sql|log|md|py|sh|neon|lock|docx)$ - [F,L,NC]
+
+# Prevent PHP execution inside public static directories (upload protection)
+RewriteRule ^(assets|js)/.*\.(php|phtml|phar)$ - [F,L,NC]
 
 <IfModule mod_headers.c>
     <FilesMatch "\.(png|jpg|jpeg|gif|ico|svg|webp|css|js)$">
@@ -7,7 +22,7 @@ RewriteBase /
     </FilesMatch>
 </IfModule>
 
-# Allow direct access to files and directories
+# Allow direct access only to legitimate static files (assets/, js/, favicon.ico)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 

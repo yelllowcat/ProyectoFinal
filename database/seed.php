@@ -4,6 +4,11 @@
  * Run: php database/seed.php
  */
 
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    exit('Acceso denegado: este script solo puede ejecutarse desde la terminal (CLI).');
+}
+
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../config/database.php';
 

@@ -18,7 +18,7 @@ from reportlab.platypus.flowables import HRFlowable
 from datetime import datetime
 
 # ── Constants ──────────────────────────────────────────────────
-OUTPUT = "/media/david/Storage/repos/ProyectoFinal/DOCUMENTACION_UNIRED.pdf"
+OUTPUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DOCUMENTACION_UNIRED.pdf")
 PAGE_W, PAGE_H = letter  # 8.5 x 11 inches
 
 # Colors

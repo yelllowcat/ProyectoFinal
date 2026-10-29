@@ -2,12 +2,14 @@
 
 Una plataforma de red social moderna diseñada para conectar a estudiantes universitarios, permitiéndoles compartir publicaciones, interactuar con amigos y gestionar sus perfiles.
 
-## 📋 Credenciales de Admin 
-- Correo: admin@gmail.com
-- Contraseña: Admin123?
+## 📋 Credenciales de Administrador por Defecto (Desarrollo / Pruebas)
+> **Nota:** Estas credenciales se generan para pruebas locales ejecutando `composer db:create-admin`. En producción, configure contraseñas seguras y actualice las variables en `.env`.
+- **Correo:** `admin@gmail.com`
+- **Contraseña:** `Admin123?`
 
 ## 📋 URL de la Aplicación
-- https://darksalmon-jellyfish-884197.hostingersite.com/
+- **Local:** `http://localhost/` (o según el puerto asignado en Apache / Docker)
+- **Despliegue Demo:** `https://darksalmon-jellyfish-884197.hostingersite.com/`
 
 ## 📋 Características
 

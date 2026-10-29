@@ -13,7 +13,7 @@ from docx.oxml.ns import qn, nsdecls
 from docx.oxml import parse_xml
 from datetime import datetime
 
-OUTPUT = "/media/david/Storage/repos/ProyectoFinal/DOCUMENTACION_UNIRED.docx"
+OUTPUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DOCUMENTACION_UNIRED.docx")
 
 DARK_BLUE = RGBColor(0x1a, 0x3a, 0x5c)
 MED_BLUE = RGBColor(0x2c, 0x5f, 0x8a)

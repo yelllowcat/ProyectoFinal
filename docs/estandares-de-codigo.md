@@ -41,7 +41,7 @@ Los siguientes valores rigen la calidad estructural del código nuevo y de cualq
 3. **Excepciones justificadas:** Quedan exentos de los límites de longitud de archivo:
    - Dependencias y librerías externas (`vendor/`, `js/chart.min.js`).
    - Esquemas, semillas y migraciones de base de datos (`database/unired_db.sql`, `database/seed.php`, `database/migrations/`).
-   - Scripts de generación de documentación académica (`generate_documentation.py`, `generate_docx.py`).
+   - Scripts de generación de documentación académica (`docs/generate_documentation.py`, `docs/generate_docx.py`).
 
 ---
 
@@ -135,6 +135,7 @@ ProyectoFinal/
   - No renombres arbitrariamente funciones globales existentes de la API interna (`clean_input`, `safe_output`) que ya son consumidas en todo el proyecto.
 - **Booleanos descriptivos:** Usa prefijos `is`, `has`, `can` o `should` (`isLoggedIn()`, `hasLiked()`, `canEdit()`, `hasFlash()`).
 - **Colecciones en plural:** Usa nombres plurales para arreglos y listados (`$comments`, `$hashtags`, `$friendCards`).
+- **Prohibición de emojis:** Queda estrictamente prohibido el uso de emojis en cualquier parte del código fuente (PHP, JavaScript, CSS, SQL), comentarios de código, mensajes de confirmación de control de versiones (commits) y documentación técnica. Todo el proyecto debe mantener un estilo sobrio, formal y profesional.
 
 ---
 
