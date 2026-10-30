@@ -21,17 +21,17 @@ use App\Components\Alert;
 
     <h1>REGISTRO</h1>
     <?php echo Alert::render(); ?>
-    <form action="/register" method="POST">
+    <form action="/register" method="POST" novalidate>
       <?= function_exists('csrfField') ? csrfField() : '' ?>
       <div class="form-group">
         <input type="text" id="full_name" placeholder="Nombre de usuario" name="full_name" required
-          pattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s]{3,50}$" minlength="3" maxlength="50"
+          pattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ'\s]{3,50}$" minlength="3" maxlength="50"
           value="<?= safe_output($_POST['full_name'] ?? '') ?>" onpaste="return false;" />
         <label for="full_name" class="form-label" data-help="Solo letras, mínimo 3 caracteres">Nombre de usuario</label>
       </div>
 
       <div class="form-group">
-        <input type="email" id="email" placeholder="Correo electrónico" name="email" required
+        <input type="text" inputmode="email" autocomplete="email" id="email" placeholder="Correo electrónico" name="email" required
           pattern="^.*@(uabcs\.mx|alu\.uabcs\.mx)$" title="Debe ser un correo @uabcs.mx o @alu.uabcs.mx"
           value="<?= safe_output($_POST['email'] ?? '') ?>" onpaste="return false;" maxlength="200" />
         <label for="email" class="form-label" data-help="Formato: usuario@uabcs.mx o @alu.uabcs.mx">Correo electrónico</label>

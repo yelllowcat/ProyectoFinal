@@ -22,9 +22,9 @@ use App\Components\Alert;
     <?php echo Alert::render(); ?>
     <h1>INICIAR SESIÓN</h1>
 
-    <form method="post" action="/login">
+    <form method="post" action="/login" novalidate>
       <div class="form-group">
-        <input type="email" id="email" placeholder="Correo electrónico" name="email"
+        <input type="text" inputmode="email" autocomplete="email" id="email" placeholder="Correo electrónico" name="email"
           value="<?= safe_output($_POST['email'] ?? '') ?>" required maxlength="200" />
         <label for="email" class="form-label" data-help="Formato: correo@ejemplo.com">Correo electrónico</label>
       </div>

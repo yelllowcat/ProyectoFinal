@@ -85,7 +85,7 @@ function animateInput(input, type) {
 
 function validateEmail() {
   const email = this.value.trim();
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
   
   if (email && !emailRegex.test(email)) {
     this.setCustomValidity('Por favor ingresa un correo electrónico válido');
@@ -112,16 +112,17 @@ function validatePassword() {
 
 function handleFormSubmit(e) {
   const submitBtn = this.querySelector('button[type="submit"]');
-  const formGroups = this.querySelectorAll('.form-group');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
   let isValid = true;
   
-  formGroups.forEach(group => {
-    const input = group.querySelector('input');
-    if (input && !input.checkValidity()) {
-      isValid = false;
-      shakeElement(input);
-    }
-  });
+  if (emailInput && !validateEmail.call(emailInput)) {
+    isValid = false;
+  }
+  
+  if (passwordInput && !validatePassword.call(passwordInput)) {
+    isValid = false;
+  }
   
   if (!isValid) {
     e.preventDefault();

@@ -28,7 +28,12 @@ class AuthController
                 redirect('/register');
             }
 
-            $email_lower = strtolower($email);
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE)) {
+                $_SESSION['error'] = 'Por favor ingresa un correo electrónico válido.';
+                redirect('/register');
+            }
+
+            $email_lower = mb_strtolower($email, 'UTF-8');
             if (str_ends_with($email_lower, '@uabcs.mx')) {
                 $role = 'teacher';
             } elseif (str_ends_with($email_lower, '@alu.uabcs.mx')) {
@@ -73,6 +78,11 @@ class AuthController
                 redirect('/login');
             }
 
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE)) {
+                $_SESSION['error'] = 'Por favor ingresa un correo electrónico válido.';
+                redirect('/login');
+            }
+
             $userModel = new UserModel();
             $user = $userModel->loginUser($email, $password);
 
@@ -84,9 +94,9 @@ class AuthController
                 redirect('/login');
             } else {
                 $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['user_email'] = safe_output($user['email']);
-                $_SESSION['user_name'] = safe_output($user['full_name']);
-                $_SESSION['user_role'] = safe_output($user['role'] ?? 'user');
+                $_SESSION['user_email'] = $user['email'];
+                $_SESSION['user_name'] = $user['full_name'];
+                $_SESSION['user_role'] = $user['role'] ?? 'user';
                 $_SESSION['user_active'] = (int) ($user['active'] ?? 1);
 
                 $_SESSION['success'] = 'Inicio de sesión exitoso.';
