@@ -41,6 +41,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
 const COMMENTS_PER_LOAD = 3;
 
+function copyPostLink(postId) {
+  const url = `${window.location.origin}/post/${postId}`;
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(url).then(() => {
+      alert("Enlace copiado al portapapeles: " + url);
+    }).catch(() => {
+      prompt("Copia el siguiente enlace:", url);
+    });
+  } else {
+    prompt("Copia el siguiente enlace:", url);
+  }
+}
+
 async function toggleMenu(event, menuId) {
   event.stopPropagation();
 

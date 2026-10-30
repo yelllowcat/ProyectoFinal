@@ -4341,3 +4341,51 @@ html[data-theme="dark"] .comment-edit-btn-cancel {
 html[data-theme="dark"] .comment-edit-btn-cancel:hover {
   background-color: #475569;
 }
+
+/* Feed Tabs & Permalink Styles */
+.feed-tabs-container {
+  width: 100%;
+}
+
+.feed-tabs a.tab {
+  text-decoration: none;
+}
+
+.feed-post-date-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.feed-post-date-link:hover .feed-post-date {
+  color: #4db8c4;
+  text-decoration: underline;
+}
+
+.action-btn.share {
+  margin-left: auto;
+}
+
+.action-btn.share:hover {
+  color: #4db8c4;
+}
+
+.single-post-navigation .btn-back {
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.single-post-navigation .btn-back:hover {
+  transform: translateX(-3px);
+  color: #3aa3af;
+}
+
+html[data-theme="dark"] .feed-post-date-link:hover .feed-post-date {
+  color: #5eead4;
+}
+
+html[data-theme="dark"] .action-btn.share:hover {
+  color: #5eead4;
+}
+
+html[data-theme="dark"] .single-post-navigation .btn-back:hover {
+  color: #5eead4;
+}

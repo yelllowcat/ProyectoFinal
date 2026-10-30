@@ -46,11 +46,35 @@ class PostModel
         }
     }
 
-    public function getAllPostsPaginated(int $page = 1, int $perPage = 20): array
-    {
+    public function getAllPostsPaginated(
+        int $page = 1,
+        int $perPage = 20,
+        string $filter = 'all',
+        ?int $currentUserId = null
+    ): array {
         try {
             $offset = ($page - 1) * $perPage;
-            $stmt = $this->pdo->prepare("
+
+            $whereClause = "WHERE p_sub.active = 1 AND u_sub.active = 1";
+            $filterParams = [];
+
+            if ($filter === 'friends' && $currentUserId) {
+                $whereClause .= " AND (
+                    p_sub.user_id = ? OR
+                    p_sub.user_id IN (
+                        SELECT user_id1 FROM friends WHERE user_id2 = ?
+                        UNION
+                        SELECT user_id2 FROM friends WHERE user_id1 = ?
+                    )
+                )";
+                $filterParams[] = $currentUserId;
+                $filterParams[] = $currentUserId;
+                $filterParams[] = $currentUserId;
+            } elseif ($filter === 'teachers') {
+                $whereClause .= " AND u_sub.role IN ('teacher', 'admin')";
+            }
+
+            $sql = "
                 SELECT
                     p.post_id,
                     p.user_id,
@@ -69,15 +93,24 @@ class PostModel
                     SELECT p_sub.post_id
                     FROM posts p_sub
                     INNER JOIN users u_sub ON p_sub.user_id = u_sub.user_id
-                    WHERE p_sub.active = 1 AND u_sub.active = 1
+                    {$whereClause}
                     ORDER BY p_sub.created_at DESC
                     LIMIT ? OFFSET ?
                 ) page
                 INNER JOIN posts p ON p.post_id = page.post_id
                 INNER JOIN users u ON p.user_id = u.user_id
                 ORDER BY p.created_at DESC
-            ");
-            $stmt->execute([$perPage, $offset]);
+            ";
+
+            $stmt = $this->pdo->prepare($sql);
+            $paramIndex = 1;
+            foreach ($filterParams as $param) {
+                $stmt->bindValue($paramIndex++, $param, PDO::PARAM_INT);
+            }
+            $stmt->bindValue($paramIndex++, $perPage, PDO::PARAM_INT);
+            $stmt->bindValue($paramIndex++, $offset, PDO::PARAM_INT);
+
+            $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("getAllPostsPaginated error: " . $e->getMessage());
@@ -85,23 +118,41 @@ class PostModel
         }
     }
 
-    public function getTotalPostsCount(): int
+    public function getTotalPostsCount(string $filter = 'all', ?int $currentUserId = null): int
     {
         try {
+            $whereClause = "WHERE p.active = 1 AND u.active = 1";
+            $params = [];
+
+            if ($filter === 'friends' && $currentUserId) {
+                $whereClause .= " AND (
+                    p.user_id = ? OR
+                    p.user_id IN (
+                        SELECT user_id1 FROM friends WHERE user_id2 = ?
+                        UNION
+                        SELECT user_id2 FROM friends WHERE user_id1 = ?
+                    )
+                )";
+                $params[] = $currentUserId;
+                $params[] = $currentUserId;
+                $params[] = $currentUserId;
+            } elseif ($filter === 'teachers') {
+                $whereClause .= " AND u.role IN ('teacher', 'admin')";
+            }
+
             $stmt = $this->pdo->prepare("
                 SELECT COUNT(*)
                 FROM posts p
                 INNER JOIN users u ON p.user_id = u.user_id
-                WHERE p.active = 1 AND u.active = 1
+                {$whereClause}
             ");
-            $stmt->execute();
+            $stmt->execute($params);
             return (int) $stmt->fetchColumn();
         } catch (PDOException $e) {
             error_log("getTotalPostsCount error: " . $e->getMessage());
             return 0;
         }
     }
-
 
     public function getPostById($postId)
     {
@@ -119,10 +170,11 @@ class PostModel
                     u.email AS author_email,
                     u.role AS author_role,
                     (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.post_id) AS likes_count,
-                    (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.post_id AND c.active = 1) AS comments_count
+                    ((SELECT COUNT(*) FROM comments c WHERE c.post_id = p.post_id AND c.active = 1) +
+                     (SELECT COUNT(*) FROM replies r INNER JOIN comments cr ON r.comment_id = cr.comment_id WHERE cr.post_id = p.post_id AND r.active = 1 AND cr.active = 1)) AS comments_count
                 FROM posts p
                 INNER JOIN users u ON p.user_id = u.user_id
-                WHERE p.post_id = ? AND p.active = 1
+                WHERE p.post_id = ? AND p.active = 1 AND u.active = 1
             ");
             $stmt->execute([$postId]);
             return $stmt->fetch(PDO::FETCH_ASSOC);

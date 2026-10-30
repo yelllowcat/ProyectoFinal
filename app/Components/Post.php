@@ -18,6 +18,8 @@ class Post
     private $userAvatar;
     private $authorRole;
     private $singleMode;
+    private $interactive;
+    private $createdAt;
     private $expandAllComments;
     private $highlightCommentId;
     private $highlightReplyId;
@@ -48,6 +50,8 @@ class Post
         $this->authorRole = $data['author_role'] ?? 'user';
 
         $this->singleMode = $data['single_mode'] ?? false;
+        $this->interactive = $data['interactive'] ?? !$this->singleMode;
+        $this->createdAt = $data['created_at'] ?? null;
         $this->expandAllComments = $data['expand_all_comments'] ?? false;
         $this->highlightCommentId = $data['highlight_comment_id'] ?? null;
         $this->highlightReplyId = $data['highlight_reply_id'] ?? null;
@@ -113,12 +117,13 @@ class Post
 
         // Menú del post
         $menuOptions = '';
-        if (!$this->singleMode) {
+        if ($this->interactive) {
             if ($this->userId == $this->currentUserId) {
                 $menuOptions = "
         <div class='feed-post-menu' onclick=\"toggleMenu(event, '{$menuId}')\">
             <img src='/assets/images/more.png' alt='more options' width='25'>
             <div class='post-menu-modal' id='{$menuId}'>
+                <div class='menu-option' onclick='copyPostLink({$this->id})'>Copiar enlace</div>
                 <div class='menu-option delete' onclick='openConfirmModal(this)'>Eliminar</div>
                 <a href='/editPost/{$this->id}' class='menu-option edit'>Editar</a>
                 <div class='menu-option'>Cancelar</div>
@@ -130,6 +135,7 @@ class Post
         <div class='feed-post-menu' onclick=\"toggleMenu(event, '{$menuId}')\">
             <img src='/assets/images/more.png' alt='more options' width='25'>
             <div class='post-menu-modal' id='{$menuId}'>
+                <div class='menu-option' onclick='copyPostLink({$this->id})'>Copiar enlace</div>
                 <div class='menu-option' style='color: #f44336;' onclick=\"openReportModal('post', {$this->id})\">Reportar publicación</div>
                 <div class='menu-option'>Cancelar</div>
             </div>
@@ -154,7 +160,7 @@ class Post
         }
 
         $actionsHtml = '';
-        if (!$this->singleMode) {
+        if ($this->interactive) {
             $actionsHtml = "
         <div class='feed-post-actions'>
             <button class='{$likeButtonClass}' onclick='handleLike(this)'>
@@ -164,6 +170,10 @@ class Post
             <button class='action-btn comments' onclick='toggleComments(this)'>
                 <img src='/assets/images/comments.png' alt='comments icon' width='25'>
                 {$this->commentsCount} Comentarios
+            </button>
+            <button class='action-btn share' onclick='copyPostLink({$this->id})' title='Copiar enlace de la publicación'>
+                <img src='/assets/images/more.png' alt='Compartir' width='16' style='transform: rotate(90deg); opacity: 0.6;'>
+                Compartir
             </button>
         </div>";
         } else {
@@ -180,18 +190,26 @@ class Post
         </div>";
         }
 
+        $relativeDate = !empty($this->createdAt) ? getTimeAgo($this->createdAt) : $this->date;
+
         return "
     <div class='feed-post-card post-container{$singleModeClass}' id='post-{$this->id}' data-post-id='{$this->id}' data-current-user-id='{$this->currentUserId}'>
         <div class='feed-post-header'>
-            <a href='/profile/{$this->userId}' class='feed-post-user'>
-                <div class='feed-post-avatar'>
-                    <img src='{$this->userAvatar}' alt='Avatar de {$this->author}' class='post-user-avatar'>
-                </div>
+            <div class='feed-post-user'>
+                <a href='/profile/{$this->userId}' class='feed-post-avatar-link'>
+                    <div class='feed-post-avatar'>
+                        <img src='{$this->userAvatar}' alt='Avatar de {$this->author}' class='post-user-avatar'>
+                    </div>
+                </a>
                 <div class='feed-post-user-info'>
-                    <h3 style='display:flex; align-items:center; gap:5px;'>{$this->author} {$roleBadge}</h3>
-                    <div class='feed-post-date'>Publicado el: {$this->date}</div>
+                    <a href='/profile/{$this->userId}' style='text-decoration:none; color:inherit;'>
+                        <h3 style='display:flex; align-items:center; gap:5px;'>{$this->author} {$roleBadge}</h3>
+                    </a>
+                    <a href='/post/{$this->id}' class='feed-post-date-link' style='text-decoration:none; color:inherit;'>
+                        <div class='feed-post-date' title='{$this->date}'>Publicado: {$relativeDate}</div>
+                    </a>
                 </div>
-            </a>
+            </div>
             {$menuOptions}
         </div>
 
@@ -227,7 +245,7 @@ class Post
 
             // Menú del comentario
             $commentMenu = '';
-            if (!$this->singleMode) {
+            if ($this->interactive) {
                 if ($commentUserId == $this->currentUserId) {
                     $commentMenu = "
                     <div class='comment-menu-wrapper'>
@@ -267,7 +285,7 @@ class Post
 
             $replyToggleHtml = '';
             $replyInputHtml = '';
-            if (!$this->singleMode) {
+            if ($this->interactive) {
                 $commentLikesCount = (int) ($comment['likes_count'] ?? 0);
                 $replyToggleHtml = "
                 <button class='reply-toggle-btn' onclick='toggleReplies(this)'>
@@ -326,7 +344,7 @@ class Post
         }
 
         $commentInputHtml = '';
-        if (!$this->singleMode) {
+        if ($this->interactive) {
             $commentInputHtml = "
         <div class='comment-input-container'>
             <input type='text' class='comment-input' placeholder='Comentar' maxlength='500' minlength='1' onkeypress='handleCommentKeyPress(event, this)'>
@@ -363,7 +381,7 @@ class Post
         $highlightClass = ($this->highlightReplyId && $this->highlightReplyId == $replyId) ? ' highlighted-reply' : '';
 
         $replyMenu = '';
-        if (!$this->singleMode) {
+        if ($this->interactive) {
             $replyMenuId = 'reply-menu-' . $commentId . '-' . $replyId;
             if ($replyUserId == $this->currentUserId) {
                 $replyMenu = "

@@ -61,6 +61,8 @@ $router->get('/posts', function () {
     require __DIR__ . '/../views/posts.php';
 });
 
+$router->get('/post/:id', [PostController::class, 'show']);
+
 $router->get('/profile', function () {
     requireUser();
     requireAuth();

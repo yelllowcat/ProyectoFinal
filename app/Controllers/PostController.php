@@ -531,4 +531,34 @@ class PostController
             return jsonError('Error al actualizar la respuesta');
         }
     }
+
+    public function show($id)
+    {
+        requireUser();
+        requireAuth();
+
+        $postModel = new PostModel();
+        $likeModel = new LikeModel();
+        $commentModel = new CommentModel();
+        $replyModel = new ReplyModel();
+
+        $postData = $postModel->getPostById((int) $id);
+        if (!$postData) {
+            flash('error', 'La publicacion no existe o no se encuentra disponible.');
+            header('Location: /posts');
+            exit();
+        }
+
+        $currentUserId = (int) $_SESSION['user_id'];
+        $hasLiked = $likeModel->hasLiked((int) $id, $currentUserId);
+        $comments = $commentModel->getCommentsByPost((int) $id);
+
+        $repliesData = [];
+        foreach ($comments as $comment) {
+            $commentId = (int) ($comment['comment_id'] ?? $comment['id']);
+            $repliesData[$commentId] = $replyModel->getRepliesByComment($commentId);
+        }
+
+        require __DIR__ . '/../../views/singlePost.php';
+    }
 }
