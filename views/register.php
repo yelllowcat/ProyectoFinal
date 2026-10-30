@@ -39,20 +39,20 @@ use App\Components\Alert;
       <div class="form-group">
         <select id="department" name="department" class="form-select" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc; background: inherit; color: inherit;">
           <option value="">Departamento Académico (opcional)...</option>
-          <option value="Ciencias de la Computación" <?= (['department'] ?? '') === 'Ciencias de la Computación' ? 'selected' : '' ?>>Ciencias de la Computación</option>
-          <option value="Ciencias Marinas y Costeras" <?= (['department'] ?? '') === 'Ciencias Marinas y Costeras' ? 'selected' : '' ?>>Ciencias Marinas y Costeras</option>
-          <option value="Ciencias Sociales y Jurídicas" <?= (['department'] ?? '') === 'Ciencias Sociales y Jurídicas' ? 'selected' : '' ?>>Ciencias Sociales y Jurídicas</option>
-          <option value="Humanidades" <?= (['department'] ?? '') === 'Humanidades' ? 'selected' : '' ?>>Humanidades</option>
-          <option value="Economía y Administración" <?= (['department'] ?? '') === 'Economía y Administración' ? 'selected' : '' ?>>Economía y Administración</option>
-          <option value="Ingeniería Pesquera" <?= (['department'] ?? '') === 'Ingeniería Pesquera' ? 'selected' : '' ?>>Ingeniería Pesquera</option>
-          <option value="Agronomía y Zootecnia" <?= (['department'] ?? '') === 'Agronomía y Zootecnia' ? 'selected' : '' ?>>Agronomía y Zootecnia</option>
-          <option value="Ciencias de la Tierra" <?= (['department'] ?? '') === 'Ciencias de la Tierra' ? 'selected' : '' ?>>Ciencias de la Tierra</option>
+          <option value="Ciencias de la Computación" <?= ($_POST['department'] ?? '') === 'Ciencias de la Computación' ? 'selected' : '' ?>>Ciencias de la Computación</option>
+          <option value="Ciencias Marinas y Costeras" <?= ($_POST['department'] ?? '') === 'Ciencias Marinas y Costeras' ? 'selected' : '' ?>>Ciencias Marinas y Costeras</option>
+          <option value="Ciencias Sociales y Jurídicas" <?= ($_POST['department'] ?? '') === 'Ciencias Sociales y Jurídicas' ? 'selected' : '' ?>>Ciencias Sociales y Jurídicas</option>
+          <option value="Humanidades" <?= ($_POST['department'] ?? '') === 'Humanidades' ? 'selected' : '' ?>>Humanidades</option>
+          <option value="Economía y Administración" <?= ($_POST['department'] ?? '') === 'Economía y Administración' ? 'selected' : '' ?>>Economía y Administración</option>
+          <option value="Ingeniería Pesquera" <?= ($_POST['department'] ?? '') === 'Ingeniería Pesquera' ? 'selected' : '' ?>>Ingeniería Pesquera</option>
+          <option value="Agronomía y Zootecnia" <?= ($_POST['department'] ?? '') === 'Agronomía y Zootecnia' ? 'selected' : '' ?>>Agronomía y Zootecnia</option>
+          <option value="Ciencias de la Tierra" <?= ($_POST['department'] ?? '') === 'Ciencias de la Tierra' ? 'selected' : '' ?>>Ciencias de la Tierra</option>
         </select>
       </div>
 
       <div class="form-group">
         <input type="text" id="career" placeholder="Carrera (ej. Lic. en Desarrollo de Software)" name="career"
-          value="<?= safe_output(['career'] ?? '') ?>" maxlength="100" />
+          value="<?= safe_output($_POST['career'] ?? '') ?>" maxlength="100" />
         <label for="career" class="form-label">Carrera (opcional)</label>
       </div>
 
