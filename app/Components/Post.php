@@ -234,6 +234,7 @@ class Post
                         <img src='/assets/images/vertical-dots.png' alt='Opciones de comentario' width='20' 
                              class='comment-menu-trigger' data-menu-id='{$commentMenuId}' style='cursor: pointer;'>
                         <div class='comment-menu-modal' id='{$commentMenuId}'>
+                            <div class='menu-option comment-edit-btn' onclick='startEditComment({$commentId})'>Editar</div>
                             <div class='menu-option delete comment-delete-btn'>Eliminar</div>
                             <div class='menu-option'>Cancelar</div>
                         </div>
@@ -286,6 +287,9 @@ class Post
                 }
             }
 
+            $isCommentEdited = !empty($comment['updated_at']) && !empty($comment['created_at']) && (strtotime($comment['updated_at']) > strtotime($comment['created_at']));
+            $commentEditedTag = $isCommentEdited ? " <span class='comment-edited-tag'>(editado)</span>" : "";
+
             $commentsHtml .= "
         <div class='comment{$isHidden}{$highlightClass}' id='comment-{$commentId}' data-comment-id='{$commentId}'>
             <div class='comment-header'>
@@ -298,7 +302,7 @@ class Post
                 {$commentMenu}
             </div>
             <div class='comment-date'>
-                {$time} • {$date}
+                {$time} &middot; {$date}{$commentEditedTag}
             </div>
             <div class='reply-toggle-container' data-comment-id='{$commentId}'>
                 {$replyToggleHtml}
@@ -353,7 +357,27 @@ class Post
         $date = date('d/m/Y', strtotime($reply['created_at'] ?? 'now'));
         $time = htmlspecialchars($reply['time'] ?? '');
 
+        $isReplyEdited = !empty($reply['updated_at']) && !empty($reply['created_at']) && (strtotime($reply['updated_at']) > strtotime($reply['created_at']));
+        $replyEditedTag = $isReplyEdited ? " <span class='comment-edited-tag'>(editado)</span>" : "";
+
         $highlightClass = ($this->highlightReplyId && $this->highlightReplyId == $replyId) ? ' highlighted-reply' : '';
+
+        $replyMenu = '';
+        if (!$this->singleMode) {
+            $replyMenuId = 'reply-menu-' . $commentId . '-' . $replyId;
+            if ($replyUserId == $this->currentUserId) {
+                $replyMenu = "
+                <div class='comment-menu-wrapper'>
+                    <img src='/assets/images/vertical-dots.png' alt='Opciones de respuesta' width='16' 
+                         class='comment-menu-trigger' data-menu-id='{$replyMenuId}' style='cursor: pointer;'>
+                    <div class='comment-menu-modal' id='{$replyMenuId}'>
+                        <div class='menu-option reply-edit-btn' onclick='startEditReply({$replyId})'>Editar</div>
+                        <div class='menu-option delete reply-delete-btn'>Eliminar</div>
+                        <div class='menu-option'>Cancelar</div>
+                    </div>
+                </div>";
+            }
+        }
 
         return "
         <div class='reply{$highlightClass}' id='reply-{$replyId}' data-reply-id='{$replyId}'>
@@ -363,8 +387,9 @@ class Post
                         <span class='reply-author-name'>{$author}</span> <span class='reply-text-body'>{$text}</span>
                     </div>
                 </a>
+                {$replyMenu}
             </div>
-            <div class='reply-date'>{$time} • {$date}</div>
+            <div class='reply-date'>{$time} &middot; {$date}{$replyEditedTag}</div>
         </div>
         ";
     }

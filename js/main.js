@@ -113,6 +113,216 @@ function toggleReplyMenu(event, menuId) {
   }
 }
 
+function startEditComment(commentId) {
+  document.querySelectorAll(".comment-menu-modal.active, .reply-menu-modal.active, .post-menu-modal.active")
+    .forEach((m) => m.classList.remove("active"));
+
+  const commentEl = document.querySelector(`.comment[data-comment-id="${commentId}"]`);
+  if (!commentEl) return;
+
+  if (commentEl.querySelector(".comment-edit-box")) return;
+
+  const textBody = commentEl.querySelector(".comment-text-body");
+  if (!textBody) return;
+
+  const originalText = textBody.textContent.trim();
+
+  const editBox = document.createElement("div");
+  editBox.className = "comment-edit-box";
+  editBox.innerHTML = `
+    <input type="text" class="comment-edit-input" maxlength="500" value="${escapeHtml(originalText)}">
+    <div class="comment-edit-actions">
+      <button type="button" class="comment-edit-btn-cancel">Cancelar</button>
+      <button type="button" class="comment-edit-btn-save">Guardar</button>
+    </div>
+  `;
+
+  textBody.style.display = "none";
+
+  const commentHeader = commentEl.querySelector(".comment-header");
+  if (commentHeader) {
+    commentHeader.after(editBox);
+  } else {
+    commentEl.prepend(editBox);
+  }
+
+  const input = editBox.querySelector(".comment-edit-input");
+  const cancelBtn = editBox.querySelector(".comment-edit-btn-cancel");
+  const saveBtn = editBox.querySelector(".comment-edit-btn-save");
+
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+
+  const cleanup = () => {
+    editBox.remove();
+    textBody.style.display = "";
+  };
+
+  cancelBtn.addEventListener("click", cleanup);
+
+  const doSave = async () => {
+    const newText = input.value.trim();
+    if (!newText) {
+      alert("El comentario no puede estar vacio");
+      return;
+    }
+    if (newText === originalText) {
+      cleanup();
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Guardando...";
+
+    try {
+      const response = await fetch(`/comments/${commentId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ comment: newText }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        textBody.textContent = newText;
+        cleanup();
+
+        const dateEl = commentEl.querySelector(".comment-date");
+        if (dateEl && !dateEl.querySelector(".comment-edited-tag")) {
+          const editedSpan = document.createElement("span");
+          editedSpan.className = "comment-edited-tag";
+          editedSpan.textContent = " (editado)";
+          dateEl.appendChild(editedSpan);
+        }
+      } else {
+        alert("Error al actualizar comentario: " + (result.message || "Error desconocido"));
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar";
+      }
+    } catch (err) {
+      console.error("Error al actualizar comentario:", err);
+      alert("Error de conexion al actualizar el comentario");
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Guardar";
+    }
+  };
+
+  saveBtn.addEventListener("click", doSave);
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      doSave();
+    } else if (e.key === "Escape") {
+      cleanup();
+    }
+  });
+}
+
+function startEditReply(replyId) {
+  document.querySelectorAll(".comment-menu-modal.active, .reply-menu-modal.active, .post-menu-modal.active")
+    .forEach((m) => m.classList.remove("active"));
+
+  const replyEl = document.querySelector(`.reply[data-reply-id="${replyId}"]`);
+  if (!replyEl) return;
+
+  if (replyEl.querySelector(".comment-edit-box")) return;
+
+  const textBody = replyEl.querySelector(".reply-text-body");
+  if (!textBody) return;
+
+  const originalText = textBody.textContent.trim();
+
+  const editBox = document.createElement("div");
+  editBox.className = "comment-edit-box";
+  editBox.innerHTML = `
+    <input type="text" class="comment-edit-input" maxlength="500" value="${escapeHtml(originalText)}">
+    <div class="comment-edit-actions">
+      <button type="button" class="comment-edit-btn-cancel">Cancelar</button>
+      <button type="button" class="comment-edit-btn-save">Guardar</button>
+    </div>
+  `;
+
+  textBody.style.display = "none";
+
+  const replyHeader = replyEl.querySelector(".reply-header");
+  if (replyHeader) {
+    replyHeader.after(editBox);
+  } else {
+    replyEl.prepend(editBox);
+  }
+
+  const input = editBox.querySelector(".comment-edit-input");
+  const cancelBtn = editBox.querySelector(".comment-edit-btn-cancel");
+  const saveBtn = editBox.querySelector(".comment-edit-btn-save");
+
+  input.focus();
+  input.setSelectionRange(input.value.length, input.value.length);
+
+  const cleanup = () => {
+    editBox.remove();
+    textBody.style.display = "";
+  };
+
+  cancelBtn.addEventListener("click", cleanup);
+
+  const doSave = async () => {
+    const newText = input.value.trim();
+    if (!newText) {
+      alert("La respuesta no puede estar vacia");
+      return;
+    }
+    if (newText === originalText) {
+      cleanup();
+      return;
+    }
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Guardando...";
+
+    try {
+      const response = await fetch(`/replies/${replyId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reply: newText }),
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        textBody.textContent = newText;
+        cleanup();
+
+        const dateEl = replyEl.querySelector(".reply-date");
+        if (dateEl && !dateEl.querySelector(".comment-edited-tag")) {
+          const editedSpan = document.createElement("span");
+          editedSpan.className = "comment-edited-tag";
+          editedSpan.textContent = " (editado)";
+          dateEl.appendChild(editedSpan);
+        }
+      } else {
+        alert("Error al actualizar respuesta: " + (result.message || "Error desconocido"));
+        saveBtn.disabled = false;
+        saveBtn.textContent = "Guardar";
+      }
+    } catch (err) {
+      console.error("Error al actualizar respuesta:", err);
+      alert("Error de conexion al actualizar la respuesta");
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Guardar";
+    }
+  };
+
+  saveBtn.addEventListener("click", doSave);
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      doSave();
+    } else if (e.key === "Escape") {
+      cleanup();
+    }
+  });
+}
+
 function openDeleteCommentModal(deleteButton) {
   commentToDelete = deleteButton.closest(".comment");
   postToDelete = null;
@@ -467,6 +677,7 @@ function updateCommentsSection(postContainer, comments, commentCount, isAddingCo
             <img src="/assets/images/vertical-dots.png" alt="Opciones de comentario" width="20" 
                  class="comment-menu-trigger" data-menu-id="${commentMenuId}" style="cursor: pointer;">
             <div class="comment-menu-modal" id="${commentMenuId}">
+              <div class="menu-option comment-edit-btn" onclick="startEditComment(${commentId})">Editar</div>
               <div class="menu-option delete comment-delete-btn">Eliminar</div>
               <div class="menu-option">Cancelar</div>
             </div>
@@ -499,7 +710,7 @@ function updateCommentsSection(postContainer, comments, commentCount, isAddingCo
           </a>
           ${commentMenuHTML}
         </div>
-        <div class="comment-date">${timeAgo} • ${dateString}</div>
+        <div class="comment-date">${timeAgo} &middot; ${dateString}${comment.updated_at && comment.created_at && (new Date(comment.updated_at) > new Date(comment.created_at)) ? ' <span class="comment-edited-tag">(editado)</span>' : ''}</div>
         <div class="reply-toggle-container" data-comment-id="${commentId}">
           <button class="reply-toggle-btn" onclick="toggleReplies(this)">
             ${replyBtnText}
@@ -726,6 +937,7 @@ function renderRepliesSection(commentEl, replies, replyCount) {
           <img src="/assets/images/vertical-dots.png" alt="Opciones de respuesta" width="16"
                class="reply-menu-trigger" data-menu-id="${replyMenuId}" style="cursor: pointer;">
           <div class="reply-menu-modal" id="${replyMenuId}">
+            <div class="menu-option reply-edit-btn" onclick="startEditReply(${replyId})">Editar</div>
             <div class="menu-option delete reply-delete-btn">Eliminar</div>
             <div class="menu-option">Cancelar</div>
           </div>
@@ -743,7 +955,7 @@ function renderRepliesSection(commentEl, replies, replyCount) {
           </a>
           ${replyMenuHTML}
         </div>
-        <div class="reply-date">${timeAgo} • ${dateString}</div>
+        <div class="reply-date">${timeAgo} &middot; ${dateString}${reply.updated_at && reply.created_at && (new Date(reply.updated_at) > new Date(reply.created_at)) ? ' <span class="comment-edited-tag">(editado)</span>' : ''}</div>
         <div class="reply-like-container">
           <button class="reply-like-btn" onclick="handleReplyLike(this)" data-reply-id="${replyId}">
             <img src="/assets/images/heartOutline.png" alt="Like" width="12"> 0

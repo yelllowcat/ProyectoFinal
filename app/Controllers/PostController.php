@@ -443,4 +443,92 @@ class PostController
             'reply_count' => $replyCount
         ]);
     }
+
+    public function updateComment($id)
+    {
+        requireAuth();
+
+        $userId = $_SESSION['user_id'];
+        $commentModel = new CommentModel();
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!$input) {
+            $input = $_POST;
+        }
+
+        $comment = clean_input($input['comment'] ?? ($input['content'] ?? ''));
+
+        if (empty($comment)) {
+            return jsonError('El comentario no puede estar vacio');
+        }
+
+        if (strlen($comment) > 500) {
+            return jsonError('El comentario no puede tener mas de 500 caracteres');
+        }
+
+        $existing = $commentModel->getCommentById($id);
+        if (!$existing) {
+            return jsonError('Comentario no encontrado', 404);
+        }
+
+        if ($existing['user_id'] != $userId && !isAdmin()) {
+            return jsonError('No tienes permisos para editar este comentario', 403);
+        }
+
+        $ok = $commentModel->updateComment((int) $id, (int) $existing['user_id'], $comment);
+        if ($ok) {
+            return jsonSuccess([
+                'comment_id' => (int) $id,
+                'content' => $comment,
+                'is_edited' => true,
+                'updated_at' => date('Y-m-d H:i:s')
+            ], 'Comentario actualizado correctamente');
+        } else {
+            return jsonError('Error al actualizar el comentario');
+        }
+    }
+
+    public function updateReply($id)
+    {
+        requireAuth();
+
+        $userId = $_SESSION['user_id'];
+        $replyModel = new ReplyModel();
+
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!$input) {
+            $input = $_POST;
+        }
+
+        $reply = clean_input($input['reply'] ?? ($input['content'] ?? ''));
+
+        if (empty($reply)) {
+            return jsonError('La respuesta no puede estar vacia');
+        }
+
+        if (strlen($reply) > 500) {
+            return jsonError('La respuesta no puede tener mas de 500 caracteres');
+        }
+
+        $existing = $replyModel->getReplyById($id);
+        if (!$existing) {
+            return jsonError('Respuesta no encontrada', 404);
+        }
+
+        if ($existing['user_id'] != $userId && !isAdmin()) {
+            return jsonError('No tienes permisos para editar esta respuesta', 403);
+        }
+
+        $ok = $replyModel->updateReply((int) $id, (int) $existing['user_id'], $reply);
+        if ($ok) {
+            return jsonSuccess([
+                'reply_id' => (int) $id,
+                'content' => $reply,
+                'is_edited' => true,
+                'updated_at' => date('Y-m-d H:i:s')
+            ], 'Respuesta actualizada correctamente');
+        } else {
+            return jsonError('Error al actualizar la respuesta');
+        }
+    }
 }

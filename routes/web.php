@@ -10,7 +10,6 @@ use App\Controllers\ReportController;
 use App\Controllers\SearchController;
 use App\Controllers\HashtagController;
 
-
 $router->get('/', function () {
     if (isAdmin()) {
         header('Location: /dashboard');
@@ -125,10 +124,14 @@ $router->post('/posts/:id/like', [PostController::class, 'like']);
 $router->post('/posts/:id/comments', [PostController::class, 'addComment']);
 $router->get('/posts/:id/comments', [PostController::class, 'getComments']);
 $router->delete('/comments/:id', [PostController::class, 'deleteComment']);
+$router->put('/comments/:id', [PostController::class, 'updateComment']);
+$router->post('/comments/:id/edit', [PostController::class, 'updateComment']);
 
 $router->post('/comments/:id/replies', [PostController::class, 'addReply']);
 $router->get('/comments/:id/replies', [PostController::class, 'getReplies']);
 $router->delete('/replies/:id', [PostController::class, 'deleteReply']);
+$router->put('/replies/:id', [PostController::class, 'updateReply']);
+$router->post('/replies/:id/edit', [PostController::class, 'updateReply']);
 
 $router->post('/comments/:id/like', [PostController::class, 'likeComment']);
 $router->post('/replies/:id/like', [PostController::class, 'likeReply']);

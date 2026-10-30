@@ -39,8 +39,21 @@ CREATE TABLE IF NOT EXISTS comments (
     user_id INT NOT NULL,
     content TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     active BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (post_id) REFERENCES posts(post_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- TABLA comment_edit_history (Auditoria de comentarios y respuestas editados)
+CREATE TABLE IF NOT EXISTS comment_edit_history (
+    history_id INT AUTO_INCREMENT PRIMARY KEY,
+    comment_type ENUM('comment', 'reply') NOT NULL DEFAULT 'comment',
+    target_id INT NOT NULL,
+    user_id INT NOT NULL,
+    previous_content TEXT NOT NULL,
+    new_content TEXT NOT NULL,
+    edited_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -75,6 +88,7 @@ CREATE TABLE replies (
     user_id     INT NOT NULL,
     content     TEXT NOT NULL,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     active      BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (comment_id) REFERENCES comments(comment_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id)    REFERENCES users(user_id) ON DELETE CASCADE

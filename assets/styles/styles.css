@@ -703,6 +703,79 @@ html[data-theme="dark"] .theme-icon-sun {
   margin-top: 5px;
 }
 
+.comment-edited-tag {
+  font-size: 10px;
+  color: #999;
+  font-style: italic;
+  margin-left: 4px;
+}
+
+.comment-edit-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0;
+  width: 100%;
+}
+
+.comment-edit-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  background-color: #fff;
+  color: #1f2937;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.comment-edit-input:focus {
+  border-color: #4db8c4;
+  box-shadow: 0 0 0 2px rgba(77, 184, 196, 0.2);
+}
+
+.comment-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.comment-edit-btn-cancel,
+.comment-edit-btn-save {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.15s ease;
+}
+
+.comment-edit-btn-cancel {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.comment-edit-btn-cancel:hover {
+  background-color: #d1d5db;
+}
+
+.comment-edit-btn-save {
+  background-color: #4db8c4;
+  color: #ffffff;
+}
+
+.comment-edit-btn-save:hover {
+  background-color: #3aa3af;
+}
+
+.comment-edit-btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .comment-input-container {
   display: flex;
   gap: 10px;
@@ -3816,6 +3889,7 @@ html[data-theme="dark"] .friend-date,
 html[data-theme="dark"] .friend-request-date,
 html[data-theme="dark"] .comment-date,
 html[data-theme="dark"] .reply-date,
+html[data-theme="dark"] .comment-edited-tag,
 html[data-theme="dark"] .search-user-bio,
 html[data-theme="dark"] .search-hashtag-count,
 html[data-theme="dark"] .hashtag-page-count,
@@ -4247,4 +4321,23 @@ html[data-theme="dark"] .suggestion-reason-badge {
   background: rgba(56, 189, 248, 0.15);
   color: #7dd3fc;
   border-color: rgba(56, 189, 248, 0.3);
+}
+html[data-theme="dark"] .comment-edit-input {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"] .comment-edit-input:focus {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+html[data-theme="dark"] .comment-edit-btn-cancel {
+  background-color: #334155;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .comment-edit-btn-cancel:hover {
+  background-color: #475569;
 }
