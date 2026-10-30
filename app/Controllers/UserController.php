@@ -152,26 +152,102 @@ class UserController
         }
     }
 
+        public function changePassword()
+    {
+        requireAuth();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('/editProfile');
+        }
+
+        $userId = $_SESSION['user_id'];
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+            flash('error', 'Por favor completa todos los campos para cambiar tu contraseña.');
+            redirect('/editProfile');
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            flash('error', 'La nueva contraseña y su confirmación no coinciden.');
+            redirect('/editProfile');
+        }
+
+        $strengthError = validatePasswordStrength($newPassword);
+        if ($strengthError !== null) {
+            flash('error', $strengthError);
+            redirect('/editProfile');
+        }
+
+        if ($currentPassword === $newPassword) {
+            flash('error', 'La nueva contraseña debe ser diferente de la contraseña actual.');
+            redirect('/editProfile');
+        }
+
+        $user = $this->userModel->getUserWithPasswordById($userId);
+        if (!$user) {
+            flash('error', 'Usuario no encontrado.');
+            redirect('/editProfile');
+        }
+
+        if (!password_verify($currentPassword, $user['password'])) {
+            flash('error', 'La contraseña actual es incorrecta.');
+            redirect('/editProfile');
+        }
+
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $updated = $this->userModel->updatePassword($userId, $hashedPassword);
+
+        if ($updated) {
+            flash('success', 'Contraseña actualizada exitosamente.');
+        } else {
+            flash('error', 'No se pudo actualizar la contraseña. Por favor intenta más tarde.');
+        }
+
+        redirect('/editProfile');
+    }
+
     public function deleteAccount()
     {
         requireAuth();
 
-        try {
+        $method = $_SERVER['REQUEST_METHOD'];
+        if ($method !== 'DELETE' && $method !== 'POST') {
+            jsonError('Método no permitido.', 405);
+            return;
+        }
 
+        try {
             if (!isset($_SESSION['user_id'])) {
-                exit;
+                jsonError('Sesión no válida o expirada.', 401);
+                return;
             }
 
             $userId = $_SESSION['user_id'];
-            $userModel = new UserModel();
-
-            $user = $userModel->getUserById($userId);
+            $user = $this->userModel->getUserWithPasswordById($userId);
 
             if (!$user) {
-                exit;
+                jsonError('Usuario no encontrado.', 404);
+                return;
             }
-            
-            $result = $userModel->deleteUser($userId);
+
+            $rawInput = file_get_contents('php://input');
+            $input = json_decode($rawInput, true);
+            $password = $input['password'] ?? ($_POST['password'] ?? '');
+
+            if (empty($password)) {
+                jsonError('Debes ingresar tu contraseña para confirmar la eliminación de la cuenta.', 400);
+                return;
+            }
+
+            if (!password_verify($password, $user['password'])) {
+                jsonError('Contraseña incorrecta. No se pudo eliminar la cuenta.', 403);
+                return;
+            }
+
+            $result = $this->userModel->deleteUser($userId);
 
             if ($result) {
                 if (!empty($user['profile_picture']) && $user['profile_picture'] !== 'default_avatar.png') {
@@ -181,15 +257,17 @@ class UserController
                     }
                 }
                 clearUserSession();
-                jsonSuccess(null, 'Cuenta eliminada exitosamente');
-                exit; 
+                jsonSuccess(['redirect' => '/login'], 'Cuenta eliminada exitosamente.');
+                return;
             } else {
-                jsonError('Error al eliminar la cuenta');
-                exit;
+                jsonError('Error al eliminar la cuenta de la base de datos.', 500);
+                return;
             }
 
         } catch (Exception $e) {
-            exit;
+            error_log("deleteAccount error: " . $e->getMessage());
+            jsonError('Ocurrió un error inesperado al eliminar la cuenta.', 500);
+            return;
         }
     }
 }

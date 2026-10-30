@@ -28,6 +28,12 @@ class AuthController
                 redirect('/register');
             }
 
+            $strengthError = validatePasswordStrength($password);
+            if ($strengthError !== null) {
+                $_SESSION['error'] = $strengthError;
+                redirect('/register');
+            }
+
             if (!filter_var($email, FILTER_VALIDATE_EMAIL, FILTER_FLAG_EMAIL_UNICODE)) {
                 $_SESSION['error'] = 'Por favor ingresa un correo electrónico válido.';
                 redirect('/register');

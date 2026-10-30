@@ -73,6 +73,8 @@ $router->get('/profile/:id', [UserController::class, 'show']);
 $router->post('/updateProfile', [UserController::class, 'update']);
 $router->get('/editProfile', [UserController::class, 'edit']);
 $router->delete('/profile/delete', [UserController::class, 'deleteAccount']);
+$router->post('/profile/delete', [UserController::class, 'deleteAccount']);
+$router->post('/profile/change-password', [UserController::class, 'changePassword']);
 
 
 $router->get('/friends', function () {

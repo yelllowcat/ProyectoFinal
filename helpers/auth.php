@@ -244,3 +244,26 @@ function validateCsrfToken(?string $token = null): bool
     }
     return hash_equals($_SESSION['csrf_token'], $token);
 }
+
+/**
+ * Validate password strength: minimum 8 characters, at least 1 uppercase letter, at least 1 number.
+ *
+ * @param string $password
+ * @return string|null Error message if invalid, or null if valid.
+ */
+function validatePasswordStrength(string $password): ?string
+{
+    if (strlen($password) < 8) {
+        return 'La contraseña debe tener al menos 8 caracteres.';
+    }
+    if (strlen($password) > 64) {
+        return 'La contraseña no puede exceder los 64 caracteres.';
+    }
+    if (!preg_match('/[A-Z]/', $password)) {
+        return 'La contraseña debe contener al menos una letra mayúscula.';
+    }
+    if (!preg_match('/[0-9]/', $password)) {
+        return 'La contraseña debe contener al menos un número.';
+    }
+    return null;
+}

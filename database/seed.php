@@ -147,7 +147,7 @@ if ($needed > 0) {
         $career = $careerList[$i % count($careerList)];
         $semester = $isTeacher ? null : (($i % 8) + 1);
 
-        $pass = password_hash('user123', PASSWORD_DEFAULT);
+        $pass = password_hash('User1234', PASSWORD_DEFAULT);
         $insU->execute([$fn, $email, $pass, $role, $biographies[$i % count($biographies)], pick($avatars), $dept, $career, $semester, randDate(random_int(1, 28))]);
         $userIds[] = (int)$pdo->lastInsertId();
     }

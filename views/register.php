@@ -70,7 +70,7 @@ use App\Components\Alert;
           minlength="8"
           maxlength="64" />
         <label for="password" class="form-label"
-          data-help="Mínimo 8 caracteres">Contraseña</label>
+          data-help="Mínimo 8 caracteres, con mayúscula y número">Contraseña</label>
         <img class="eye-icon password" onclick="togglePassword(event)" src="../assets/images/eye-off.png"
           alt="Ocultar contraseña" />
       </div>

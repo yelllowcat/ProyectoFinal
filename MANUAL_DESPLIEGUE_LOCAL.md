@@ -134,7 +134,7 @@ Si no deseas configurar VirtualHosts en Apache, puedes correrlo inmediatamente c
 - **Contraseña:** `Admin123?`
 
 ### 🎓 Cuentas de Prueba (Alumnos y Docentes con Feed, Amigos y Posts)
-- **Contraseña universal para todas las cuentas seed:** `user123`
+- **Contraseña universal para todas las cuentas seed:** `User1234`
 - **Ejemplos de correos:**
   - `maria.rivera@alu.uabcs.mx` (Estudiante)
   - `ana.flores@alu.uabcs.mx` (Estudiante)

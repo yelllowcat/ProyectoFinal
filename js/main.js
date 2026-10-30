@@ -1404,49 +1404,89 @@ document.addEventListener("DOMContentLoaded", function () {
 function showDeleteConfirmation() {
   const modal = document.getElementById('confirm-delete-account-modal');
   if (modal) {
+    const pwdInput = document.getElementById('delete-account-password');
+    if (pwdInput) {
+      pwdInput.value = '';
+    }
+    const errDiv = document.getElementById('delete-account-error');
+    if (errDiv) {
+      errDiv.style.display = 'none';
+      errDiv.textContent = '';
+    }
     modal.showModal();
+    if (pwdInput) {
+      setTimeout(() => pwdInput.focus(), 100);
+    }
+  }
+}
+
+function closeDeleteAccountModal() {
+  const modal = document.getElementById('confirm-delete-account-modal');
+  if (modal) {
+    modal.close();
   }
 }
 
 async function deleteAccount() {
   const modal = document.getElementById('confirm-delete-account-modal');
+  const pwdInput = document.getElementById('delete-account-password');
+  const errDiv = document.getElementById('delete-account-error');
+  const btn = document.getElementById('btn-confirm-delete-account');
+
+  const password = pwdInput ? pwdInput.value : '';
+  if (!password) {
+    if (errDiv) {
+      errDiv.textContent = 'Por favor ingresa tu contraseña para confirmar.';
+      errDiv.style.display = 'block';
+    } else {
+      alert('Por favor ingresa tu contraseña para confirmar.');
+    }
+    if (pwdInput) pwdInput.focus();
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Eliminando...';
+  }
 
   try {
-
     const response = await fetch('/profile/delete', {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-      }
+      },
+      body: JSON.stringify({ password: password })
     });
 
-    const textResponse = await response.text();
-    console.log('Response text:', textResponse);
+    const data = await response.json().catch(() => ({}));
 
-    let data = {};
-    if (textResponse) {
-      try {
-        data = JSON.parse(textResponse);
-        console.log('Parsed data:', data);
-      } catch (parseError) {
-        console.error('Error parseando JSON:', parseError);
-        console.log('Texto recibido:', textResponse);
+    if (response.ok && data.success) {
+      const redirectUrl = (data.data && data.data.redirect) ? data.data.redirect : (data.redirect || '/login');
+      window.location.href = redirectUrl;
+    } else {
+      const errMsg = data.message || 'Error al eliminar la cuenta.';
+      if (errDiv) {
+        errDiv.textContent = errMsg;
+        errDiv.style.display = 'block';
+      } else {
+        alert(errMsg);
       }
-    } else {
-      console.log('Response vacío');
-    }
-
-    if (response.ok) {
-      window.location.href = '/logout';
-    } else {
-      alert(data.message || 'Error al eliminar la cuenta');
-      if (modal) modal.close();
+      if (pwdInput) pwdInput.focus();
     }
   } catch (error) {
-    console.error('Error completo:', error);
-    console.error('Error stack:', error.stack);
-    alert('Error al eliminar la cuenta');
-    if (modal) modal.close();
+    console.error('Error al eliminar la cuenta:', error);
+    if (errDiv) {
+      errDiv.textContent = 'Error de conexión al eliminar la cuenta.';
+      errDiv.style.display = 'block';
+    } else {
+      alert('Error de conexión al eliminar la cuenta.');
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Eliminar cuenta';
+    }
   }
 }
 

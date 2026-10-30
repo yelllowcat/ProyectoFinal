@@ -106,9 +106,38 @@
         <?php endif; ?>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary btn-save">Guardar</button>
+          <button type="submit" class="btn btn-primary btn-save">Guardar perfil</button>
         </div>
       </form>
+
+      <div class="profile-section-edit" style="margin-top: 35px; text-align: left; padding: 35px 40px;">
+        <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 20px; font-weight: 700; color: inherit;">Cambiar contraseña</h3>
+        <form action="/profile/change-password" method="POST">
+          <?= function_exists('csrfField') ? csrfField() : '' ?>
+
+          <div class="form-group">
+            <label for="current_password">Contraseña actual</label>
+            <input type="password" id="current_password" name="current_password" placeholder="Ingresa tu contraseña actual" required minlength="6" maxlength="64" autocomplete="current-password">
+          </div>
+
+          <div class="form-group">
+            <label for="new_password">Nueva contraseña</label>
+            <input type="password" id="new_password" name="new_password" placeholder="Mínimo 8 caracteres, al menos una mayúscula y un número" required minlength="8" maxlength="64" autocomplete="new-password">
+            <small style="color: #64748b; font-size: 13px; display: block; margin-top: 6px;">
+              Debe contener al menos 8 caracteres, una letra mayúscula y un número.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="confirm_password">Confirmar nueva contraseña</label>
+            <input type="password" id="confirm_password" name="confirm_password" placeholder="Repite la nueva contraseña" required minlength="8" maxlength="64" autocomplete="new-password">
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-save">Actualizar contraseña</button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -116,12 +145,17 @@
     <div class="confirm-box">
       <div class="confirm-head">
         <h3>Eliminar cuenta</h3>
-        <p>¿Estás seguro de que deseas eliminar tu cuenta?</p>
+        <p class="confirm-subtitle">Esta acción es permanente. Para confirmar, por favor ingresa tu contraseña actual:</p>
+      </div>
+      <div style="padding: 0 26px 18px; text-align: left;">
+        <label for="delete-account-password" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: inherit;">Contraseña actual:</label>
+        <input type="password" id="delete-account-password" placeholder="Tu contraseña" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; background: inherit; color: inherit;" autocomplete="current-password" onkeydown="if(event.key==='Enter') deleteAccount()">
+        <div id="delete-account-error" style="color: #ef4444; font-size: 13px; margin-top: 8px; display: none;"></div>
       </div>
       <div class="confirm-sep"></div>
       <div class="confirm-actions">
-        <button type="button" class="confirm-delete" onclick="deleteAccount()">Eliminar</button>
-        <button type="button" class="confirm-cancel" onclick="document.getElementById('confirm-delete-account-modal').close()">Cancelar</button>
+        <button type="button" class="confirm-delete" id="btn-confirm-delete-account" onclick="deleteAccount()">Eliminar cuenta</button>
+        <button type="button" class="confirm-cancel" onclick="closeDeleteAccountModal()">Cancelar</button>
       </div>
     </div>
   </dialog>

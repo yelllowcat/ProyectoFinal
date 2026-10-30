@@ -162,6 +162,23 @@ class UserModel
         }
     }
 
+    public function getUserWithPasswordById($id)
+    {
+        try {
+            $stmt = $this->pdo->prepare("
+                SELECT user_id, full_name, email, password, active, role, profile_picture
+                FROM users 
+                WHERE user_id = ?
+                LIMIT 1
+            ");
+            $stmt->execute([(int) $id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("getUserWithPasswordById error: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function updateUser($userId, $fullName, $biography, $profilePicture = null, $department = null, $career = null, $semester = null)
     {
         unset(self::$userCache[(int) $userId]);
@@ -222,6 +239,18 @@ class UserModel
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    public function updatePassword($userId, $hashedPassword)
+    {
+        unset(self::$userCache[(int) $userId]);
+        try {
+            $stmt = $this->pdo->prepare("UPDATE users SET password = ?, updated_at = NOW() WHERE user_id = ?");
+            return $stmt->execute([$hashedPassword, $userId]);
+        } catch (PDOException $e) {
+            error_log("updatePassword error: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function deleteUser($userId)
 {
     try {
@@ -254,6 +283,9 @@ class UserModel
 
         $stmt3 = $this->pdo->prepare("DELETE FROM comments WHERE user_id = ?");
         $stmt3->execute([$userId]);
+
+        $stmtHistory = $this->pdo->prepare("DELETE FROM comment_edit_history WHERE user_id = ?");
+        $stmtHistory->execute([$userId]);
         
         $stmt8 = $this->pdo->prepare("DELETE FROM users WHERE user_id = ?");
         $stmt8->execute([$userId]);
