@@ -1,6 +1,5 @@
 <?php
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -12,153 +11,210 @@
   <script src="<?php echo asset('js/main.js'); ?>"></script>
 </head>
 
-<body>
+<body class="edit-profile-page">
   <?php
   $currentPage = 'editProfile';
-  require_once 'assets/sidebar.php' ?>
+  require_once 'assets/sidebar.php';
+  ?>
 
   <div class="main-content">
     <?php require_once 'assets/search_header.php'; ?>
     <?= \App\Components\Alert::render(); ?>
-    <div class="content-wrapper">
-      <form action="/updateProfile" method="POST" enctype="multipart/form-data">
+
+    <div class="content-wrapper edit-profile-container">
+      <!-- Top Navigation & Header -->
+      <div class="edit-profile-header">
+        <a href="/profile" class="edit-profile-back" title="Volver al perfil">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Volver al perfil</span>
+        </a>
+        <div class="edit-profile-title-block">
+          <h1 class="edit-profile-title">Editar Perfil</h1>
+          <p class="edit-profile-desc">Personaliza tu foto, biografía y detalles académicos</p>
+        </div>
+      </div>
+
+      <form action="/updateProfile" method="POST" enctype="multipart/form-data" class="edit-profile-form">
         <?= function_exists('csrfField') ? csrfField() : '' ?>
-        <div class="profile-section-edit">
-          <div class="profile-photo-edit">
 
-            <div id="profilePreview" class="profile-preview">
-              <img src="<?= getProfilePicture($user['profile_picture']) ?>" alt="Foto de perfil"
-                id="currentProfileImage">
-
-              <img id="previewProfileImage" alt="Vista previa" style="display:none;">
+        <!-- Hero Card: Avatar & User Highlights -->
+        <div class="edit-card edit-card-hero">
+          <div class="edit-avatar-section">
+            <div class="edit-avatar-box">
+              <div id="profilePreview" class="edit-avatar-preview">
+                <img src="<?= getProfilePicture($user['profile_picture']) ?>" alt="Foto de perfil" id="currentProfileImage" class="edit-avatar-img">
+                <img id="previewProfileImage" alt="Vista previa de foto" class="edit-avatar-img" style="display:none;">
+              </div>
+              <button type="button" class="edit-avatar-overlay-btn" onclick="document.getElementById('profile_picture').click()" aria-label="Cambiar foto de perfil" title="Cambiar foto de perfil">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+              </button>
+              <input type="file" id="profile_picture" name="profile_picture" accept="image/png, image/jpeg, image/jpg" style="display: none;" onchange="handleProfileImageSelect(event)">
             </div>
 
+            <div class="edit-avatar-info">
+              <div class="edit-user-name-row">
+                <h2 class="edit-user-name"><?= safe_output($user['full_name'] ?? 'Usuario') ?></h2>
+                <?php if (($user['role'] ?? '') === 'teacher'): ?>
+                  <span class="role-badge role-teacher">Profesor</span>
+                <?php elseif (($user['role'] ?? '') === 'student'): ?>
+                  <span class="role-badge role-student">Estudiante</span>
+                <?php endif; ?>
+              </div>
+              <p class="edit-user-meta">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>Miembro desde: <?= date('d/m/Y', strtotime($user['registration_date'] ?? 'now')) ?></span>
+              </p>
+              <div class="edit-avatar-actions">
+                <button type="button" class="btn-change-avatar" onclick="document.getElementById('profile_picture').click()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <span>Subir nueva foto</span>
+                </button>
+                <span class="edit-avatar-hint">JPG o PNG. Máx. 5 MB</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-            <input type="file" id="profile_picture" name="profile_picture" accept="image/png, image/jpeg, image/jpg"
-              style="display: none;" onchange="handleProfileImageSelect(event)">
+        <!-- Section: Información Personal -->
+        <div class="edit-card">
+          <div class="edit-card-heading">
+            <div class="edit-heading-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div>
+              <h3 class="edit-card-title">Información Personal</h3>
+              <p class="edit-card-subtitle">Tu nombre público y biografía visible en tu perfil.</p>
+            </div>
           </div>
 
-          <button type="button" class="btn-change-photo" onclick="document.getElementById('profile_picture').click()">
-            Cambiar foto de perfil
+          <div class="edit-form-body">
+            <div class="edit-field-group">
+              <label for="full_name" class="edit-label">Nombre completo <span class="required-star">*</span></label>
+              <div class="edit-input-wrapper">
+                <input type="text" id="full_name" name="full_name" class="edit-input"
+                  value="<?= safe_output($user['full_name'] ?? '') ?>"
+                  placeholder="Ingresa tu nombre completo" required minlength="2" maxlength="50" onpaste="return false;"
+                  pattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s']{2,50}$">
+              </div>
+              <small class="edit-field-hint">Solo letras y espacios (2 a 50 caracteres).</small>
+            </div>
+
+            <div class="edit-field-group">
+              <div class="edit-label-row">
+                <label for="postText" class="edit-label">Biografía</label>
+                <span class="edit-counter"><span id="charCount"><?= strlen($user['biography'] ?? '') ?></span>/500</span>
+              </div>
+              <div class="edit-input-wrapper">
+                <textarea id="postText" name="biography" class="edit-textarea"
+                  placeholder="Cuéntanos un poco sobre ti, tus intereses o proyectos..." rows="4" maxlength="500"
+                  oninput="updateCounter()"><?= safe_output($user['biography'] ?? '') ?></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section: Información Académica -->
+        <div class="edit-card">
+          <div class="edit-card-heading">
+            <div class="edit-heading-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="edit-card-title">Información Académica</h3>
+              <p class="edit-card-subtitle">Facilita que compañeros de tu misma carrera y departamento te encuentren.</p>
+            </div>
+          </div>
+
+          <div class="edit-form-body">
+            <div class="edit-grid-2col">
+              <div class="edit-field-group">
+                <label for="department" class="edit-label">Departamento Académico</label>
+                <div class="edit-select-wrapper">
+                  <select id="department" name="department" class="edit-select">
+                    <option value="">Selecciona tu departamento...</option>
+                    <?php
+                    $departments = [
+                        'Ciencias de la Computación',
+                        'Ciencias Marinas y Costeras',
+                        'Ciencias Sociales y Jurídicas',
+                        'Humanidades',
+                        'Economía y Administración',
+                        'Ingeniería Pesquera',
+                        'Agronomía y Zootecnia',
+                        'Ciencias de la Tierra'
+                    ];
+                    $currentDept = $user['department'] ?? '';
+                    foreach ($departments as $dept): ?>
+                      <option value="<?= $dept ?>" <?= $currentDept === $dept ? 'selected' : '' ?>><?= $dept ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+              </div>
+
+              <div class="edit-field-group">
+                <label for="career" class="edit-label">Carrera</label>
+                <div class="edit-input-wrapper">
+                  <input type="text" id="career" name="career" class="edit-input"
+                    value="<?= safe_output($user['career'] ?? '') ?>"
+                    placeholder="Ej. Lic. en Desarrollo de Software" maxlength="100">
+                </div>
+              </div>
+            </div>
+
+            <?php if (($user['role'] ?? 'user') !== 'teacher'): ?>
+            <div class="edit-field-group" style="margin-top: 18px;">
+              <label for="semester" class="edit-label">Semestre actual</label>
+              <div class="edit-select-wrapper" style="max-width: 320px;">
+                <select id="semester" name="semester" class="edit-select">
+                  <option value="">Selecciona tu semestre...</option>
+                  <?php
+                  $currentSemester = isset($user['semester']) ? (int) $user['semester'] : 0;
+                  for ($s = 1; $s <= 12; $s++): ?>
+                    <option value="<?= $s ?>" <?= $currentSemester === $s ? 'selected' : '' ?>><?= $s ?>° Semestre</option>
+                  <?php endfor; ?>
+                </select>
+              </div>
+            </div>
+            <?php endif; ?>
+          </div>
+        </div>
+
+        <!-- Sticky Form Footer -->
+        <div class="edit-form-footer">
+          <a href="/profile" class="btn-cancel-edit">
+            Cancelar
+          </a>
+          <button type="submit" class="btn-submit-profile">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Guardar cambios</span>
           </button>
-
-          <h2 class="profile-name"><?= safe_output($user['full_name'] ?? 'Usuario') ?></h2>
-          <p class="profile-date">
-            Miembro desde: <?= date('d-m-Y', strtotime($user['registration_date'] ?? 'now')) ?>
-          </p>
-
-          <button type="button" class="btn btn-delete" onclick="showDeleteConfirmation()">Eliminar cuenta</button>
-        </div>
-
-        <div class="form-group">
-          <label for="full_name">Nombre completo</label>
-          <input type="text" id="full_name" name="full_name" value="<?= safe_output($user['full_name'] ?? '') ?>"
-            placeholder="Ingresa tu nombre completo" required minlength="2" maxlength="50" onpaste="return false;"
-            pattern="^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s']{2,50}$">
-        </div>
-
-        <div class="form-group">
-          <label for="biography">Biografía</label>
-          <textarea id="postText" name="biography" placeholder="Describe algo sobre ti..." rows="6" maxlength="500"
-            oninput="updateCounter()"><?= safe_output($user['biography'] ?? '') ?></textarea>
-          <div class="char-counter"><span id="charCount"><?= strlen($user['biography'] ?? '') ?></span>/500</div>
-        </div>
-        <div class="form-group">
-          <label for="department">Departamento Académico</label>
-          <select id="department" name="department" class="form-select">
-            <option value="">Selecciona tu departamento...</option>
-            <?php
-            $departments = [
-                'Ciencias de la Computación',
-                'Ciencias Marinas y Costeras',
-                'Ciencias Sociales y Jurídicas',
-                'Humanidades',
-                'Economía y Administración',
-                'Ingeniería Pesquera',
-                'Agronomía y Zootecnia',
-                'Ciencias de la Tierra'
-            ];
-            $currentDept = $user['department'] ?? '';
-            foreach ($departments as $dept): ?>
-              <option value="<?= $dept ?>" <?= $currentDept === $dept ? 'selected' : '' ?>><?= $dept ?></option>
-            <?php endforeach; ?>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="career">Carrera</label>
-          <input type="text" id="career" name="career" value="<?= safe_output($user['career'] ?? '') ?>"
-            placeholder="Ej. Lic. en Desarrollo de Software" maxlength="100">
-        </div>
-
-        <?php if (($user['role'] ?? 'user') !== 'teacher'): ?>
-        <div class="form-group">
-          <label for="semester">Semestre</label>
-          <select id="semester" name="semester" class="form-select">
-            <option value="">Selecciona tu semestre...</option>
-            <?php
-            $currentSemester = isset($user['semester']) ? (int) $user['semester'] : 0;
-            for ($s = 1; $s <= 12; $s++): ?>
-              <option value="<?= $s ?>" <?= $currentSemester === $s ? 'selected' : '' ?>><?= $s ?>° Semestre</option>
-            <?php endfor; ?>
-          </select>
-        </div>
-        <?php endif; ?>
-
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary btn-save">Guardar perfil</button>
         </div>
       </form>
-
-      <div class="profile-section-edit" style="margin-top: 35px; text-align: left; padding: 35px 40px;">
-        <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 20px; font-weight: 700; color: inherit;">Cambiar contraseña</h3>
-        <form action="/profile/change-password" method="POST">
-          <?= function_exists('csrfField') ? csrfField() : '' ?>
-
-          <div class="form-group">
-            <label for="current_password">Contraseña actual</label>
-            <input type="password" id="current_password" name="current_password" placeholder="Ingresa tu contraseña actual" required minlength="6" maxlength="64" autocomplete="current-password">
-          </div>
-
-          <div class="form-group">
-            <label for="new_password">Nueva contraseña</label>
-            <input type="password" id="new_password" name="new_password" placeholder="Mínimo 8 caracteres, al menos una mayúscula y un número" required minlength="8" maxlength="64" autocomplete="new-password">
-            <small style="color: #64748b; font-size: 13px; display: block; margin-top: 6px;">
-              Debe contener al menos 8 caracteres, una letra mayúscula y un número.
-            </small>
-          </div>
-
-          <div class="form-group">
-            <label for="confirm_password">Confirmar nueva contraseña</label>
-            <input type="password" id="confirm_password" name="confirm_password" placeholder="Repite la nueva contraseña" required minlength="8" maxlength="64" autocomplete="new-password">
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary btn-save">Actualizar contraseña</button>
-          </div>
-        </form>
-      </div>
     </div>
   </div>
-
-  <dialog id="confirm-delete-account-modal" class="confirm-dialog">
-    <div class="confirm-box">
-      <div class="confirm-head">
-        <h3>Eliminar cuenta</h3>
-        <p class="confirm-subtitle">Esta acción es permanente. Para confirmar, por favor ingresa tu contraseña actual:</p>
-      </div>
-      <div style="padding: 0 26px 18px; text-align: left;">
-        <label for="delete-account-password" style="display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: inherit;">Contraseña actual:</label>
-        <input type="password" id="delete-account-password" placeholder="Tu contraseña" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; box-sizing: border-box; background: inherit; color: inherit;" autocomplete="current-password" onkeydown="if(event.key==='Enter') deleteAccount()">
-        <div id="delete-account-error" style="color: #ef4444; font-size: 13px; margin-top: 8px; display: none;"></div>
-      </div>
-      <div class="confirm-sep"></div>
-      <div class="confirm-actions">
-        <button type="button" class="confirm-delete" id="btn-confirm-delete-account" onclick="deleteAccount()">Eliminar cuenta</button>
-        <button type="button" class="confirm-cancel" onclick="closeDeleteAccountModal()">Cancelar</button>
-      </div>
-    </div>
-  </dialog>
 </body>
 
 </html>

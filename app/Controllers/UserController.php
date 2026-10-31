@@ -49,6 +49,16 @@ class UserController
         require __DIR__ . '/../../views/editProfile.php';
     }
 
+    public function settings()
+    {
+        requireAuth();
+
+        $userId = getCurrentUserId();
+        $user = $this->userModel->getUserById($userId);
+
+        require __DIR__ . '/../../views/settings.php';
+    }
+
     public function update()
     {
         requireAuth();
@@ -157,7 +167,7 @@ class UserController
         requireAuth();
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            redirect('/editProfile');
+            redirect('/settings');
         }
 
         $userId = $_SESSION['user_id'];
@@ -167,34 +177,34 @@ class UserController
 
         if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
             flash('error', 'Por favor completa todos los campos para cambiar tu contraseña.');
-            redirect('/editProfile');
+            redirect('/settings');
         }
 
         if ($newPassword !== $confirmPassword) {
             flash('error', 'La nueva contraseña y su confirmación no coinciden.');
-            redirect('/editProfile');
+            redirect('/settings');
         }
 
         $strengthError = validatePasswordStrength($newPassword);
         if ($strengthError !== null) {
             flash('error', $strengthError);
-            redirect('/editProfile');
+            redirect('/settings');
         }
 
         if ($currentPassword === $newPassword) {
             flash('error', 'La nueva contraseña debe ser diferente de la contraseña actual.');
-            redirect('/editProfile');
+            redirect('/settings');
         }
 
         $user = $this->userModel->getUserWithPasswordById($userId);
         if (!$user) {
             flash('error', 'Usuario no encontrado.');
-            redirect('/editProfile');
+            redirect('/settings');
         }
 
         if (!password_verify($currentPassword, $user['password'])) {
             flash('error', 'La contraseña actual es incorrecta.');
-            redirect('/editProfile');
+            redirect('/settings');
         }
 
         $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
@@ -206,7 +216,7 @@ class UserController
             flash('error', 'No se pudo actualizar la contraseña. Por favor intenta más tarde.');
         }
 
-        redirect('/editProfile');
+        redirect('/settings');
     }
 
     public function deleteAccount()

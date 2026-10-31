@@ -27,10 +27,14 @@ $postAuthorName = htmlspecialchars($postData['author_name'] ?? 'Usuario');
         <?php require_once 'assets/search_header.php'; ?>
         <?= Alert::render(); ?>
 
-        <div class="content-wrapper" style="max-width: 680px; margin: 0 auto;">
-            <div class="single-post-navigation" style="margin-bottom: 20px;">
-                <a href="/posts" class="btn-back" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #4db8c4; font-weight: 600; font-size: 14px;">
-                    &larr; Volver a publicaciones
+        <div class="content-wrapper posts-content-wrapper single-post-content-wrapper">
+            <div class="single-post-navigation">
+                <a href="/posts" class="btn-back">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    <span>Volver a publicaciones</span>
                 </a>
             </div>
 
@@ -63,7 +67,7 @@ $postAuthorName = htmlspecialchars($postData['author_name'] ?? 'Usuario');
         </div>
     </div>
 
-        <?php require __DIR__ . '/assets/modals.php'; ?>
+    <?php require __DIR__ . '/assets/modals.php'; ?>
 </body>
 
 </html>

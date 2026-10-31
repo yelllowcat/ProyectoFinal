@@ -40,7 +40,7 @@ $profilePicture = getProfilePicture($user['profile_picture']);
   <script src="<?php echo asset('js/editPost.js'); ?>"></script>
 </head>
 
-<body>
+<body class="posts-page edit-post-page">
   <?php
   $currentPage = 'editPost';
   require_once 'assets/sidebar.php';
@@ -49,7 +49,18 @@ $profilePicture = getProfilePicture($user['profile_picture']);
   <div class="main-content">
     <?php require_once 'assets/search_header.php'; ?>
     <?= \App\Components\Alert::render(); ?>
+
     <div class="edit-container">
+      <div class="single-post-navigation edit-post-navigation">
+        <a href="/posts" class="btn-back">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Volver a publicaciones</span>
+        </a>
+      </div>
+
       <form id="editPostForm" method="POST" action="/editPost/<?= $postId ?>" novalidate>
         <div class="post-preview">
           <div class="post-header-section">
@@ -79,7 +90,7 @@ $profilePicture = getProfilePicture($user['profile_picture']);
             <div class="char-counter"><span id="charCount"><?= strlen($post['content']) ?></span>/500</div>
           </div>
 
-          <div class="action-buttons">
+          <div class="action-buttons edit-post-actions">
             <button type="button" class="btn btn-deny btn-delete-post" onclick="deletePost(<?= $postId ?>)">Eliminar publicación</button>
             <button type="submit" class="btn btn-primary btn-save">Guardar cambios</button>
           </div>
@@ -91,6 +102,8 @@ $profilePicture = getProfilePicture($user['profile_picture']);
   <script>
     const POST_ID = <?= $postId ?>;
   </script>
+
+  <?php require __DIR__ . '/assets/modals.php'; ?>
 </body>
 
 </html>

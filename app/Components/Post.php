@@ -163,29 +163,29 @@ class Post
         if ($this->interactive) {
             $actionsHtml = "
         <div class='feed-post-actions'>
-            <button class='{$likeButtonClass}' onclick='handleLike(this)'>
-                <img src='/assets/images/{$heartIcon}' alt='{$heartAlt}' width='25'>
-                {$this->likes} Me gusta
+            <button class='{$likeButtonClass}' onclick='handleLike(this)' aria-label='Me gusta'>
+                <img src='/assets/images/{$heartIcon}' alt='{$heartAlt}' width='20' height='20'>
+                <span class='action-btn-text'>{$this->likes} Me gusta</span>
             </button>
-            <button class='action-btn comments' onclick='toggleComments(this)'>
-                <img src='/assets/images/comments.png' alt='comments icon' width='25'>
-                {$this->commentsCount} Comentarios
+            <button class='action-btn comments' onclick='toggleComments(this)' aria-label='Comentarios'>
+                <img src='/assets/images/comments.png' alt='comments icon' width='20' height='20'>
+                <span class='action-btn-text'>{$this->commentsCount} Comentarios</span>
             </button>
-            <button class='action-btn share' onclick='copyPostLink({$this->id})' title='Copiar enlace de la publicación'>
-                <img src='/assets/images/more.png' alt='Compartir' width='16' style='transform: rotate(90deg); opacity: 0.6;'>
-                Compartir
+            <button class='action-btn share' onclick='copyPostLink({$this->id})' title='Copiar enlace de la publicación' aria-label='Compartir'>
+                <img src='/assets/images/more.png' alt='Compartir' width='16' height='16' style='transform: rotate(90deg); opacity: 0.6;'>
+                <span class='action-btn-text'>Compartir</span>
             </button>
         </div>";
         } else {
             $actionsHtml = "
         <div class='feed-post-actions' style='opacity: 0.7;'>
             <span class='action-btn' style='cursor: default;'>
-                <img src='/assets/images/{$heartIcon}' alt='Like' width='25'>
-                {$this->likes} Me gusta
+                <img src='/assets/images/{$heartIcon}' alt='Like' width='20' height='20'>
+                <span class='action-btn-text'>{$this->likes} Me gusta</span>
             </span>
             <span class='action-btn' style='cursor: default;'>
-                <img src='/assets/images/comments.png' alt='Comments' width='25'>
-                {$this->commentsCount} Comentarios
+                <img src='/assets/images/comments.png' alt='Comments' width='20' height='20'>
+                <span class='action-btn-text'>{$this->commentsCount} Comentarios</span>
             </span>
         </div>";
         }
@@ -203,7 +203,7 @@ class Post
                 </a>
                 <div class='feed-post-user-info'>
                     <a href='/profile/{$this->userId}' style='text-decoration:none; color:inherit;'>
-                        <h3 style='display:flex; align-items:center; gap:5px;'>{$this->author} {$roleBadge}</h3>
+                        <h3 class='feed-post-author-name'>{$this->author} {$roleBadge}</h3>
                     </a>
                     <a href='/post/{$this->id}' class='feed-post-date-link' style='text-decoration:none; color:inherit;'>
                         <div class='feed-post-date' title='{$this->date}'>Publicado: {$relativeDate}</div>

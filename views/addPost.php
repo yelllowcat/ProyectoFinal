@@ -21,15 +21,27 @@ $userRole = $user['role'] ?? 'user';
   <script src="<?php echo asset('js/hashtagAutocomplete.js'); ?>"></script>
 </head>
 
-<body>
+<body class="posts-page add-post-page">
   <?php
   $currentPage = 'addPost';
   require_once 'assets/sidebar.php';
   ?>
 
   <div class="main-content">
+    <?php require_once 'assets/search_header.php'; ?>
     <?= \App\Components\Alert::render(); ?>
+
     <div class="edit-container add-post-container">
+      <div class="single-post-navigation add-post-navigation">
+        <a href="/posts" class="btn-back">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Volver a publicaciones</span>
+        </a>
+      </div>
+
       <form action="/posts" method="POST" enctype="multipart/form-data">
         <div class="post-preview add-post-card">
           <div class="add-post-top-header">
@@ -188,6 +200,8 @@ $userRole = $user['role'] ?? 'user';
       }
     });
   </script>
+
+  <?php require __DIR__ . '/assets/modals.php'; ?>
 </body>
 
 </html>

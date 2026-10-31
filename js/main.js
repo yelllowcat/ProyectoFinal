@@ -594,8 +594,8 @@ async function handleLike(button) {
       }
 
       button.innerHTML = `
-        <img src="${img.src}" alt="${img.alt}" width="25" height="25">
-        ${result.data.likes} Me gusta
+        <img src="${img.src}" alt="${img.alt}" width="20" height="20">
+        <span class="action-btn-text">${result.data.likes} Me gusta</span>
       `;
     }
   } catch (error) {

@@ -52,16 +52,32 @@ $trendingHashtags = $hashtagModel->getTrendingHashtags(8);
     <div class="main-content">
         <?php require_once 'assets/search_header.php'; ?>
         <?= \App\Components\Alert::render(); ?>
-        <div class="content-wrapper">
-            <div class="feed-tabs-container" style="margin-bottom: 24px;">
-                <div class="friends-tabs feed-tabs">
-                    <a href="/posts?tab=all" class="tab <?php echo $activeTab === 'all' ? 'active' : ''; ?>" style="text-decoration: none;">
-                        <span>Comunidad (Todos)</span>
+
+        <div class="content-wrapper posts-content-wrapper">
+            <div class="feed-tabs-container">
+                <div class="friends-tabs feed-tabs" role="tablist">
+                    <a href="/posts?tab=all" class="tab <?php echo $activeTab === 'all' ? 'active' : ''; ?>" role="tab" aria-selected="<?php echo $activeTab === 'all' ? 'true' : 'false'; ?>">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                        <span>Comunidad</span>
                     </a>
-                    <a href="/posts?tab=friends" class="tab <?php echo $activeTab === 'friends' ? 'active' : ''; ?>" style="text-decoration: none;">
+                    <a href="/posts?tab=friends" class="tab <?php echo $activeTab === 'friends' ? 'active' : ''; ?>" role="tab" aria-selected="<?php echo $activeTab === 'friends' ? 'true' : 'false'; ?>">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
                         <span>Mis Amigos</span>
                     </a>
-                    <a href="/posts?tab=teachers" class="tab <?php echo $activeTab === 'teachers' ? 'active' : ''; ?>" style="text-decoration: none;">
+                    <a href="/posts?tab=teachers" class="tab <?php echo $activeTab === 'teachers' ? 'active' : ''; ?>" role="tab" aria-selected="<?php echo $activeTab === 'teachers' ? 'true' : 'false'; ?>">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                            <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                        </svg>
                         <span>Profesores / Avisos</span>
                     </a>
                 </div>
@@ -83,13 +99,35 @@ $trendingHashtags = $hashtagModel->getTrendingHashtags(8);
 
             <?php
             if (empty($postsData)) {
+                echo '<div class="posts-empty-state">';
+                echo '    <div class="posts-empty-icon">';
+                echo '        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+                echo '            <rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect>';
+                echo '            <line x1="8" y1="12" x2="16" y2="12"></line>';
+                echo '        </svg>';
+                echo '    </div>';
+
                 if ($activeTab === 'friends') {
-                    echo '<div class="no-posts">Aún no hay publicaciones de tus amigos. <a href="/friends">Encuentra compañeros</a> o sé el primero en publicar.</div>';
+                    echo '    <h3>Aún no hay publicaciones de tus amigos</h3>';
+                    echo '    <p>Conecta con compañeros de tu facultad o carrera para estar al día con lo que comparten.</p>';
+                    echo '    <div class="posts-empty-actions">';
+                    echo '        <a href="/friends" class="btn btn-primary">Encontrar compañeros</a>';
+                    echo '        <a href="/addPost" class="btn btn-secondary">Crear publicación</a>';
+                    echo '    </div>';
                 } elseif ($activeTab === 'teachers') {
-                    echo '<div class="no-posts">No hay avisos o publicaciones de profesores por el momento.</div>';
+                    echo '    <h3>No hay avisos de profesores por el momento</h3>';
+                    echo '    <p>Los avisos o publicaciones académicas de los docentes aparecerán en esta sección.</p>';
+                    echo '    <div class="posts-empty-actions">';
+                    echo '        <a href="/posts?tab=all" class="btn btn-secondary">Ver toda la comunidad</a>';
+                    echo '    </div>';
                 } else {
-                    echo '<div class="no-posts">No hay publicaciones aún. <a href="/addPost">Sé el primero en publicar</a></div>';
+                    echo '    <h3>Aún no hay publicaciones</h3>';
+                    echo '    <p>Sé el primero en compartir ideas, dudas o novedades con toda la comunidad universitaria.</p>';
+                    echo '    <div class="posts-empty-actions">';
+                    echo '        <a href="/addPost" class="btn btn-primary">Crear primera publicación</a>';
+                    echo '    </div>';
                 }
+                echo '</div>';
             } else {
                 foreach ($postsData as $postData) {
                     // Use pre-fetched bulk data instead of N+1 queries
@@ -123,28 +161,39 @@ $trendingHashtags = $hashtagModel->getTrendingHashtags(8);
 
             // Pagination controls
             if ($totalPages > 1):
+                $tabParam = $activeTab !== 'all' ? '&tab=' . urlencode($activeTab) : '';
             ?>
-            <?php $tabParam = $activeTab !== 'all' ? '&tab=' . urlencode($activeTab) : ''; ?>
-            <div class="pagination" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin: 30px 0; padding: 15px;">
+            <nav class="posts-pagination" aria-label="Paginación de publicaciones">
                 <?php if ($page > 1): ?>
-                    <a href="/posts?page=<?php echo $page - 1; ?><?php echo $tabParam; ?>" class="btn btn-primary" style="padding: 8px 16px; text-decoration: none;">&larr; Anterior</a>
+                    <a href="/posts?page=<?php echo $page - 1; ?><?php echo $tabParam; ?>" class="posts-page-btn posts-page-prev" aria-label="Página anterior">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="15 18 9 12 15 6"></polyline>
+                        </svg>
+                        <span>Anterior</span>
+                    </a>
                 <?php endif; ?>
 
-                <span style="color: #666; font-size: 14px;">
-                    P&aacute;gina <?php echo $page; ?> de <?php echo $totalPages; ?> (<?php echo $totalPosts; ?> publicaciones)
-                </span>
+                <div class="posts-page-info">
+                    <span>Página <strong><?php echo $page; ?></strong> de <strong><?php echo $totalPages; ?></strong></span>
+                    <span class="posts-page-count-badge">(<?php echo $totalPosts; ?> publicaciones)</span>
+                </div>
 
                 <?php if ($page < $totalPages): ?>
-                    <a href="/posts?page=<?php echo $page + 1; ?><?php echo $tabParam; ?>" class="btn btn-primary" style="padding: 8px 16px; text-decoration: none;">Siguiente &rarr;</a>
+                    <a href="/posts?page=<?php echo $page + 1; ?><?php echo $tabParam; ?>" class="posts-page-btn posts-page-next" aria-label="Página siguiente">
+                        <span>Siguiente</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </a>
                 <?php endif; ?>
-            </div>
+            </nav>
             <?php
             endif;
             ?>
         </div>
     </div>
 
-        <?php require __DIR__ . '/assets/modals.php'; ?>
+    <?php require __DIR__ . '/assets/modals.php'; ?>
 </body>
 
 </html>

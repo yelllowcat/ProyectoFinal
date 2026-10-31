@@ -75,6 +75,10 @@ $router->get('/editProfile', [UserController::class, 'edit']);
 $router->delete('/profile/delete', [UserController::class, 'deleteAccount']);
 $router->post('/profile/delete', [UserController::class, 'deleteAccount']);
 $router->post('/profile/change-password', [UserController::class, 'changePassword']);
+$router->get('/settings', [UserController::class, 'settings']);
+$router->get('/configuracion', function () {
+    redirect('/settings');
+});
 
 
 $router->get('/friends', function () {
