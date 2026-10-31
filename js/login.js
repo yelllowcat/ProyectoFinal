@@ -31,6 +31,27 @@ document.addEventListener('DOMContentLoaded', function() {
   const submitBtn = form.querySelector('button[type="submit"]');
   
   setupInputAnimations();
+    // Theme toggle
+  const themeBtn = document.getElementById("themeToggle");
+  const themeText = document.getElementById("themeToggleText");
+  function syncThemeLabel() {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    if (themeText) themeText.textContent = isDark ? "Modo claro" : "Modo oscuro";
+  }
+  syncThemeLabel();
+  if (themeBtn) {
+    themeBtn.addEventListener("click", function() {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      if (isDark) {
+        document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("unired_theme", "light");
+      } else {
+        document.documentElement.setAttribute("data-theme", "dark");
+        localStorage.setItem("unired_theme", "dark");
+      }
+      syncThemeLabel();
+    });
+  }
   
   form.addEventListener('submit', handleFormSubmit);
   

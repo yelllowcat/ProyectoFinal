@@ -1207,3 +1207,140 @@ body {
     font-size: 20px;
   }
 }
+
+/* =========================================================
+   THEME TOGGLE BUTTON & DARK MODE SUPPORT
+   ========================================================= */
+.btn-theme-toggle {
+  padding: 8px 16px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-theme-toggle:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+html[data-theme="dark"] body {
+  background-color: #0b1120;
+  background-image: none;
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] .btn-theme-toggle {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .btn-theme-toggle:hover {
+  background: #334155;
+}
+
+html[data-theme="dark"] .admin-header {
+  background: #0f172a;
+  border-bottom: 1px solid #1e293b;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .chart-panel,
+html[data-theme="dark"] .table-panel {
+  background: #1e293b;
+  color: #f8fafc;
+  border: 1px solid #334155;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .panel-header h3,
+html[data-theme="dark"] .chart-panel h3,
+html[data-theme="dark"] .table-panel h3 {
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] .stat-btn,
+html[data-theme="dark"] .chart-tab,
+html[data-theme="dark"] .heatmap-toggle {
+  background: #0f172a;
+  color: #94a3b8;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .stat-btn:hover,
+html[data-theme="dark"] .chart-tab:hover,
+html[data-theme="dark"] .heatmap-toggle:hover {
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+html[data-theme="dark"] .stat-btn.active,
+html[data-theme="dark"] .chart-tab.active,
+html[data-theme="dark"] .heatmap-toggle.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+html[data-theme="dark"] .users-table {
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .users-table th {
+  background-color: #0f172a;
+  color: #94a3b8;
+  border-bottom: 1px solid #334155;
+}
+
+html[data-theme="dark"] .users-table td {
+  border-bottom: 1px solid #334155;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"] .users-table tr:hover {
+  background-color: rgba(51, 65, 85, 0.4);
+}
+
+html[data-theme="dark"] .summary-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+html[data-theme="dark"] .summary-title {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .summary-value {
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] select,
+html[data-theme="dark"] input[type="text"],
+html[data-theme="dark"] input[type="search"] {
+  background: #0f172a;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+html[data-theme="dark"] .confirm-box {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] .confirm-head h3 {
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] .confirm-subtitle {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .confirm-sep {
+  background: #334155;
+}

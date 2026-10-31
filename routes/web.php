@@ -167,6 +167,11 @@ $router->get('/dashboard', function () {
 
 $router->get('/admin/stats/pdf', [PdfController::class, 'downloadStatsPdf']);
 
+// Admin User Management routes
+$router->get('/admin/users', [AdminController::class, 'getUsersList']);
+$router->post('/admin/users/:id/toggle-status', [AdminController::class, 'toggleUserStatus']);
+$router->post('/admin/users/:id/status', [AdminController::class, 'toggleUserStatus']);
+
 // Report routes
 $router->post('/report', [ReportController::class, 'store']);
 $router->get('/admin/reports', [ReportController::class, 'index']);

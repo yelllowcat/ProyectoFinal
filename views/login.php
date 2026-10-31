@@ -9,10 +9,12 @@ use App\Components\Alert;
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UNIRED - Iniciar Sesión</title>
   <link rel="stylesheet" href="<?php echo asset('assets/styles/login.css'); ?>">
+  <script>(function(){const t=localStorage.getItem("unired_theme");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");})();</script>
   <script src="<?php echo asset('js/login.js'); ?>"></script>
 </head>
 
 <body>
+  <button class="theme-toggle-floating" id="themeToggle" type="button" aria-label="Cambiar tema"><span id="themeToggleText">Modo oscuro</span></button>
   <div class="container">
     <div class="logo-container">
       <div class="logo">

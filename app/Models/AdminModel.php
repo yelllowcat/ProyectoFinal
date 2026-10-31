@@ -563,4 +563,84 @@ class AdminModel
             return ['labels' => [], 'datasets' => []];
         }
     }
+
+    public function getAllUsersForManagement(string $search = '', string $status = 'all', string $role = 'all', int $limit = 100): array
+    {
+        try {
+            $sql = "
+                SELECT 
+                    u.user_id,
+                    u.full_name,
+                    u.email,
+                    u.role,
+                    u.department,
+                    u.career,
+                    u.semester,
+                    u.profile_picture,
+                    u.active,
+                    u.registration_date,
+                    IFNULL(p.posts_count, 0) AS posts_count,
+                    IFNULL(f.friends_count, 0) AS friends_count
+                FROM users u
+                LEFT JOIN (
+                    SELECT user_id, COUNT(*) AS posts_count 
+                    FROM posts 
+                    GROUP BY user_id
+                ) p ON u.user_id = p.user_id
+                LEFT JOIN (
+                    SELECT u_id, COUNT(*) AS friends_count
+                    FROM (
+                        SELECT user_id1 AS u_id FROM friends
+                        UNION ALL
+                        SELECT user_id2 AS u_id FROM friends
+                    ) all_f
+                    GROUP BY u_id
+                ) f ON u.user_id = f.u_id
+                WHERE u.role != 'admin'
+            ";
+
+            $params = [];
+
+            if (!empty($search)) {
+                $sql .= " AND (u.full_name LIKE ? OR u.email LIKE ? OR u.career LIKE ? OR u.department LIKE ?)";
+                $term = "%{$search}%";
+                $params[] = $term;
+                $params[] = $term;
+                $params[] = $term;
+                $params[] = $term;
+            }
+
+            if ($status === 'active') {
+                $sql .= " AND u.active = 1";
+            } elseif ($status === 'suspended') {
+                $sql .= " AND u.active = 0";
+            }
+
+            if ($role === 'student' || $role === 'teacher') {
+                $sql .= " AND u.role = ?";
+                $params[] = $role;
+            }
+
+            $sql .= " ORDER BY u.registration_date DESC LIMIT ?";
+            $params[] = $limit;
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("getAllUsersForManagement error: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function setUserActive(int $userId, int $active): bool
+    {
+        try {
+            $stmt = $this->pdo->prepare("UPDATE users SET active = ?, updated_at = NOW() WHERE user_id = ? AND role != 'admin'");
+            return $stmt->execute([$active, $userId]);
+        } catch (PDOException $e) {
+            error_log("setUserActive error: " . $e->getMessage());
+            return false;
+        }
+    }
 }

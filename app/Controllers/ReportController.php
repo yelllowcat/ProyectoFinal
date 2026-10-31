@@ -54,7 +54,15 @@ class ReportController
     public function index()
     {
         requireAdmin();
+        $status = clean_input($_GET['status'] ?? 'all');
         $reports = $this->reportModel->getAllReports();
+
+        if ($status === 'pending') {
+            $reports = array_values(array_filter($reports, fn($r) => ($r['status'] ?? '') === 'pending'));
+        } elseif ($status === 'resolved') {
+            $reports = array_values(array_filter($reports, fn($r) => ($r['status'] ?? '') === 'resolved'));
+        }
+
         jsonSuccess($reports);
     }
 

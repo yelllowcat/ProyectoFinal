@@ -70,4 +70,37 @@ class HelpersTest extends TestCase
         $this->assertSame('Operación completada', $messages[0]['message']);
         $this->assertFalse(hasFlash());
     }
+
+    public function testValidatePasswordStrengthRejectsWeakPasswords(): void
+    {
+        $short = validatePasswordStrength('Abc1');
+        $this->assertSame('La contraseña debe tener al menos 8 caracteres.', $short);
+
+        $noUpper = validatePasswordStrength('password123');
+        $this->assertSame('La contraseña debe contener al menos una letra mayúscula.', $noUpper);
+
+        $noNumber = validatePasswordStrength('PasswordOnly');
+        $this->assertSame('La contraseña debe contener al menos un número.', $noNumber);
+
+        $tooLong = validatePasswordStrength(str_repeat('A1', 35));
+        $this->assertSame('La contraseña no puede exceder los 64 caracteres.', $tooLong);
+    }
+
+    public function testValidatePasswordStrengthAcceptsStrongPasswords(): void
+    {
+        $this->assertNull(validatePasswordStrength('Admin2026!'));
+        $this->assertNull(validatePasswordStrength('Password123'));
+        $this->assertNull(validatePasswordStrength('Uabcs_2026_Secure'));
+    }
+
+    public function testCsrfTokenGenerationAndValidation(): void
+    {
+        $this->assertEmpty($_SESSION['csrf_token'] ?? '');
+        $token = generateCsrfToken();
+
+        $this->assertNotEmpty($token);
+        $this->assertSame(64, strlen($token));
+        $this->assertTrue(validateCsrfToken($token));
+        $this->assertFalse(validateCsrfToken('invalid_token'));
+    }
 }

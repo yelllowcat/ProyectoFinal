@@ -9,9 +9,11 @@ use App\Components\Alert;
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UNIRED - Registro</title>
   <link rel="stylesheet" href="<?php echo asset('assets/styles/register.css'); ?>">
+  <script>(function(){const t=localStorage.getItem("unired_theme");if(t==="dark")document.documentElement.setAttribute("data-theme","dark");})();</script>
 </head>
 
 <body>
+  <button class="theme-toggle-floating" id="themeToggle" type="button" aria-label="Cambiar tema"><span id="themeToggleText">Modo oscuro</span></button>
   <div class="container">
     <div class="logo-container">
       <div class="logo">
@@ -93,6 +95,27 @@ use App\Components\Alert;
     </form>
   </div>
   <script>
+    // Theme toggle
+    const themeBtn = document.getElementById("themeToggle");
+    const themeText = document.getElementById("themeToggleText");
+    function syncThemeLabel() {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      if (themeText) themeText.textContent = isDark ? "Modo claro" : "Modo oscuro";
+    }
+    syncThemeLabel();
+    if (themeBtn) {
+      themeBtn.addEventListener("click", function() {
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+        if (isDark) {
+          document.documentElement.removeAttribute("data-theme");
+          localStorage.setItem("unired_theme", "light");
+        } else {
+          document.documentElement.setAttribute("data-theme", "dark");
+          localStorage.setItem("unired_theme", "dark");
+        }
+        syncThemeLabel();
+      });
+    }
     function togglePassword(event) {
       const eyeIcon = event.target;
       const container = eyeIcon.closest('.password-field');

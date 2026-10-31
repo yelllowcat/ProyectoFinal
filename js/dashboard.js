@@ -805,3 +805,256 @@ window.switchHashtagRange = function(range, btn) {
     window._hashtagRange = range;
     fetchHashtagTrend(range);
 };
+
+
+// ==========================================
+// ADMIN SECTION SWITCHER
+// ==========================================
+window.switchAdminSection = function (section, btn) {
+    const sections = {
+        stats: document.getElementById('admin-section-stats'),
+        users: document.getElementById('admin-section-users'),
+        reports: document.getElementById('admin-section-reports')
+    };
+
+    document.querySelectorAll('.admin-nav-tabs .chart-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    Object.keys(sections).forEach(k => {
+        if (sections[k]) {
+            sections[k].style.display = (k === section) ? 'block' : 'none';
+        }
+    });
+
+    if (section === 'users') {
+        fetchAdminUsers();
+    } else if (section === 'reports') {
+        fetchReports();
+    }
+};
+
+// ==========================================
+// USER MANAGEMENT
+// ==========================================
+let adminUserSearchTimer = null;
+
+window.debounceAdminUserSearch = function () {
+    clearTimeout(adminUserSearchTimer);
+    adminUserSearchTimer = setTimeout(() => {
+        fetchAdminUsers();
+    }, 300);
+};
+
+window.fetchAdminUsers = async function () {
+    const tbody = document.getElementById('adminUsersTableBody');
+    if (!tbody) return;
+
+    const search = document.getElementById('adminUserSearchInput')?.value || '';
+    const status = document.getElementById('adminUserStatusFilter')?.value || 'all';
+    const role = document.getElementById('adminUserRoleFilter')?.value || 'all';
+
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;">Cargando usuarios...</td></tr>';
+
+    try {
+        const queryParams = new URLSearchParams({ search, status, role, limit: 150 });
+        const res = await fetch(`/admin/users?${queryParams.toString()}`);
+        const data = await res.json();
+
+        if (data.success && Array.isArray(data.data)) {
+            renderAdminUsersTable(data.data);
+        } else {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #dc2626;">Error al cargar usuarios.</td></tr>';
+        }
+    } catch (err) {
+        console.error('Error fetching admin users:', err);
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px; color: #dc2626;">Error de conexión.</td></tr>';
+    }
+};
+
+window.renderAdminUsersTable = function (users) {
+    const tbody = document.getElementById('adminUsersTableBody');
+    if (!tbody) return;
+
+    if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px; color: #64748b;">No se encontraron usuarios con los filtros aplicados.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = users.map(u => {
+        const isActive = parseInt(u.active) === 1;
+        const statusBadge = isActive
+            ? '<span style="background: #10b981; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Activo</span>'
+            : '<span style="background: #ef4444; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">Suspendido</span>';
+
+        const roleBadge = (u.role === 'teacher')
+            ? '<span style="background: #6366f1; color: white; padding: 2px 7px; border-radius: 4px; font-size: 11px;">Profesor</span>'
+            : '<span style="background: #0ea5e9; color: white; padding: 2px 7px; border-radius: 4px; font-size: 11px;">Estudiante</span>';
+
+        const actionBtn = isActive
+            ? `<button class="btn-view-profile-table" style="background-color: #ef4444;" onclick="toggleAdminUserStatus(${u.user_id}, 1, '${escapeHtml(u.full_name)}')">Suspender</button>`
+            : `<button class="btn-view-profile-table" style="background-color: #10b981;" onclick="toggleAdminUserStatus(${u.user_id}, 0, '${escapeHtml(u.full_name)}')">Reactivar</button>`;
+
+        const academicInfo = u.career ? `${escapeHtml(u.career)}` : (u.department ? `${escapeHtml(u.department)}` : '-');
+
+        const avatarImg = u.profile_picture ? `/assets/imagesProfile/${escapeHtml(u.profile_picture)}` : '/assets/imagesProfile/default_avatar.png';
+
+        return `
+            <tr>
+                <td>${u.user_id}</td>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <img src="${avatarImg}" alt="${escapeHtml(u.full_name)}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid #cbd5e1;">
+                        <span style="font-weight: 600;">${escapeHtml(u.full_name)}</span>
+                    </div>
+                </td>
+                <td>${escapeHtml(u.email)}</td>
+                <td>${roleBadge}</td>
+                <td><small style="color: #64748b;">${academicInfo}</small></td>
+                <td style="font-weight: 600; text-align: center;">${u.posts_count || 0}</td>
+                <td>${statusBadge}</td>
+                <td>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        ${actionBtn}
+                        <a href="/profile/${u.user_id}" class="btn-view-profile-table" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;" target="_blank">Ver</a>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+};
+
+window.toggleAdminUserStatus = async function (userId, currentActive, userName) {
+    const actionWord = currentActive === 1 ? 'suspender' : 'reactivar';
+    const confirmMsg = `¿Estás seguro de que deseas ${actionWord} a "${userName || 'este usuario'}"?`;
+
+    if (!confirm(confirmMsg)) return;
+
+    try {
+        const res = await fetch(`/admin/users/${userId}/toggle-status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+
+        if (data.success) {
+            fetchAdminUsers();
+            fetchSummaryStats();
+        } else {
+            alert(data.message || 'Error al actualizar el estado del usuario');
+        }
+    } catch (err) {
+        console.error('Error toggling user status:', err);
+        alert('Error de conexión al modificar estado');
+    }
+};
+
+// ==========================================
+// REPORTS FILTERING
+// ==========================================
+let allLoadedReports = [];
+let currentReportFilter = 'pending';
+
+window.fetchReports = function () {
+    fetch('/admin/reports')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data) {
+                allLoadedReports = data.data;
+                renderFilteredReports();
+            }
+        })
+        .catch(error => console.error('Error fetching reports:', error));
+};
+
+window.filterReportsByStatus = function (status, btn) {
+    currentReportFilter = status;
+    document.querySelectorAll('.report-filter-buttons .heatmap-toggle').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    renderFilteredReports();
+};
+
+function renderFilteredReports() {
+    let filtered = allLoadedReports;
+    if (currentReportFilter === 'pending') {
+        filtered = allLoadedReports.filter(r => r.status === 'pending');
+    } else if (currentReportFilter === 'resolved') {
+        filtered = allLoadedReports.filter(r => r.status === 'resolved');
+    }
+    renderReportTable(filtered);
+}
+
+// ==========================================
+// CSV EXPORT UTILITY
+// ==========================================
+window.exportTableToCSV = function (tableId, filename = 'export.csv') {
+    const table = document.getElementById(tableId);
+    if (!table) {
+        alert('Tabla no encontrada para exportar.');
+        return;
+    }
+
+    const rows = Array.from(table.querySelectorAll('tr'));
+    if (rows.length === 0) {
+        alert('No hay datos en la tabla para exportar.');
+        return;
+    }
+
+    const csvLines = [];
+
+    rows.forEach(row => {
+        const cells = Array.from(row.querySelectorAll('th, td'));
+        if (cells.length === 0) return;
+
+        // Skip action buttons cell if last column is 'Acciones'
+        const rowValues = cells.map((cell, idx) => {
+            const isHeader = cell.tagName.toLowerCase() === 'th';
+            if (isHeader && cell.textContent.trim().toLowerCase() === 'acciones') {
+                return null;
+            }
+            if (!isHeader && idx === cells.length - 1 && cell.querySelector('button, a')) {
+                return null;
+            }
+
+            const clone = cell.cloneNode(true);
+            const interactive = clone.querySelectorAll('button, svg, .btn-view-profile-table, select, input');
+            interactive.forEach(el => el.remove());
+
+            let text = clone.innerText || clone.textContent || '';
+            text = text.replace(/(\r\n|\n|\r)/gm, ' ').replace(/\s+/g, ' ').trim();
+            text = text.replace(/"/g, '""');
+            return `"${text}"`;
+        }).filter(v => v !== null);
+
+        if (rowValues.length > 0 && rowValues.join('').replace(/""/g, '').trim() !== '') {
+            csvLines.push(rowValues.join(','));
+        }
+    });
+
+    if (csvLines.length === 0) {
+        alert('No hay registros válidos para exportar.');
+        return;
+    }
+
+    // Prepend UTF-8 BOM (\uFEFF) for Microsoft Excel compatibility
+    const csvContent = '\uFEFF' + csvLines.join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+};
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}

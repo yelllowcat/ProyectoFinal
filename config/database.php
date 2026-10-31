@@ -27,28 +27,36 @@ if (!defined('DB_HOST')) {
     define('DB_PASS', $_ENV['DB_PASS'] ?? '');
 }
 
-try {
-    $pdo = new PDO(
-        "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
-        DB_USER,
-        DB_PASS,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-            PDO::ATTR_PERSISTENT => true
-        ]
-    );
-} catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+if (!isset($pdo) || $pdo === null) {
+    try {
+        $pdo = new PDO(
+            "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4",
+            DB_USER,
+            DB_PASS,
+            [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES => false,
+                PDO::ATTR_PERSISTENT => true
+            ]
+        );
+    } catch (PDOException $e) {
+        if (defined('PHPUNIT_RUNNING') || (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'testing')) {
+            $pdo = null;
+        } else {
+            die("Database connection failed: " . $e->getMessage());
+        }
+    }
 }
 
-/**
- * Get database connection
- * @return PDO
- */
-function getDB()
-{
-    global $pdo;
-    return $pdo;
+if (!function_exists('getDB')) {
+    /**
+     * Get database connection
+     * @return PDO
+     */
+    function getDB()
+    {
+        global $pdo;
+        return $pdo;
+    }
 }
