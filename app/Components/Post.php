@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Components;
 
 class Post
@@ -231,107 +232,9 @@ class Post
         $commentsHtml = '';
 
         foreach ($this->comments as $index => $comment) {
-            $isHidden = ($index >= 3 && !$this->expandAllComments) ? ' hidden' : '';
-            $author = htmlspecialchars($comment['full_name'] ?? $comment['author']);
-            $text = htmlspecialchars($comment['content'] ?? $comment['text']);
-            $time = htmlspecialchars($comment['time'] ?? '');
-            $date = htmlspecialchars($comment['date'] ?? date('d/m/Y', strtotime($comment['created_at'])));
-
-            $commentId = $comment['comment_id'] ?? $comment['id'] ?? $index;
-            $commentMenuId = 'comment-menu-' . $this->id . '-' . $commentId;
-            $commentUserId = $comment['user_id'] ?? null;
-
-            $highlightClass = ($this->highlightCommentId && $this->highlightCommentId == $commentId) ? ' highlighted-comment' : '';
-
-            // Menú del comentario
-            $commentMenu = '';
-            if ($this->interactive) {
-                if ($commentUserId == $this->currentUserId) {
-                    $commentMenu = "
-                    <div class='comment-menu-wrapper'>
-                        <img src='/assets/images/vertical-dots.png' alt='Opciones de comentario' width='20' 
-                             class='comment-menu-trigger' data-menu-id='{$commentMenuId}' style='cursor: pointer;'>
-                        <div class='comment-menu-modal' id='{$commentMenuId}'>
-                            <div class='menu-option comment-edit-btn' onclick='startEditComment({$commentId})'>Editar</div>
-                            <div class='menu-option delete comment-delete-btn'>Eliminar</div>
-                            <div class='menu-option'>Cancelar</div>
-                        </div>
-                    </div>";
-                } else {
-                    $commentMenu = "
-                    <div class='comment-menu-wrapper'>
-                        <img src='/assets/images/vertical-dots.png' alt='Opciones de comentario' width='20' 
-                             class='comment-menu-trigger' data-menu-id='{$commentMenuId}' style='cursor: pointer;'>
-                        <div class='comment-menu-modal' id='{$commentMenuId}'>
-                            <div class='menu-option' style='color: #f44336;' onclick=\"openReportModal('comment', {$commentId})\">Reportar comentario</div>
-                            <div class='menu-option'>Cancelar</div>
-                        </div>
-                    </div>";
-                }
-            }
-
-            $replyCount = $comment['reply_count'] ?? 0;
-            $replyBtnText = $replyCount > 0 ? "Ver respuestas ({$replyCount})" : 'Responder';
-
-            // Replies: server-side if available, otherwise empty container for JS
-            $repliesHtml = '';
-            $replySectionClass = 'hidden';
-            if (isset($this->repliesData[$commentId]) && !empty($this->repliesData[$commentId])) {
-                $replySectionClass = '';
-                foreach ($this->repliesData[$commentId] as $reply) {
-                    $repliesHtml .= $this->renderReply($reply, $commentId);
-                }
-            }
-
-            $replyToggleHtml = '';
-            $replyInputHtml = '';
-            if ($this->interactive) {
-                $commentLikesCount = (int) ($comment['likes_count'] ?? 0);
-                $replyToggleHtml = "
-                <button class='reply-toggle-btn' onclick='toggleReplies(this)'>
-                    {$replyBtnText}
-                </button>
-                <button class='comment-like-btn' onclick='handleCommentLike(this)' data-comment-id='{$commentId}'>
-                    <img src='/assets/images/heartOutline.png' alt='Like' width='14'> {$commentLikesCount}
-                </button>";
-                $replyInputHtml = "
-                <div class='reply-input-container'>
-                    <input type='text' class='reply-input' placeholder='Escribir respuesta...' maxlength='500' minlength='1' onkeypress='handleReplyKeyPress(event, this)'>
-                    <button class='reply-submit' onclick='addReply(this)'>Publicar</button>
-                </div>";
-            } else {
-                if ($replyCount > 0) {
-                    $replyToggleHtml = "<span class='reply-toggle-btn' style='cursor: default;'>{$replyBtnText}</span>";
-                }
-            }
-
-            $isCommentEdited = !empty($comment['updated_at']) && !empty($comment['created_at']) && (strtotime($comment['updated_at']) > strtotime($comment['created_at']));
-            $commentEditedTag = $isCommentEdited ? " <span class='comment-edited-tag'>(editado)</span>" : "";
-
-            $commentsHtml .= "
-        <div class='comment{$isHidden}{$highlightClass}' id='comment-{$commentId}' data-comment-id='{$commentId}'>
-            <div class='comment-header'>
-            <a href='/profile/{$commentUserId}' class='comment-user'>
-                <div class='comment-text-content'>
-                    <span class='comment-author-name'>{$author}</span> <span class='comment-text-body'>{$text}</span>
-                </div>
-            </a>
-
-                {$commentMenu}
-            </div>
-            <div class='comment-date'>
-                {$time} &middot; {$date}{$commentEditedTag}
-            </div>
-            <div class='reply-toggle-container' data-comment-id='{$commentId}'>
-                {$replyToggleHtml}
-            </div>
-            <div class='reply-section {$replySectionClass}' data-comment-id='{$commentId}'>
-                <div class='replies-container'>{$repliesHtml}</div>
-                {$replyInputHtml}
-            </div>
-        </div>
-        ";
+            $commentsHtml .= $this->renderCommentItem($comment, (int) $index);
         }
+
         $loadMoreBtn = '';
         if ($totalComments > 3 && !$this->expandAllComments) {
             $loadMoreBtn = "
@@ -366,36 +269,140 @@ class Post
     ";
     }
 
+    private function renderCommentItem(array $comment, int $index): string
+    {
+        $isHidden = ($index >= 3 && !$this->expandAllComments) ? ' hidden' : '';
+        $author = htmlspecialchars($comment['full_name'] ?? $comment['author']);
+        $text = htmlspecialchars($comment['content'] ?? $comment['text']);
+        $time = htmlspecialchars($comment['time'] ?? '');
+        $date = htmlspecialchars($comment['date'] ?? date('d/m/Y', strtotime($comment['created_at'])));
+
+        $commentId = (int) ($comment['comment_id'] ?? $comment['id'] ?? $index);
+        $commentUserId = $comment['user_id'] ?? null;
+        $highlightClass = ($this->highlightCommentId && $this->highlightCommentId == $commentId) ? ' highlighted-comment' : '';
+
+        $commentMenu = $this->renderCommentMenu($commentId, $commentUserId);
+        $repliesHtml = $this->renderCommentRepliesList($commentId);
+        $replySectionClass = $repliesHtml !== '' ? '' : 'hidden';
+
+        $replyToggleHtml = $this->renderCommentActions($comment, $commentId);
+        $replyInputHtml = $this->interactive ? "
+                <div class='reply-input-container'>
+                    <input type='text' class='reply-input' placeholder='Escribir respuesta...' maxlength='500' minlength='1' onkeypress='handleReplyKeyPress(event, this)'>
+                    <button class='reply-submit' onclick='addReply(this)'>Publicar</button>
+                </div>" : '';
+
+        $commentEditedTag = $this->isRecordEdited($comment) ? " <span class='comment-edited-tag'>(editado)</span>" : "";
+
+        return "
+        <div class='comment{$isHidden}{$highlightClass}' id='comment-{$commentId}' data-comment-id='{$commentId}'>
+            <div class='comment-header'>
+            <a href='/profile/{$commentUserId}' class='comment-user'>
+                <div class='comment-text-content'>
+                    <span class='comment-author-name'>{$author}</span> <span class='comment-text-body'>{$text}</span>
+                </div>
+            </a>
+
+                {$commentMenu}
+            </div>
+            <div class='comment-date'>
+                {$time} &middot; {$date}{$commentEditedTag}
+            </div>
+            <div class='reply-toggle-container' data-comment-id='{$commentId}'>
+                {$replyToggleHtml}
+            </div>
+            <div class='reply-section {$replySectionClass}' data-comment-id='{$commentId}'>
+                <div class='replies-container'>{$repliesHtml}</div>
+                {$replyInputHtml}
+            </div>
+        </div>
+        ";
+    }
+
+    private function renderCommentRepliesList(int $commentId): string
+    {
+        if (empty($this->repliesData[$commentId])) {
+            return '';
+        }
+
+        $repliesHtml = '';
+        foreach ($this->repliesData[$commentId] as $reply) {
+            $repliesHtml .= $this->renderReply($reply, $commentId);
+        }
+        return $repliesHtml;
+    }
+
+    private function renderCommentMenu(int $commentId, $commentUserId): string
+    {
+        if (!$this->interactive) {
+            return '';
+        }
+
+        $commentMenuId = 'comment-menu-' . $this->id . '-' . $commentId;
+        if ($commentUserId == $this->currentUserId) {
+            return "
+                    <div class='comment-menu-wrapper'>
+                        <img src='/assets/images/vertical-dots.png' alt='Opciones de comentario' width='20' 
+                             class='comment-menu-trigger' data-menu-id='{$commentMenuId}' style='cursor: pointer;'>
+                        <div class='comment-menu-modal' id='{$commentMenuId}'>
+                            <div class='menu-option comment-edit-btn' onclick='startEditComment({$commentId})'>Editar</div>
+                            <div class='menu-option delete comment-delete-btn'>Eliminar</div>
+                            <div class='menu-option'>Cancelar</div>
+                        </div>
+                    </div>";
+        }
+
+        return "
+                    <div class='comment-menu-wrapper'>
+                        <img src='/assets/images/vertical-dots.png' alt='Opciones de comentario' width='20' 
+                             class='comment-menu-trigger' data-menu-id='{$commentMenuId}' style='cursor: pointer;'>
+                        <div class='comment-menu-modal' id='{$commentMenuId}'>
+                            <div class='menu-option' style='color: #f44336;' onclick=\"openReportModal('comment', {$commentId})\">Reportar comentario</div>
+                            <div class='menu-option'>Cancelar</div>
+                        </div>
+                    </div>";
+    }
+
+    private function renderCommentActions(array $comment, int $commentId): string
+    {
+        $replyCount = (int) ($comment['reply_count'] ?? 0);
+        $replyBtnText = $replyCount > 0 ? "Ver respuestas ({$replyCount})" : 'Responder';
+
+        if (!$this->interactive) {
+            return $replyCount > 0
+                ? "<span class='reply-toggle-btn' style='cursor: default;'>{$replyBtnText}</span>"
+                : '';
+        }
+
+        $commentLikesCount = (int) ($comment['likes_count'] ?? 0);
+        $commentHasLiked = !empty($comment['has_liked']);
+        $commentHeartIcon = $commentHasLiked ? 'heartFilled.png' : 'heartOutline.png';
+        $commentHeartAlt = $commentHasLiked ? 'Liked' : 'Like';
+        $commentLikeClass = $commentHasLiked ? 'comment-like-btn liked' : 'comment-like-btn';
+
+        return "
+                <button class='reply-toggle-btn' onclick='toggleReplies(this)'>
+                    {$replyBtnText}
+                </button>
+                <button class='{$commentLikeClass}' onclick='handleCommentLike(this)' data-comment-id='{$commentId}'>
+                    <img src='/assets/images/{$commentHeartIcon}' alt='{$commentHeartAlt}' width='14'> {$commentLikesCount}
+                </button>";
+    }
+
     private function renderReply(array $reply, int $commentId): string
     {
-        $replyId = $reply['reply_id'] ?? $reply['id'] ?? 0;
+        $replyId = (int) ($reply['reply_id'] ?? $reply['id'] ?? 0);
         $author = htmlspecialchars($reply['full_name'] ?? $reply['author'] ?? 'Usuario');
         $text = htmlspecialchars($reply['content'] ?? $reply['text'] ?? '');
         $replyUserId = $reply['user_id'] ?? null;
         $date = date('d/m/Y', strtotime($reply['created_at'] ?? 'now'));
         $time = htmlspecialchars($reply['time'] ?? '');
 
-        $isReplyEdited = !empty($reply['updated_at']) && !empty($reply['created_at']) && (strtotime($reply['updated_at']) > strtotime($reply['created_at']));
-        $replyEditedTag = $isReplyEdited ? " <span class='comment-edited-tag'>(editado)</span>" : "";
-
+        $replyEditedTag = $this->isRecordEdited($reply) ? " <span class='comment-edited-tag'>(editado)</span>" : "";
         $highlightClass = ($this->highlightReplyId && $this->highlightReplyId == $replyId) ? ' highlighted-reply' : '';
 
-        $replyMenu = '';
-        if ($this->interactive) {
-            $replyMenuId = 'reply-menu-' . $commentId . '-' . $replyId;
-            if ($replyUserId == $this->currentUserId) {
-                $replyMenu = "
-                <div class='comment-menu-wrapper'>
-                    <img src='/assets/images/vertical-dots.png' alt='Opciones de respuesta' width='16' 
-                         class='comment-menu-trigger' data-menu-id='{$replyMenuId}' style='cursor: pointer;'>
-                    <div class='comment-menu-modal' id='{$replyMenuId}'>
-                        <div class='menu-option reply-edit-btn' onclick='startEditReply({$replyId})'>Editar</div>
-                        <div class='menu-option delete reply-delete-btn'>Eliminar</div>
-                        <div class='menu-option'>Cancelar</div>
-                    </div>
-                </div>";
-            }
-        }
+        $replyMenu = $this->renderReplyMenu($commentId, $replyId, $replyUserId);
+        $replyLikeHtml = $this->renderReplyLikeButton($reply, $replyId);
 
         return "
         <div class='reply{$highlightClass}' id='reply-{$replyId}' data-reply-id='{$replyId}'>
@@ -408,8 +415,56 @@ class Post
                 {$replyMenu}
             </div>
             <div class='reply-date'>{$time} &middot; {$date}{$replyEditedTag}</div>
+            {$replyLikeHtml}
         </div>
         ";
+    }
+
+    private function renderReplyMenu(int $commentId, int $replyId, $replyUserId): string
+    {
+        if (!$this->interactive || $replyUserId != $this->currentUserId) {
+            return '';
+        }
+
+        $replyMenuId = 'reply-menu-' . $commentId . '-' . $replyId;
+        return "
+                <div class='comment-menu-wrapper'>
+                    <img src='/assets/images/vertical-dots.png' alt='Opciones de respuesta' width='16' 
+                         class='comment-menu-trigger' data-menu-id='{$replyMenuId}' style='cursor: pointer;'>
+                    <div class='comment-menu-modal' id='{$replyMenuId}'>
+                        <div class='menu-option reply-edit-btn' onclick='startEditReply({$replyId})'>Editar</div>
+                        <div class='menu-option delete reply-delete-btn'>Eliminar</div>
+                        <div class='menu-option'>Cancelar</div>
+                    </div>
+                </div>";
+    }
+
+    private function renderReplyLikeButton(array $reply, int $replyId): string
+    {
+        if (!$this->interactive) {
+            return '';
+        }
+
+        $replyLikesCount = (int) ($reply['likes_count'] ?? 0);
+        $replyHasLiked = !empty($reply['has_liked']);
+        $replyHeartIcon = $replyHasLiked ? 'heartFilled.png' : 'heartOutline.png';
+        $replyHeartAlt = $replyHasLiked ? 'Liked' : 'Like';
+        $replyLikeClass = $replyHasLiked ? 'reply-like-btn liked' : 'reply-like-btn';
+
+        return "
+            <div class='reply-like-container'>
+                <button class='{$replyLikeClass}' onclick='handleReplyLike(this)' data-reply-id='{$replyId}'>
+                    <img src='/assets/images/{$replyHeartIcon}' alt='{$replyHeartAlt}' width='12'> {$replyLikesCount}
+                </button>
+            </div>";
+    }
+
+    private function isRecordEdited(array $record): bool
+    {
+        if (empty($record['updated_at']) || empty($record['created_at'])) {
+            return false;
+        }
+        return strtotime($record['updated_at']) > strtotime($record['created_at']);
     }
 
     private function renderHashtags(string $text): string
@@ -431,4 +486,3 @@ class Post
         );
     }
 }
-?>

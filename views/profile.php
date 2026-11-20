@@ -40,7 +40,7 @@ $totalLikes = $likeModel->getTotalLikesForUser($userId);
 // Bulk fetch data for displayed posts (eliminates N+1 queries)
 $postIds = array_column($userPosts, 'post_id');
 $likedMap = $likeModel->bulkHasLiked($postIds, $currentUserId);
-$commentsMap = $commentModel->getFirstCommentsForPosts($postIds, 3);
+$commentsMap = $commentModel->getFirstCommentsForPosts($postIds, 3, (int) $currentUserId);
 
 $isOwnProfile = ($userId == $currentUserId);
 $friendsCount = $friendModel->countFriends((int) $userId);

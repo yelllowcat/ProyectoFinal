@@ -35,7 +35,7 @@ class HashtagController
         $likeModel = new LikeModel();
         $commentModel = new CommentModel();
         $likedMap = $likeModel->bulkHasLiked($postIds, $currentUserId);
-        $commentsMap = $commentModel->getFirstCommentsForPosts($postIds, 3);
+        $commentsMap = $commentModel->getFirstCommentsForPosts($postIds, 3, (int) $currentUserId);
 
         require __DIR__ . '/../../views/hashtag.php';
     }

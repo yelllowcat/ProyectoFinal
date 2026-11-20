@@ -20,9 +20,9 @@ class CommentLikeModel
             $stmt = $this->pdo->prepare("CALL sp_add_comment_like(?, ?)");
             $stmt->execute([$commentId, $userId]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
 
             return ($result['affected_rows'] ?? 0) > 0;
-
         } catch (PDOException $e) {
             error_log("addCommentLike error: " . $e->getMessage());
             return false;
@@ -35,9 +35,9 @@ class CommentLikeModel
             $stmt = $this->pdo->prepare("CALL sp_remove_comment_like(?, ?)");
             $stmt->execute([$commentId, $userId]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
 
             return ($result['affected_rows'] ?? 0) > 0;
-
         } catch (PDOException $e) {
             error_log("removeCommentLike error: " . $e->getMessage());
             return false;
@@ -50,9 +50,9 @@ class CommentLikeModel
             $stmt = $this->pdo->prepare("CALL sp_get_comment_like_count(?)");
             $stmt->execute([$commentId]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
 
             return $result['like_count'] ?? 0;
-
         } catch (PDOException $e) {
             error_log("getCommentLikeCount error: " . $e->getMessage());
             return 0;
@@ -65,9 +65,9 @@ class CommentLikeModel
             $stmt = $this->pdo->prepare("CALL sp_has_comment_liked(?, ?)");
             $stmt->execute([$commentId, $userId]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->closeCursor();
 
             return ($result['has_liked'] ?? 0) == 1;
-
         } catch (PDOException $e) {
             error_log("hasCommentLiked error: " . $e->getMessage());
             return false;

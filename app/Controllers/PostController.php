@@ -294,7 +294,7 @@ class PostController
 
             if ($commentId) {
                 $newComment = $commentModel->getCommentById($commentId);
-                $comments = $commentModel->getCommentsByPost($postId);
+                $comments = $commentModel->getCommentsByPost($postId, (int) $userId);
                 $commentCount = $commentModel->getCommentCount($postId);
 
                 return jsonSuccess([
@@ -343,8 +343,9 @@ class PostController
     {
         requireAuth();
 
+        $userId = (int) ($_SESSION['user_id'] ?? 0);
         $commentModel = new CommentModel();
-        $comments = $commentModel->getCommentsByPost($postId);
+        $comments = $commentModel->getCommentsByPost($postId, $userId);
         $commentCount = $commentModel->getCommentCount($postId);
 
         return jsonSuccess([
@@ -373,7 +374,7 @@ class PostController
 
             if ($replyId) {
                 $newReply = $replyModel->getReplyById($replyId);
-                $replies = $replyModel->getRepliesByComment($commentId);
+                $replies = $replyModel->getRepliesByComment($commentId, (int) $userId);
                 $replyCount = $replyModel->getReplyCount($commentId);
 
                 $commentModel = new CommentModel();
@@ -434,8 +435,9 @@ class PostController
     {
         requireAuth();
 
+        $userId = (int) ($_SESSION['user_id'] ?? 0);
         $replyModel = new ReplyModel();
-        $replies = $replyModel->getRepliesByComment($commentId);
+        $replies = $replyModel->getRepliesByComment($commentId, $userId);
         $replyCount = $replyModel->getReplyCount($commentId);
 
         return jsonSuccess([
@@ -551,12 +553,12 @@ class PostController
 
         $currentUserId = (int) $_SESSION['user_id'];
         $hasLiked = $likeModel->hasLiked((int) $id, $currentUserId);
-        $comments = $commentModel->getCommentsByPost((int) $id);
+        $comments = $commentModel->getCommentsByPost((int) $id, $currentUserId);
 
         $repliesData = [];
         foreach ($comments as $comment) {
             $commentId = (int) ($comment['comment_id'] ?? $comment['id']);
-            $repliesData[$commentId] = $replyModel->getRepliesByComment($commentId);
+            $repliesData[$commentId] = $replyModel->getRepliesByComment($commentId, $currentUserId);
         }
 
         require __DIR__ . '/../../views/singlePost.php';

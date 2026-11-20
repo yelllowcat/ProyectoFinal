@@ -22,20 +22,29 @@ class ReplyModel
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             return $result['reply_id'] ?? false;
-
         } catch (PDOException $e) {
             error_log("createReply error: " . $e->getMessage());
             return false;
         }
     }
 
-    public function getRepliesByComment($commentId)
+    public function getRepliesByComment($commentId, ?int $userId = null)
     {
         try {
-            $stmt = $this->pdo->prepare("CALL sp_get_replies_by_comment(?)");
-            $stmt->execute([$commentId]);
+            $currentUserId = $userId ?? 0;
+            $stmt = $this->pdo->prepare("
+                SELECT r.*, u.full_name, u.profile_picture,
+                    (SELECT COUNT(*) FROM reply_likes rl
+                     WHERE rl.reply_id = r.reply_id) as likes_count,
+                    (SELECT COUNT(*) FROM reply_likes rl
+                     WHERE rl.reply_id = r.reply_id AND rl.user_id = ?) as has_liked
+                FROM replies r
+                JOIN users u ON r.user_id = u.user_id
+                WHERE r.comment_id = ? AND r.active = 1
+                ORDER BY r.created_at ASC
+            ");
+            $stmt->execute([$currentUserId, $commentId]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         } catch (PDOException $e) {
             error_log("getRepliesByComment error: " . $e->getMessage());
             return [];
@@ -50,7 +59,6 @@ class ReplyModel
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             return ($result['affected_rows'] ?? 0) > 0;
-
         } catch (PDOException $e) {
             error_log("deleteReply error: " . $e->getMessage());
             return false;
@@ -65,7 +73,6 @@ class ReplyModel
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
             return $result['reply_count'] ?? 0;
-
         } catch (PDOException $e) {
             error_log("getReplyCount error: " . $e->getMessage());
             return 0;
@@ -78,7 +85,6 @@ class ReplyModel
             $stmt = $this->pdo->prepare("CALL sp_get_reply_by_id(?)");
             $stmt->execute([$replyId]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
-
         } catch (PDOException $e) {
             error_log("getReplyById error: " . $e->getMessage());
             return false;

@@ -29,7 +29,7 @@ $totalPages = (int) ceil($totalPosts / $perPage);
 // Bulk fetch data for all posts in one go (eliminates N+1 queries)
 $postIds = array_column($postsData, 'post_id');
 $likedMap = $likeModel->bulkHasLiked($postIds, $currentUserId);
-$commentsMap = $commentModel->getFirstCommentsForPosts($postIds, 3);
+$commentsMap = $commentModel->getFirstCommentsForPosts($postIds, 3, $currentUserId);
 $trendingHashtags = $hashtagModel->getTrendingHashtags(8);
 ?>
 <!DOCTYPE html>

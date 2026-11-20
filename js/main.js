@@ -712,6 +712,11 @@ function updateCommentsSection(postContainer, comments, commentCount, isAddingCo
 
     const replyCount = comment.reply_count || 0;
     const replyBtnText = replyCount > 0 ? `Ver respuestas (${replyCount})` : 'Responder';
+    const commentLikesCount = Number(comment.likes_count || 0);
+    const commentHasLiked = Number(comment.has_liked || 0) > 0;
+    const commentLikeClass = commentHasLiked ? 'comment-like-btn liked' : 'comment-like-btn';
+    const commentHeartIcon = commentHasLiked ? 'heartFilled.png' : 'heartOutline.png';
+    const commentHeartAlt = commentHasLiked ? 'Liked' : 'Like';
 
     const commentHTML = `
       <div class="comment${isHidden}" data-comment-id="${commentId}">
@@ -728,8 +733,8 @@ function updateCommentsSection(postContainer, comments, commentCount, isAddingCo
           <button class="reply-toggle-btn" onclick="toggleReplies(this)">
             ${replyBtnText}
           </button>
-          <button class="comment-like-btn" onclick="handleCommentLike(this)" data-comment-id="${commentId}">
-            <img src="/assets/images/heartOutline.png" alt="Like" width="14"> 0
+          <button class="${commentLikeClass}" onclick="handleCommentLike(this)" data-comment-id="${commentId}">
+            <img src="/assets/images/${commentHeartIcon}" alt="${commentHeartAlt}" width="14"> ${commentLikesCount}
           </button>
         </div>
         <div class="reply-section hidden" data-comment-id="${commentId}">
@@ -958,6 +963,12 @@ function renderRepliesSection(commentEl, replies, replyCount) {
       `;
     }
 
+    const replyLikesCount = Number(reply.likes_count || 0);
+    const replyHasLiked = Number(reply.has_liked || 0) > 0;
+    const replyLikeClass = replyHasLiked ? 'reply-like-btn liked' : 'reply-like-btn';
+    const replyHeartIcon = replyHasLiked ? 'heartFilled.png' : 'heartOutline.png';
+    const replyHeartAlt = replyHasLiked ? 'Liked' : 'Like';
+
     const replyHTML = `
       <div class="reply" data-reply-id="${replyId}">
         <div class="reply-header">
@@ -970,8 +981,8 @@ function renderRepliesSection(commentEl, replies, replyCount) {
         </div>
         <div class="reply-date">${timeAgo} &middot; ${dateString}${reply.updated_at && reply.created_at && (new Date(reply.updated_at) > new Date(reply.created_at)) ? ' <span class="comment-edited-tag">(editado)</span>' : ''}</div>
         <div class="reply-like-container">
-          <button class="reply-like-btn" onclick="handleReplyLike(this)" data-reply-id="${replyId}">
-            <img src="/assets/images/heartOutline.png" alt="Like" width="12"> 0
+          <button class="${replyLikeClass}" onclick="handleReplyLike(this)" data-reply-id="${replyId}">
+            <img src="/assets/images/${replyHeartIcon}" alt="${replyHeartAlt}" width="12"> ${replyLikesCount}
           </button>
         </div>
       </div>

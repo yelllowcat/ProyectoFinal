@@ -413,7 +413,8 @@ CREATE PROCEDURE sp_get_comments_by_post(
 )
 BEGIN
     SELECT c.*, u.full_name, u.profile_picture,
-        (SELECT COUNT(*) FROM replies r WHERE r.comment_id = c.comment_id AND r.active = 1) as reply_count
+        (SELECT COUNT(*) FROM replies r WHERE r.comment_id = c.comment_id AND r.active = 1) as reply_count,
+        (SELECT COUNT(*) FROM comment_likes cl WHERE cl.comment_id = c.comment_id) as likes_count
     FROM comments c 
     JOIN users u ON c.user_id = u.user_id 
     WHERE c.post_id = p_post_id AND c.active = 1 
@@ -487,7 +488,8 @@ CREATE PROCEDURE sp_get_replies_by_comment(
     IN p_comment_id INT
 )
 BEGIN
-    SELECT r.*, u.full_name, u.profile_picture
+    SELECT r.*, u.full_name, u.profile_picture,
+        (SELECT COUNT(*) FROM reply_likes rl WHERE rl.reply_id = r.reply_id) as likes_count
     FROM replies r
     JOIN users u ON r.user_id = u.user_id
     WHERE r.comment_id = p_comment_id AND r.active = 1
