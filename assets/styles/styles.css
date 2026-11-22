@@ -1776,8 +1776,26 @@ html[data-theme="dark"] .theme-icon-sun {
   opacity: 0.85;
 }
 
+dialog,
+dialog:focus,
+dialog:focus-visible,
+dialog[open],
+.confirm-dialog,
+.confirm-dialog[open] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+dialog::backdrop,
+.confirm-dialog::backdrop {
+  outline: none !important;
+  border: none !important;
+}
+
 .confirm-dialog {
   border: none !important;
+  outline: none !important;
   padding: 0 !important;
   margin: 0 !important;
   position: fixed !important;
@@ -1811,6 +1829,8 @@ html[data-theme="dark"] .theme-icon-sun {
   margin: 0 !important;
   background: transparent !important;
   border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
   color: inherit !important;
 }
 
@@ -1825,6 +1845,57 @@ html[data-theme="dark"] .theme-icon-sun {
   font-family: inherit;
   text-align: center;
   margin: 0 auto;
+  outline: none !important;
+}
+
+.confirm-box:focus,
+.confirm-box:focus-visible {
+  outline: none !important;
+}
+
+.confirm-modal-buttons {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.confirm-action-submit {
+  flex: 1;
+  padding: 11px 18px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #ffffff !important;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+
+.confirm-action-submit:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.confirm-action-cancel {
+  flex: 1;
+  padding: 11px 18px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f1f5f9;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #334155 !important;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.confirm-action-cancel:hover {
+  background: #e2e8f0;
+  color: #0f172a !important;
+}
+
+#confirm-action-btn {
+  color: #ffffff !important;
 }
 
 .confirm-head {
@@ -3926,12 +3997,12 @@ html[data-theme="dark"] .predefined-hashtags-section {
 html[data-theme="dark"] .action-btn {
   background: #0f172a;
   border-color: #334155;
-  color: #cbd5e1;
+  color: #94a3b8;
 }
 
 html[data-theme="dark"] .action-btn:hover {
-  background: rgba(77, 184, 196, 0.16);
-  border-color: rgba(77, 184, 196, 0.35);
+  background: rgba(94, 234, 212, 0.12);
+  border-color: rgba(94, 234, 212, 0.35);
   color: #5eead4;
 }
 
@@ -3939,6 +4010,73 @@ html[data-theme="dark"] .action-btn.liked {
   background: rgba(225, 29, 72, 0.18);
   border-color: rgba(244, 63, 94, 0.4);
   color: #fb7185;
+}
+
+html[data-theme="dark"] .action-btn img {
+  filter: brightness(0) saturate(100%) invert(71%) sepia(8%) saturate(983%) hue-rotate(178deg) brightness(92%) contrast(87%);
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+html[data-theme="dark"] .action-btn:hover img {
+  filter: brightness(0) saturate(100%) invert(83%) sepia(21%) saturate(924%) hue-rotate(119deg) brightness(99%) contrast(93%);
+  opacity: 1;
+}
+
+html[data-theme="dark"] .action-btn.liked img {
+  filter: none !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="dark"] .action-btn.share img {
+  opacity: 0.85;
+}
+
+html[data-theme="dark"] .action-btn.share:hover img {
+  opacity: 1;
+}
+
+html[data-theme="dark"] .comment-like-btn,
+html[data-theme="dark"] .reply-like-btn {
+  background: transparent;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .comment-like-btn:hover,
+html[data-theme="dark"] .reply-like-btn:hover {
+  border-color: rgba(94, 234, 212, 0.35);
+  color: #5eead4;
+}
+
+html[data-theme="dark"] .comment-like-btn img,
+html[data-theme="dark"] .reply-like-btn img {
+  filter: brightness(0) saturate(100%) invert(71%) sepia(8%) saturate(983%) hue-rotate(178deg) brightness(92%) contrast(87%);
+  transition: filter 0.2s ease;
+}
+
+html[data-theme="dark"] .comment-like-btn:hover img,
+html[data-theme="dark"] .reply-like-btn:hover img {
+  filter: brightness(0) saturate(100%) invert(83%) sepia(21%) saturate(924%) hue-rotate(119deg) brightness(99%) contrast(93%);
+}
+
+html[data-theme="dark"] .comment-like-btn.liked,
+html[data-theme="dark"] .reply-like-btn.liked {
+  border-color: rgba(244, 63, 94, 0.4);
+  color: #fb7185;
+}
+
+html[data-theme="dark"] .comment-like-btn.liked img,
+html[data-theme="dark"] .reply-like-btn.liked img {
+  filter: none !important;
+}
+
+html[data-theme="dark"] .feed-post-menu img {
+  filter: brightness(0) saturate(100%) invert(71%) sepia(8%) saturate(983%) hue-rotate(178deg) brightness(92%) contrast(87%);
+  transition: filter 0.2s ease;
+}
+
+html[data-theme="dark"] .feed-post-menu:hover img {
+  filter: brightness(0) saturate(100%) invert(83%) sepia(21%) saturate(924%) hue-rotate(119deg) brightness(99%) contrast(93%);
 }
 
 html[data-theme="dark"] .comment {
@@ -4095,8 +4233,19 @@ html[data-theme="dark"] .search-tab.active {
 
 html[data-theme="dark"] .confirm-box {
   background: #1e293b;
-  border-color: #334155;
+  border: 1px solid #334155;
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+}
+
+html[data-theme="dark"] .confirm-action-cancel {
+  background: #334155;
+  color: #f1f5f9 !important;
+  border-color: #475569;
+}
+
+html[data-theme="dark"] .confirm-action-cancel:hover {
+  background: #475569;
+  color: #ffffff !important;
 }
 
 html[data-theme="dark"] .confirm-head h3 {

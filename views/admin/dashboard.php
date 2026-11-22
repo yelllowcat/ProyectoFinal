@@ -333,25 +333,25 @@ namespace App\views\admin;
                     </select>
                 </div>
 
-                <div class="confirm-actions" style="display: flex; gap: 10px;">
-                    <button type="submit" class="btn-primary" style="flex: 1; padding: 10px; border-radius: 8px; background: #e74c3c; color: white; border: none; cursor: pointer; font-weight: 600;">Aplicar Acción</button>
-                    <button type="button" class="btn-secondary" onclick="document.getElementById('resolve-report-modal').close()" style="flex: 1; padding: 10px; border-radius: 8px; background: #eee; border: none; cursor: pointer; font-weight: 600;">Cancelar</button>
+                <div class="confirm-actions confirm-modal-buttons" style="display: flex; gap: 12px;">
+                    <button type="submit" class="confirm-action-submit" style="background: #e74c3c;">Aplicar Acción</button>
+                    <button type="button" class="confirm-action-cancel" onclick="document.getElementById('resolve-report-modal').close()">Cancelar</button>
                 </div>
             </form>
         </div>
     </dialog>
 
     <dialog id="confirm-delete-report-modal" class="confirm-dialog">
-        <div class="confirm-box" style="max-width: 400px; padding: 20px;">
-            <div class="confirm-head">
-                <h3>Confirmar eliminación</h3>
-                <p class="confirm-subtitle">¿Estás seguro/a de que deseas eliminar este reporte permanentemente?</p>
+        <div class="confirm-box" style="max-width: 400px; padding: 24px;">
+            <div class="confirm-head" style="padding: 0 0 16px;">
+                <h3 style="margin: 0 0 8px;">Confirmar eliminación</h3>
+                <p class="confirm-subtitle" style="margin: 0;">¿Estás seguro/a de que deseas eliminar este reporte permanentemente?</p>
             </div>
-            <div class="confirm-sep"></div>
+            <div class="confirm-sep" style="margin-bottom: 20px;"></div>
             <input type="hidden" id="delete-report-id">
-            <div class="confirm-actions" style="display: flex; gap: 10px;">
-                <button id="btn-confirm-delete-report" class="btn-primary" style="flex: 1; padding: 10px; border-radius: 8px; background: #e74c3c; color: white; border: none; cursor: pointer; font-weight: 600;">Eliminar</button>
-                <button type="button" class="btn-secondary" onclick="document.getElementById('confirm-delete-report-modal').close()" style="flex: 1; padding: 10px; border-radius: 8px; background: #eee; border: none; cursor: pointer; font-weight: 600;">Cancelar</button>
+            <div class="confirm-actions confirm-modal-buttons" style="display: flex; gap: 12px;">
+                <button id="btn-confirm-delete-report" type="button" class="confirm-action-submit" style="background: #e74c3c;">Eliminar</button>
+                <button type="button" class="confirm-action-cancel" onclick="document.getElementById('confirm-delete-report-modal').close()">Cancelar</button>
             </div>
         </div>
     </dialog>

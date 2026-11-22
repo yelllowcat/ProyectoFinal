@@ -10,14 +10,20 @@ use App\Models\FriendModel;
 
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $segments = explode('/', trim($path, '/'));
-$userId = $segments[1] ?? getCurrentUserId();
+$userId = $segments[1] ?? (isAdmin() && !empty($_SESSION['admin_last_viewed_profile_id'])
+    ? (int) $_SESSION['admin_last_viewed_profile_id']
+    : getCurrentUserId());
 
 $userModel = new UserModel();
 $user = $userModel->getUserById($userId);
 
-if (!$user || ($user['role'] ?? '') === 'admin') {
+if (!$user || (($user['role'] ?? '') === 'admin' && !isAdmin())) {
     flash('error', 'Usuario no encontrado');
     redirect('/posts');
+}
+
+if (isAdmin() && (int) $userId !== (int) getCurrentUserId()) {
+    $_SESSION['admin_last_viewed_profile_id'] = (int) $userId;
 }
 
 $postModel = new PostModel();
@@ -94,6 +100,17 @@ $safe_email = safe_output($user['email'] ?? '');
         <?= \App\Components\Alert::render(); ?>
 
         <div class="content-wrapper profile-view-container">
+            <?php if (isAdmin()): ?>
+                <div class="single-post-navigation" style="margin-bottom: 16px;">
+                    <a href="/dashboard" class="btn-back">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        <span>Volver al panel de administración</span>
+                    </a>
+                </div>
+            <?php endif; ?>
             <?php
             $profile = new Profile(
                 $state,

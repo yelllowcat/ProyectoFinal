@@ -5,7 +5,6 @@ namespace App\Controllers;
 use App\Models\UserModel;
 use Exception;
 
-
 class UserController
 {
     private $userModel;
@@ -23,7 +22,11 @@ class UserController
 
         if (!$user || ($user['role'] ?? '') === 'admin') {
             flash('error', 'Usuario no encontrado');
-            redirect('/posts');
+            redirect(isAdmin() ? '/dashboard' : '/posts');
+        }
+
+        if (isAdmin()) {
+            $_SESSION['admin_last_viewed_profile_id'] = (int) $id;
         }
 
         $user['full_name'] = $user['full_name'] ?? '';
@@ -63,60 +66,76 @@ class UserController
     {
         requireAuth();
 
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('/editProfile');
+        }
+
         $userId = $_SESSION['user_id'];
+        $fullName = clean_input($_POST['full_name'] ?? '');
+        $biography = clean_input($_POST['biography'] ?? '');
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $fullName = clean_input($_POST['full_name'] ?? '');
-            $biography = clean_input($_POST['biography'] ?? '');
+        if (empty($fullName) || strlen(trim($fullName)) < 1) {
+            flash('error', 'El nombre debe tener al menos 1 caracteres');
+            redirect('/editProfile');
+        }
 
-            if (empty($fullName) || strlen(trim($fullName)) < 1) {
-                flash('error', 'El nombre debe tener al menos 1 caracteres');
-                redirect('/editProfile');
-            }
+        $oldUser = $this->userModel->getUserById($userId);
+        $profilePicture = $this->processUpdatedProfileImage($oldUser);
 
-            $profilePicture = null;
-            $oldUser = $this->userModel->getUserById($userId);
+        $department = clean_input($_POST['department'] ?? '') ?: null;
+        $career = clean_input($_POST['career'] ?? '') ?: null;
+        $semester = $this->resolveUpdatedSemester($oldUser);
 
-            if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
-                $profilePicture = $this->handleProfileImageUpload($_FILES['profile_picture']);
-                if ($profilePicture && !empty($oldUser['profile_picture']) && $oldUser['profile_picture'] !== 'default_avatar.png') {
-                    $oldPath = __DIR__ . '/../../assets/imagesProfile/' . $oldUser['profile_picture'];
-                    if (file_exists($oldPath)) {
-                        @unlink($oldPath);
-                    }
-                }
-            }
+        $result = $this->userModel->updateUser(
+            $userId,
+            $fullName,
+            $biography,
+            $profilePicture,
+            $department,
+            $career,
+            $semester
+        );
 
-            $safeFullName = clean_input($fullName);
-            $safeBiography = clean_input($biography);
-            $department = clean_input($_POST['department'] ?? '');
-            $career = clean_input($_POST['career'] ?? '');
-            $semester = isset($_POST['semester']) && $_POST['semester'] !== '' ? intval($_POST['semester']) : null;
-            if ($oldUser && ($oldUser['role'] ?? '') === 'teacher') {
-                $semester = null;
-            }
+        if ($result) {
+            $_SESSION['user_name'] = $fullName;
+            $suffix = $profilePicture ? ' con nueva foto de perfil' : '';
+            flash('success', 'Perfil actualizado correctamente' . $suffix);
+            redirect('/profile');
+        }
 
-            $result = $this->userModel->updateUser(
-                $userId,
-                $safeFullName,
-                $safeBiography,
-                $profilePicture,
-                $department ?: null,
-                $career ?: null,
-                $semester
-            );
+        flash('error', 'Error al actualizar el perfil');
+        redirect('/editProfile');
+    }
 
-            if ($result) {
-                $_SESSION['user_name'] = $safeFullName;
-                flash('success', 'Perfil actualizado correctamente' . ($profilePicture ? ' con nueva foto de perfil' : ''));
-                redirect('/profile');
-            } else {
-                flash('error', 'Error al actualizar el perfil');
-                redirect('/editProfile');
+    private function processUpdatedProfileImage($oldUser): ?string
+    {
+        if (!isset($_FILES['profile_picture']) || $_FILES['profile_picture']['error'] !== 0) {
+            return null;
+        }
+
+        $profilePicture = $this->handleProfileImageUpload($_FILES['profile_picture']);
+        $oldPic = $oldUser['profile_picture'] ?? '';
+        if ($profilePicture && !empty($oldPic) && $oldPic !== 'default_avatar.png') {
+            $oldPath = __DIR__ . '/../../assets/imagesProfile/' . $oldPic;
+            if (file_exists($oldPath)) {
+                @unlink($oldPath);
             }
         }
 
-        redirect('/editProfile');
+        return $profilePicture;
+    }
+
+    private function resolveUpdatedSemester($oldUser): ?int
+    {
+        if ($oldUser && ($oldUser['role'] ?? '') === 'teacher') {
+            return null;
+        }
+
+        if (isset($_POST['semester']) && $_POST['semester'] !== '') {
+            return (int) $_POST['semester'];
+        }
+
+        return null;
     }
 
     private function handleProfileImageUpload($imageFile)
@@ -162,7 +181,7 @@ class UserController
         }
     }
 
-        public function changePassword()
+    public function changePassword()
     {
         requireAuth();
 
@@ -273,7 +292,6 @@ class UserController
                 jsonError('Error al eliminar la cuenta de la base de datos.', 500);
                 return;
             }
-
         } catch (Exception $e) {
             error_log("deleteAccount error: " . $e->getMessage());
             jsonError('Ocurrió un error inesperado al eliminar la cuenta.', 500);

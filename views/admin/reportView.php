@@ -298,7 +298,7 @@ $statusBadge = $report['status'] === 'pending'
 
     <div class="report-view-container">
         <div class="report-content">
-            <a href="/dashboard" class="back-to-dashboard">Volver al Dashboard</a>
+            <a href="/dashboard?section=reports" class="back-to-dashboard">Volver a Reportes de Moderación</a>
 
             <!-- Report Header Card -->
             <div class="report-header-card fade-in-up">
@@ -407,16 +407,30 @@ $statusBadge = $report['status'] === 'pending'
     </div>
 
     <dialog id="confirm-action-modal" class="confirm-dialog">
-        <div class="confirm-box" style="max-width: 400px; padding: 20px;">
+        <div class="confirm-box" style="max-width: 400px; padding: 24px;">
+            <div class="confirm-head" style="padding: 0 0 16px;">
+                <h3 id="confirm-action-title" style="margin: 0 0 8px;">Confirmar acción</h3>
+                <p class="confirm-subtitle" id="confirm-action-subtitle" style="margin: 0;">¿Estás seguro?</p>
+            </div>
+            <div class="confirm-sep" style="margin-bottom: 20px;"></div>
+            <div class="confirm-actions confirm-modal-buttons" style="display: flex; gap: 12px;">
+                <button type="button" value="confirm" class="confirm-action-submit" id="confirm-action-btn">Confirmar</button>
+                <button type="button" value="cancel" class="confirm-action-cancel" id="confirm-cancel-btn">Cancelar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="confirm-logout-modal" class="confirm-dialog" aria-labelledby="confirm-logout-title">
+        <div class="confirm-box">
             <div class="confirm-head">
-                <h3 id="confirm-action-title">Confirmar acción</h3>
-                <p class="confirm-subtitle" id="confirm-action-subtitle">¿Estás seguro?</p>
+                <h3 id="confirm-logout-title">Confirmar cierre de sesión</h3>
+                <p class="confirm-subtitle">¿Estás seguro/a de que deseas cerrar sesión?</p>
             </div>
             <div class="confirm-sep"></div>
-            <div class="confirm-actions" style="display: flex; gap: 10px;">
-                <button value="confirm" class="confirm-delete" id="confirm-action-btn">Confirmar</button>
+            <form method="dialog" class="confirm-actions">
+                <button value="confirm" class="confirm-logout">Cerrar sesión</button>
                 <button value="cancel" class="confirm-cancel">Cancelar</button>
-            </div>
+            </form>
         </div>
     </dialog>
 </body>

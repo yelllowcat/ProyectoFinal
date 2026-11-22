@@ -127,4 +127,32 @@ class ReportModelTest extends TestCase
         $remaining = $this->db->query("SELECT COUNT(*) FROM reports")->fetchColumn();
         $this->assertSame(2, (int) $remaining);
     }
+
+    public function testDuplicatePendingReportIsDetectedForSameTarget(): void
+    {
+        $this->db->exec("
+            INSERT INTO reports (reporter_id, comment_id, reason, status, created_at)
+            VALUES (5, 77, 'Spam', 'pending', '2026-01-04 10:00:00')
+        ");
+
+        $reflection = new \ReflectionClass($this->reportModel);
+        $method = $reflection->getMethod('hasPendingDuplicateReport');
+        $method->setAccessible(true);
+
+        $isDuplicate = $method->invoke($this->reportModel, 5, [
+            'reported_user_id' => null,
+            'post_id' => null,
+            'comment_id' => 77,
+            'reply_id' => null,
+        ]);
+        $this->assertTrue($isDuplicate);
+
+        $isDifferentComment = $method->invoke($this->reportModel, 5, [
+            'reported_user_id' => null,
+            'post_id' => null,
+            'comment_id' => 78,
+            'reply_id' => null,
+        ]);
+        $this->assertFalse($isDifferentComment);
+    }
 }

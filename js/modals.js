@@ -147,13 +147,17 @@ function openReportModal(entityType, entityId) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const reportForm = document.getElementById("report-form");
-  if (reportForm) {
+  if (reportForm && !reportForm.dataset.reportBound) {
+    reportForm.dataset.reportBound = "true";
     reportForm.addEventListener("submit", async function (e) {
       e.preventDefault();
-      
+      if (reportForm.dataset.submitting === "true") {
+        return;
+      }
+
       const entityType = document.getElementById("report-entity-type").value;
       const entityId = document.getElementById("report-entity-id").value;
-      
+
       const reasonRadio = document.querySelector('input[name="reason"]:checked');
       if (!reasonRadio) {
         showDialogMessage("Atención", "Por favor selecciona una razón.");
@@ -162,22 +166,28 @@ document.addEventListener("DOMContentLoaded", () => {
       const reason = reasonRadio.value;
       const details = document.getElementById("report-reason-details").value;
       const fullReason = details ? `${reason}: ${details}` : reason;
-      
+
       const formData = new FormData();
       formData.append("reason", fullReason);
-      
+
       if (entityType === "user") formData.append("reported_user_id", entityId);
       if (entityType === "post") formData.append("post_id", entityId);
       if (entityType === "comment") formData.append("comment_id", entityId);
       if (entityType === "reply") formData.append("reply_id", entityId);
-      
+
+      const submitBtn = reportForm.querySelector('button[type="submit"]');
+      reportForm.dataset.submitting = "true";
+      if (submitBtn) {
+        submitBtn.disabled = true;
+      }
+
       try {
         const response = await fetch("/report", {
           method: "POST",
           body: formData
         });
         const result = await response.json();
-        
+
         if (result.success) {
           document.getElementById("report-modal").close();
           showDialogMessage("Éxito", result.data.message || "Reporte enviado correctamente.");
@@ -187,6 +197,11 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         console.error("Error al enviar reporte:", error);
         showDialogMessage("Error", "Ocurrió un error al enviar el reporte.");
+      } finally {
+        reportForm.dataset.submitting = "false";
+        if (submitBtn) {
+          submitBtn.disabled = false;
+        }
       }
     });
   }

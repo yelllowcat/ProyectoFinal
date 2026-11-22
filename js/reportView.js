@@ -20,10 +20,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Logout button
     const logoutBtn = document.getElementById('admin-logout');
+    const confirmLogoutModal = document.getElementById('confirm-logout-modal');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            window.location.href = '/logout';
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirmLogoutModal) {
+                confirmLogoutModal.showModal();
+            } else {
+                window.location.href = '/logout';
+            }
         });
+    }
+    if (confirmLogoutModal) {
+        const confirmActions = confirmLogoutModal.querySelector('.confirm-actions');
+        if (confirmActions) {
+            confirmActions.addEventListener('click', (e) => {
+                const button = e.target.closest('button');
+                if (!button) return;
+                if (button.value === 'confirm') {
+                    window.location.href = '/logout';
+                } else if (button.value === 'cancel') {
+                    confirmLogoutModal.close();
+                }
+            });
+        }
     }
 
     // Moderation buttons
@@ -76,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmSubtitle.textContent = config.subtitle;
             confirmBtn.textContent = config.btnText;
             confirmBtn.style.backgroundColor = config.btnColor;
+            confirmBtn.style.color = '#ffffff';
 
             confirmModal.showModal();
         });

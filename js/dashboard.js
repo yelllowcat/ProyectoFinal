@@ -49,6 +49,13 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchUsersWithMostPosts({ target: document.querySelector('.stat-btn.active') });
     fetchReports();
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const requestedSection = urlParams.get('section') || window.location.hash.replace('#', '');
+    if (requestedSection === 'reports' || requestedSection === 'users' || requestedSection === 'stats') {
+        const tabBtn = document.getElementById(`tab-btn-${requestedSection}`);
+        switchAdminSection(requestedSection, tabBtn);
+    }
+
     const resolveForm = document.getElementById('resolve-report-form');
     if (resolveForm) {
         resolveForm.addEventListener('submit', async function(e) {
@@ -831,6 +838,11 @@ window.switchAdminSection = function (section, btn) {
     } else if (section === 'reports') {
         fetchReports();
     }
+
+    if (window.history && window.history.replaceState) {
+        const nextUrl = section === 'stats' ? '/dashboard' : `/dashboard?section=${section}`;
+        window.history.replaceState(null, '', nextUrl);
+    }
 };
 
 // ==========================================
@@ -915,7 +927,7 @@ window.renderAdminUsersTable = function (users) {
                 <td>
                     <div style="display: flex; gap: 6px; align-items: center;">
                         ${actionBtn}
-                        <a href="/profile/${u.user_id}" class="btn-view-profile-table" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;" target="_blank">Ver</a>
+                        <a href="/profile/${u.user_id}" class="btn-view-profile-table" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Ver</a>
                     </div>
                 </td>
             </tr>

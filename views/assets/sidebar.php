@@ -39,13 +39,31 @@
         <span>Amigos</span>
     </a>
 
-    <a href="/profile" class="menu-item <?php echo ($currentPage === 'profile') ? 'active' : ''; ?>">
+    <?php
+    $sidebarProfileHref = '/profile';
+    if (function_exists('isAdmin') && isAdmin() && !empty($_SESSION['admin_last_viewed_profile_id'])) {
+        $sidebarProfileHref = '/profile/' . (int) $_SESSION['admin_last_viewed_profile_id'];
+    }
+    ?>
+    <a href="<?php echo $sidebarProfileHref; ?>" class="menu-item <?php echo ($currentPage === 'profile') ? 'active' : ''; ?>">
         <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
         </svg>
         <span>Perfil</span>
     </a>
+
+    <?php if (function_exists('isAdmin') && isAdmin()): ?>
+    <a href="/dashboard" class="menu-item <?php echo ($currentPage === 'dashboard') ? 'active' : ''; ?>">
+        <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        <span>Panel Admin</span>
+    </a>
+    <?php endif; ?>
 
     <a href="/settings" class="menu-item <?php echo ($currentPage === 'settings') ? 'active' : ''; ?>">
         <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
